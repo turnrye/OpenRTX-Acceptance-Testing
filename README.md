@@ -103,7 +103,7 @@ feature), add it to `results/` and open a pull request:
 scripts/export-run.sh runs/bandwidth-tx
 ```
 
-It writes `results/<firmware sha>/<radio>/<date-station-suite>/` with the run's `output.xml`, passed
+It writes `results/<firmware sha>/<radio>/<start time>-<station>-<suite>/` with the run's `output.xml`, passed
 through Robot's `rebot` with the `oat.sanitize` pre-rebot modifier, and its `measurements.json`. It
 refuses to overwrite a run, and removes the export again if an absolute path survived, so nothing
 from your machine reaches a commit. See [results/README.md](results/README.md).

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
 # Add a bench run to the results tree, as
-#   <results>/<firmware sha>/<radio>/<date>-<station>-<suite>/
+#   <results>/<firmware sha>/<radio>/<yyyymmdd-hhmmss>-<station>-<suite>/
 #     output.xml         Robot's output, through rebot with oat.sanitize
 #     measurements.json  the run's measurements and operator answers
 # Refuses to overwrite a run, and removes the export again if an absolute path
@@ -31,7 +31,8 @@ m = json.load(open(sys.argv[1]))
 safe = lambda s: re.sub(r"[^A-Za-z0-9._-]", "_", s)
 sha = re.search(r"(?:^|-g)([0-9a-f]{7,40})$", m["firmware"])
 firmware = sha.group(1) if sha else safe(m["firmware"])
-run = safe(f"{m['started'][:10]}-{m['station']}-{m['suite']}")
+start = m["started"][:19].replace("-", "").replace(":", "").replace("T", "-")
+run = safe(f"{start}-{m['station']}-{m['suite']}")
 print(f"{sys.argv[2]}/{firmware}/{m['radio_file']}/{run}")
 PY
 )
