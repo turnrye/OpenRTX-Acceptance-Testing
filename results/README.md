@@ -10,7 +10,7 @@ Exports of acceptance runs that serve as evidence: a release's acceptance run, o
 merged feature. Exploratory and debugging runs stay on the tester's machine.
 
 ```
-results/<firmware sha>/<radio file>/<date>-<station>-<suite>/
+results/<firmware sha>/<radio file>/<yyyymmdd-hhmmss>-<station>-<suite>/
     output.xml          Robot's output, sanitized
     measurements.json   measurements, limit checks and operator answers
 ```
