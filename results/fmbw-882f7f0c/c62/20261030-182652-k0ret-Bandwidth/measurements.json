@@ -1,0 +1,346 @@
+{
+  "schema": 1,
+  "suite": "Bandwidth",
+  "started": "2026-10-30T18:26:52+00:00",
+  "station": "k0ret",
+  "radio": "Retevis C62/C2",
+  "radio_file": "c62",
+  "firmware": "fmbw-882f7f0c",
+  "suite_commit": "2005df1680",
+  "calibration": {
+    "method": "assumed",
+    "measured": "2026-10-20",
+    "expires": "2026-12-31",
+    "sha256": "d55ce4aa0a3c"
+  },
+  "records": [
+    {
+      "test": "FM TX At 25 kHz Stays Within Wide Limits",
+      "kind": "operator",
+      "text": "Set the radio to FM, 445.975 MHz, 25 kHz bandwidth, low power, programming cable out",
+      "answer": ""
+    },
+    {
+      "test": "FM TX At 25 kHz Stays Within Wide Limits",
+      "kind": "capture",
+      "instruction": "Play runs/tx/bench-Bandwidth/tone-1000hz.wav at a fixed volume and distance from the mic, key PTT for 5 s, release. Then key PTT, whistle loudly close to the mic for 5 s, release.",
+      "files": [
+        "capture01.cu8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 10.00414,
+          "duration_s": 8.578936,
+          "carrier_offset_hz": 73695.1796990029,
+          "peak_deviation_hz": 773.9585021391441,
+          "max_deviation_hz": 1224.8285080553505,
+          "rms_deviation_hz": 389.40564698907014,
+          "tone_hz": 1000.0072852844539,
+          "ctcss_hz": 182.27298227960418,
+          "ctcss_deviation_hz": 0.015574908651392614,
+          "occupied_bandwidth_hz": 4000.0,
+          "power_db": -9.896068572998047
+        },
+        {
+          "start_s": 21.006708,
+          "duration_s": 5.89688,
+          "carrier_offset_hz": 73698.31346068578,
+          "peak_deviation_hz": 4775.316924783406,
+          "max_deviation_hz": 5071.247036252576,
+          "rms_deviation_hz": 2814.345576081847,
+          "tone_hz": 1640.8633073191759,
+          "ctcss_hz": 222.0396021569274,
+          "ctcss_deviation_hz": 3.842731763994213,
+          "occupied_bandwidth_hz": 13000.0,
+          "power_db": -9.97317886352539
+        }
+      ]
+    },
+    {
+      "test": "FM TX At 25 kHz Stays Within Wide Limits",
+      "kind": "limit",
+      "field": "peak_deviation_hz",
+      "value": 773.9585021391441,
+      "limit": 5000,
+      "bandwidth": "BW_25",
+      "passed": true
+    },
+    {
+      "test": "FM TX At 25 kHz Stays Within Wide Limits",
+      "kind": "limit",
+      "field": "occupied_bandwidth_hz",
+      "value": 4000.0,
+      "limit": 16000,
+      "bandwidth": "BW_25",
+      "passed": true
+    },
+    {
+      "test": "FM TX At 25 kHz Stays Within Wide Limits",
+      "kind": "limit",
+      "field": "peak_deviation_hz",
+      "value": 4775.316924783406,
+      "limit": 5000,
+      "bandwidth": "BW_25",
+      "passed": true
+    },
+    {
+      "test": "FM TX At 25 kHz Stays Within Wide Limits",
+      "kind": "limit",
+      "field": "occupied_bandwidth_hz",
+      "value": 13000.0,
+      "limit": 16000,
+      "bandwidth": "BW_25",
+      "passed": true
+    },
+    {
+      "test": "FM TX At 12.5 kHz Stays Within Narrow Limits",
+      "kind": "operator",
+      "text": "Set the bandwidth to 12.5 kHz, nothing else changed",
+      "answer": ""
+    },
+    {
+      "test": "FM TX At 12.5 kHz Stays Within Narrow Limits",
+      "kind": "capture",
+      "instruction": "Play the same tone at the same volume and distance, key PTT for 5 s, release. Then key PTT, whistle loudly close to the mic for 5 s, release.",
+      "files": [
+        "capture02.cu8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 7.834452,
+          "duration_s": 5.500348,
+          "carrier_offset_hz": 73686.06015351234,
+          "peak_deviation_hz": 361.5106866561893,
+          "max_deviation_hz": 387.99183200446197,
+          "rms_deviation_hz": 187.05614192429167,
+          "tone_hz": 999.9356102069185,
+          "ctcss_hz": 258.4427544415045,
+          "ctcss_deviation_hz": 0.018811127185873022,
+          "occupied_bandwidth_hz": 2200.0,
+          "power_db": -9.952940940856934
+        },
+        {
+          "start_s": 16.657352,
+          "duration_s": 6.045688,
+          "carrier_offset_hz": 73688.44248108698,
+          "peak_deviation_hz": 2345.43040828494,
+          "max_deviation_hz": 2469.419975500884,
+          "rms_deviation_hz": 1591.970092437518,
+          "tone_hz": 1643.9817638606032,
+          "ctcss_hz": 225.54946140186914,
+          "ctcss_deviation_hz": 0.40781973231102964,
+          "occupied_bandwidth_hz": 6800.0,
+          "power_db": -10.027423858642578
+        }
+      ]
+    },
+    {
+      "test": "FM TX At 12.5 kHz Stays Within Narrow Limits",
+      "kind": "limit",
+      "field": "peak_deviation_hz",
+      "value": 361.5106866561893,
+      "limit": 2500,
+      "bandwidth": "BW_12_5",
+      "passed": true
+    },
+    {
+      "test": "FM TX At 12.5 kHz Stays Within Narrow Limits",
+      "kind": "limit",
+      "field": "occupied_bandwidth_hz",
+      "value": 2200.0,
+      "limit": 11000,
+      "bandwidth": "BW_12_5",
+      "passed": true
+    },
+    {
+      "test": "FM TX At 12.5 kHz Stays Within Narrow Limits",
+      "kind": "limit",
+      "field": "peak_deviation_hz",
+      "value": 2345.43040828494,
+      "limit": 2500,
+      "bandwidth": "BW_12_5",
+      "passed": true
+    },
+    {
+      "test": "FM TX At 12.5 kHz Stays Within Narrow Limits",
+      "kind": "limit",
+      "field": "occupied_bandwidth_hz",
+      "value": 6800.0,
+      "limit": 11000,
+      "bandwidth": "BW_12_5",
+      "passed": true
+    },
+    {
+      "test": "Narrow FM TX Deviates Less Than Wide",
+      "kind": "ratio",
+      "what": "narrow/wide peak deviation",
+      "value": 0.4670931137225185,
+      "low": 0.4,
+      "high": 0.6,
+      "passed": true
+    },
+    {
+      "test": "FM Bandwidth Survives An M17 Round Trip",
+      "kind": "operator",
+      "text": "With 12.5 kHz still set, switch to M17, then back to FM",
+      "answer": ""
+    },
+    {
+      "test": "FM Bandwidth Survives An M17 Round Trip",
+      "kind": "capture",
+      "instruction": "Play the same tone at the same volume and distance, key PTT for 5 s, release.",
+      "files": [
+        "capture03.cu8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 4.618028,
+          "duration_s": 7.135132,
+          "carrier_offset_hz": 73683.33869508594,
+          "peak_deviation_hz": 392.41111952943044,
+          "max_deviation_hz": 512.2369660165904,
+          "rms_deviation_hz": 202.4649807788343,
+          "tone_hz": 999.979561268019,
+          "ctcss_hz": 241.3810775479004,
+          "ctcss_deviation_hz": 0.016054945414474723,
+          "occupied_bandwidth_hz": 2200.0,
+          "power_db": -9.995402336120605
+        }
+      ]
+    },
+    {
+      "test": "FM Bandwidth Survives An M17 Round Trip",
+      "kind": "limit",
+      "field": "peak_deviation_hz",
+      "value": 392.41111952943044,
+      "limit": 2500,
+      "bandwidth": "BW_12_5",
+      "passed": true
+    },
+    {
+      "test": "FM Bandwidth Survives An M17 Round Trip",
+      "kind": "limit",
+      "field": "occupied_bandwidth_hz",
+      "value": 2200.0,
+      "limit": 11000,
+      "bandwidth": "BW_12_5",
+      "passed": true
+    },
+    {
+      "test": "FM Bandwidth Survives An M17 Round Trip",
+      "kind": "ratio",
+      "what": "deviation after M17 / before",
+      "value": 1.0854758490241496,
+      "low": 0.8,
+      "high": 1.25,
+      "passed": true
+    },
+    {
+      "test": "CTCSS Deviation Follows The Bandwidth",
+      "kind": "operator",
+      "text": "Set the bandwidth to 25 kHz and a 100.0 Hz CTCSS tone on transmit",
+      "answer": ""
+    },
+    {
+      "test": "CTCSS Deviation Follows The Bandwidth",
+      "kind": "capture",
+      "instruction": "Key PTT for 5 s without speaking, release.",
+      "files": [
+        "capture04.cu8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 3.180548,
+          "duration_s": 5.322124,
+          "carrier_offset_hz": 73684.90665836787,
+          "peak_deviation_hz": 167.6504483439315,
+          "max_deviation_hz": 180.5068546705841,
+          "rms_deviation_hz": 108.14302820275591,
+          "tone_hz": 0.0,
+          "ctcss_hz": 99.95670764476853,
+          "ctcss_deviation_hz": 152.6784467294851,
+          "occupied_bandwidth_hz": 600.0,
+          "power_db": -9.992748260498047
+        }
+      ]
+    },
+    {
+      "test": "CTCSS Deviation Follows The Bandwidth",
+      "kind": "limit",
+      "field": "ctcss_hz",
+      "value": 99.95670764476853,
+      "limit": "100.0 Hz +-0.5%",
+      "bandwidth": "BW_25",
+      "passed": true
+    },
+    {
+      "test": "CTCSS Deviation Follows The Bandwidth",
+      "kind": "limit",
+      "field": "ctcss_deviation_hz",
+      "value": 152.6784467294851,
+      "limit": "500-1000 Hz",
+      "bandwidth": "BW_25",
+      "passed": false
+    },
+    {
+      "test": "CTCSS Deviation Follows The Bandwidth",
+      "kind": "operator",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    }
+  ],
+  "operator": [
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 445.975 MHz, 25 kHz bandwidth, low power, programming cable out",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Play runs/tx/bench-Bandwidth/tone-1000hz.wav at a fixed volume and distance from the mic, key PTT for 5 s, release. Then key PTT, whistle loudly close to the mic for 5 s, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the bandwidth to 12.5 kHz, nothing else changed",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Play the same tone at the same volume and distance, key PTT for 5 s, release. Then key PTT, whistle loudly close to the mic for 5 s, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "With 12.5 kHz still set, switch to M17, then back to FM",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Play the same tone at the same volume and distance, key PTT for 5 s, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the bandwidth to 25 kHz and a 100.0 Hz CTCSS tone on transmit",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT for 5 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    }
+  ],
+  "bands": {
+    "70cm": 445975000
+  }
+}

@@ -1,0 +1,229 @@
+{
+  "schema": 1,
+  "suite": "Bandwidth",
+  "started": "2026-10-30T18:35:41+00:00",
+  "station": "k0ret",
+  "radio": "Retevis C62/C2",
+  "radio_file": "c62",
+  "firmware": "fmbw-882f7f0c",
+  "suite_commit": "2005df1680",
+  "calibration": {
+    "method": "assumed",
+    "measured": "2026-10-20",
+    "expires": "2026-12-31",
+    "sha256": "d55ce4aa0a3c"
+  },
+  "records": [
+    {
+      "test": "FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "kind": "operator",
+      "text": "Set the bandwidth to 25 kHz, volume to a comfortable level",
+      "answer": ""
+    },
+    {
+      "test": "FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "kind": "transmit",
+      "deviation_hz": 3000.0,
+      "tone_hz": 1000.0,
+      "ctcss_hz": 0.0
+    },
+    {
+      "test": "FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "kind": "assertion",
+      "text": "The radio plays a clean, steady 1 kHz tone",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "kind": "transmit",
+      "deviation_hz": 5000.0,
+      "tone_hz": 1000.0,
+      "ctcss_hz": 0.0
+    },
+    {
+      "test": "FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "kind": "assertion",
+      "text": "The radio plays the tone louder and still undistorted",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "kind": "operator",
+      "text": "Set the bandwidth to 12.5 kHz, volume unchanged",
+      "answer": ""
+    },
+    {
+      "test": "FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "kind": "transmit",
+      "deviation_hz": 1500.0,
+      "tone_hz": 1000.0,
+      "ctcss_hz": 0.0
+    },
+    {
+      "test": "FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "kind": "assertion",
+      "text": "The radio plays a clean, steady 1 kHz tone",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "kind": "transmit",
+      "deviation_hz": 2500.0,
+      "tone_hz": 1000.0,
+      "ctcss_hz": 0.0
+    },
+    {
+      "test": "FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "kind": "assertion",
+      "text": "The radio plays the tone louder and still undistorted",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "kind": "observation",
+      "text": "Compared with 25 kHz at 5 kHz deviation, is this quieter, the same, or louder?",
+      "answer": "same"
+    },
+    {
+      "test": "FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "kind": "operator",
+      "text": "Set the bandwidth to 12.5 kHz, volume comfortable",
+      "answer": ""
+    },
+    {
+      "test": "FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "kind": "transmit",
+      "deviation_hz": 1500.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": 12500.0,
+      "interferer_db": 30.0,
+      "interferer": false,
+      "interferer_deviation_hz": 2500.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 13.270418442160764
+    },
+    {
+      "test": "FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "kind": "assertion",
+      "text": "The wanted signal alone: a clean, steady 1 kHz tone",
+      "passed": false,
+      "note": "a little bit of scratchy noise in the tone that I hear"
+    },
+    {
+      "test": "FM RX At 25 kHz Rejects An Adjacent Channel",
+      "kind": "operator",
+      "text": "Set the bandwidth to 25 kHz",
+      "answer": ""
+    },
+    {
+      "test": "FM RX At 25 kHz Rejects An Adjacent Channel",
+      "kind": "transmit",
+      "deviation_hz": 3000.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": 25000.0,
+      "interferer_db": 30.0,
+      "interferer": false,
+      "interferer_deviation_hz": 5000.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 13.270418442160764
+    },
+    {
+      "test": "FM RX At 25 kHz Rejects An Adjacent Channel",
+      "kind": "assertion",
+      "text": "The wanted signal alone: a clean, steady 1 kHz tone",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "FM RX At 25 kHz Rejects An Adjacent Channel",
+      "kind": "transmit",
+      "deviation_hz": 3000.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": 25000.0,
+      "interferer_db": 30.0,
+      "interferer": true,
+      "interferer_deviation_hz": 5000.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 13.270418442160764
+    },
+    {
+      "test": "FM RX At 25 kHz Rejects An Adjacent Channel",
+      "kind": "assertion",
+      "text": "You hear only the steady 1 kHz tone: no 400 Hz tone and no noise from the channel above",
+      "passed": false,
+      "note": "a little bit of scratch"
+    }
+  ],
+  "operator": [
+    {
+      "kind": "instruct",
+      "text": "Set the bandwidth to 25 kHz, volume to a comfortable level",
+      "answer": ""
+    },
+    {
+      "kind": "confirm",
+      "text": "The radio plays a clean, steady 1 kHz tone",
+      "answer": "yes"
+    },
+    {
+      "kind": "confirm",
+      "text": "The radio plays the tone louder and still undistorted",
+      "answer": "yes"
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the bandwidth to 12.5 kHz, volume unchanged",
+      "answer": ""
+    },
+    {
+      "kind": "confirm",
+      "text": "The radio plays a clean, steady 1 kHz tone",
+      "answer": "yes"
+    },
+    {
+      "kind": "confirm",
+      "text": "The radio plays the tone louder and still undistorted",
+      "answer": "yes"
+    },
+    {
+      "kind": "ask",
+      "text": "Compared with 25 kHz at 5 kHz deviation, is this quieter, the same, or louder?",
+      "answer": "same"
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the bandwidth to 12.5 kHz, volume comfortable",
+      "answer": ""
+    },
+    {
+      "kind": "confirm",
+      "text": "The wanted signal alone: a clean, steady 1 kHz tone",
+      "answer": "no: a little bit of scratchy noise in the tone that I hear"
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the bandwidth to 25 kHz",
+      "answer": ""
+    },
+    {
+      "kind": "confirm",
+      "text": "The wanted signal alone: a clean, steady 1 kHz tone",
+      "answer": "yes"
+    },
+    {
+      "kind": "confirm",
+      "text": "You hear only the steady 1 kHz tone: no 400 Hz tone and no noise from the channel above",
+      "answer": "no: a little bit of scratch"
+    }
+  ],
+  "bands": {
+    "70cm": 445975000
+  }
+}
