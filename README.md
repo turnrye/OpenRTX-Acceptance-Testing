@@ -114,7 +114,9 @@ GitHub Pages publishes `results/` on every push to `main` (`.github/workflows/pa
 standard tools: Robot's `rebot` writes each run's `log.html` and `report.html`, and
 [robotframework-dashboard](https://marketsquare.github.io/robotframework-dashboard/) is the front
 page, with every run grouped by radio, filterable by firmware, radio and the suite metadata, and
-linking to each run's log.
+linking to each run's log. Each log links to its suite on GitHub as it was when the run was made,
+and to that commit (`oat.sanitize.SourceLink`); a run made from a commit that was never pushed
+links to the suite on `main` instead, so push before you run.
 
 ## Layout
 

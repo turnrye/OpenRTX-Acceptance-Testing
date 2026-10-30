@@ -3,7 +3,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 # Publishes the results website with the standard tools: rebot writes each
-# run's log and report, and robotframework-dashboard indexes every run,
+# run's log and report (linked to its suite on GitHub by oat.sanitize.SourceLink),
+# and robotframework-dashboard indexes every run,
 # grouped by radio, filterable by firmware and radio (and by the suite
 # metadata: firmware name, station, calibration), linking to each run's log.
 # Runs under results/ are already sanitized (scripts/export-run.sh).
@@ -13,7 +14,7 @@ name: Results site
 on:
   push:
     branches: [main]
-    paths: ["results/**", ".github/workflows/pages.yml"]
+    paths: ["results/**", "src/oat/sanitize.py", ".github/workflows/pages.yml"]
   workflow_dispatch:
 
 permissions:
@@ -30,7 +31,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # Commits of merged pull requests, so logs can link to the suite as it
+      # ran (oat.sanitize.SourceLink)
+      - run: git fetch origin '+refs/pull/*/head:refs/remotes/pull/*'
       - uses: astral-sh/setup-uv@v6
+      - run: uv sync
       - name: Build the site
         run: |
           set -euo pipefail
@@ -41,10 +48,11 @@ jobs:
             firmware=$(cut -d/ -f2 <<< "$dir")
             radio=$(cut -d/ -f3 <<< "$dir")
             run=$(basename "$dir")
-            # rebot exits with the number of failed tests
-            uvx --from robotframework rebot --outputdir "_site/$dir" \
-              --output NONE --log log.html --report report.html "$out" \
-              > /dev/null || [ $? -le 250 ]
+            # rebot exits with the number of failed tests. SourceLink links
+            # the log to the suite on GitHub at the run's commit.
+            uv run rebot --prerebotmodifier oat.sanitize.SourceLink \
+              --outputdir "_site/$dir" --output NONE --log log.html \
+              --report report.html "$out" > /dev/null || [ $? -le 250 ]
             # The dashboard names a run after its file, output_<alias>.xml
             cp "$out" "output_${firmware}_${run}.xml"
             uvx --from robotframework-dashboard robotdashboard \
