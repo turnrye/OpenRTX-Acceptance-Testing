@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Rebot 7.5 (Python 3.13.13 on darwin)" generated="2026-10-30T18:44:28.328683" rpa="false" schemaversion="5">
+<suite id="s1" name="Bandwidth" source="acceptance/fm/bandwidth.robot">
+<kw name="Open Bench" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T14:23:44.510691" level="INFO">Results in runs/rx-adjacent/bench-Bandwidth</msg>
+<arg>${BENCH}</arg>
+<arg>${CALIBRATION}</arg>
+<arg>${RADIO}</arg>
+<arg>${FIRMWARE}</arg>
+<doc>Load the bench, its calibration and the radio file, and prepare the
+instruments. All four are mandatory and differ from tester to tester,
+so suites take them from the command line (-v BENCH:... and so on).
+`firmware` names what the radio runs, such as a git describe.</doc>
+<status status="PASS" start="2026-10-30T14:23:44.507223" elapsed="0.003502"/>
+</kw>
+<test id="s1-t1" name="FM RX At 12.5 kHz Rejects An Adjacent Channel" line="108">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the bandwidth to 12.5 kHz, volume comfortable</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T14:23:44.510911" elapsed="4.536405"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T14:23:49.173971" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>1500</arg>
+<arg>12500</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>2500</arg>
+<arg>interferer=off</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T14:23:49.047861" elapsed="0.126498"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The wanted signal alone: a clean, steady 1 kHz tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T14:23:49.174498" elapsed="15.154892"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T14:24:04.329687" elapsed="0.004414"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T14:24:04.508836" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>1500</arg>
+<arg>12500</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>2500</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T14:24:04.334328" elapsed="0.174854"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T14:24:16.842561" level="FAIL">Operator: You hear only the steady 1 kHz tone: no 400 Hz tone and no noise from the channel above -&gt; no (dont hear the tone but do hear some slight white noise)</msg>
+<arg>You hear only the steady 1 kHz tone: no 400 Hz tone and no noise from the channel above</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="FAIL" start="2026-10-30T14:24:04.509318" elapsed="12.338421">Operator: You hear only the steady 1 kHz tone: no 400 Hz tone and no noise from the channel above -&gt; no (dont hear the tone but do hear some slight white noise)</status>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="NOT RUN" start="2026-10-30T14:24:16.848036" elapsed="0.000028"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>1500</arg>
+<arg>-12500</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>2500</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="NOT RUN" start="2026-10-30T14:24:16.848156" elapsed="0.000013"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>With the interferer on the channel below: still only the 1 kHz tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="NOT RUN" start="2026-10-30T14:24:16.848232" elapsed="0.000009"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T14:24:16.848687" elapsed="0.004260"/>
+</kw>
+<tag>adjacent</tag>
+<tag>fm</tag>
+<tag>manual</tag>
+<tag>rx</tag>
+<status status="FAIL" start="2026-10-30T14:23:44.510773" elapsed="32.342331">Operator: You hear only the steady 1 kHz tone: no 400 Hz tone and no noise from the channel above -&gt; no (dont hear the tone but do hear some slight white noise)</status>
+</test>
+<test id="s1-t2" name="FM RX At 25 kHz Rejects An Adjacent Channel" line="121">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the bandwidth to 25 kHz</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T14:24:16.853833" elapsed="6.381143"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T14:24:23.350053" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>3000</arg>
+<arg>25000</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>5000</arg>
+<arg>interferer=off</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T14:24:23.235350" elapsed="0.115036"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The wanted signal alone: a clean, steady 1 kHz tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T14:24:23.350528" elapsed="1.933075"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T14:24:25.283825" elapsed="0.004085"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T14:24:25.458991" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>3000</arg>
+<arg>25000</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>5000</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T14:24:25.288002" elapsed="0.171341"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T14:24:33.767567" level="FAIL">Operator: You hear only the steady 1 kHz tone: no 400 Hz tone and no noise from the channel above -&gt; no (don't hear the tone but do hear some slight white noise)</msg>
+<arg>You hear only the steady 1 kHz tone: no 400 Hz tone and no noise from the channel above</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="FAIL" start="2026-10-30T14:24:25.459474" elapsed="8.308592">Operator: You hear only the steady 1 kHz tone: no 400 Hz tone and no noise from the channel above -&gt; no (don't hear the tone but do hear some slight white noise)</status>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="NOT RUN" start="2026-10-30T14:24:33.768231" elapsed="0.000020"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>3000</arg>
+<arg>12500</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>2500</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="NOT RUN" start="2026-10-30T14:24:33.768521" elapsed="0.000012"/>
+</kw>
+<kw name="Operator Reports" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>With a 12.5 kHz neighbour this close, do you hear the 1 kHz tone only, both tones, or mostly 400 Hz?</arg>
+<doc>Ask the operator for a value or an observation.</doc>
+<status status="NOT RUN" start="2026-10-30T14:24:33.768603" elapsed="0.000010"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T14:24:33.768807" elapsed="0.003968"/>
+</kw>
+<tag>adjacent</tag>
+<tag>fm</tag>
+<tag>manual</tag>
+<tag>rx</tag>
+<status status="FAIL" start="2026-10-30T14:24:16.853469" elapsed="16.919370">Operator: You hear only the steady 1 kHz tone: no 400 Hz tone and no noise from the channel above -&gt; no (don't hear the tone but do hear some slight white noise)</status>
+</test>
+<kw name="Close Bench" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the instruments and write results.json.</doc>
+<status status="PASS" start="2026-10-30T14:24:33.773366" elapsed="0.016949"/>
+</kw>
+<doc>FM follows the 12.5/25 kHz channel bandwidth setting, on transmit
+and on receive.
+
+Transmit is measured from the SDR capture. Receive is judged by the
+operator, until the radio can report its own audio. The programming
+cable stays out throughout: it disconnects the mic and the speaker.
+
+To measure stock firmware as a reference, run with --exclude m17 and
+compare the two exports with oat compare.</doc>
+<meta name="Calibration">assumed, measured 2026-10-20 (d55ce4aa0a3c)</meta>
+<meta name="Firmware">fmbw-882f7f0c</meta>
+<meta name="Radio">Retevis C62/C2 (c62)</meta>
+<meta name="Station">k0ret</meta>
+<meta name="Suite commit">20efc739f8</meta>
+<status status="FAIL" start="2026-10-30T14:23:43.804550" elapsed="49.985872"/>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="2" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="0" fail="2" skip="0">adjacent</stat>
+<stat pass="0" fail="2" skip="0">fm</stat>
+<stat pass="0" fail="2" skip="0">manual</stat>
+<stat pass="0" fail="2" skip="0">rx</stat>
+</tag>
+<suite>
+<stat name="Bandwidth" id="s1" pass="0" fail="2" skip="0">Bandwidth</stat>
+</suite>
+</statistics>
+<errors>
+<msg time="2026-10-30T14:23:49.173971" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<msg time="2026-10-30T14:24:04.508836" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<msg time="2026-10-30T14:24:23.350053" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<msg time="2026-10-30T14:24:25.458991" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+</errors>
+</robot>
