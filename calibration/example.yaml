@@ -1,0 +1,28 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# A bench calibration: the loss of each RF path, by frequency, as measured on
+# that bench. Copy to calibration/<name>.local.yaml (ignored by git), measure
+# your own paths and fill them in. Results record the method and dates, and a
+# fingerprint of this file, but never its values.
+
+# How the losses were found: vna, power-meter, or assumed (from attenuator
+# labels; fine for tests that don't depend on absolute levels)
+method: vna
+measured: 2026-10-20
+expires: 2027-04-20
+
+paths:
+  # Radio antenna port to the receiver input: the attenuators that keep the
+  # radio's transmitter from damaging the SDR
+  to_receiver:
+    # A two-port VNA export, relative to this file; loss is -S21
+    touchstone: to_receiver.local.s2p
+  # Transmitter output to the radio antenna port
+  from_transmitter:
+    # Or a table of [frequency Hz, loss dB], interpolated between points.
+    # A single point is a flat loss.
+    points:
+      - [144000000, 60.1]
+      - [440000000, 60.4]

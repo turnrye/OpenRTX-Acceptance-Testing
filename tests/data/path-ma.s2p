@@ -1,0 +1,4 @@
+! The same path as magnitude-angle, frequencies in Hz
+# HZ S MA R 50
+140000000 0.03 0 0.001 10 0.001 10 0.03 0
+450000000 0.03 0 0.000891251 10 0.000891251 10 0.03 0

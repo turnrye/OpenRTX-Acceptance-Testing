@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Calibration of the simulated bench: flat, assumed losses.
+
+method: assumed
+measured: 2026-10-30
+expires: 2099-12-31
+
+paths:
+  to_receiver:
+    points:
+      - [0, 60]
+  from_transmitter:
+    points:
+      - [0, 60]

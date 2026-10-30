@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Robot Framework argument file for a bench. Copy to bench/<name>.local.args
+# (ignored by git), point it at your bench, calibration and radio, then run
+#
+#   uv run robot -A bench/<name>.local.args -v FIRMWARE:<git describe> \
+#       -d runs/<name> [--include tx] acceptance/fm/bandwidth.robot
+#
+# The firmware and the output folder change per run, so they stay on the
+# command line. The radio file appears twice: once for the suite, once for
+# oat.expand, which repeats per-band tests on every band it lists.
+
+--prerunmodifier oat.expand.Expand:radios/c62.yaml
+--variable RADIO:radios/c62.yaml
+--variable BENCH:bench/example.yaml
+--variable CALIBRATION:calibration/example.yaml

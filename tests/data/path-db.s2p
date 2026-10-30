@@ -1,0 +1,4 @@
+! Two-port VNA export, S21 in dB: 60 dB loss at 140 MHz, 61 dB at 450 MHz
+# MHz S DB R 50
+140 -30 0 -60 0 -60 0 -30 0
+450 -30 0 -61 0 -61 0 -30 0

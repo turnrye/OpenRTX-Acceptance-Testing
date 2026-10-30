@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# A bench without hardware: synthetic captures and scripted operator answers.
+
+station: sim
+
+receiver:
+  type: sim
+  rate: 250000
+  tune_offset_hz: -75000
+
+transmitter:
+  type: sim
+  rate: 2000000
+  tune_offset_hz: -250000
+
+operator:
+  type: scripted
+  default: "yes"
+

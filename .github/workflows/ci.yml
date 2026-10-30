@@ -1,0 +1,36 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync
+      - run: uv run pytest
+      - name: Robot self-test on the simulated bench
+        run: uv run robot --outputdir runs/selftest --xunit xunit.xml acceptance/selftest.robot
+      - name: Suites resolve their keywords
+        run: >-
+          uv run robot --dryrun --outputdir runs/dryrun
+          --prerunmodifier oat.expand.Expand:radios/c62.yaml
+          -v RADIO:radios/c62.yaml -v BENCH:bench/sim.yaml
+          -v CALIBRATION:calibration/sim.yaml -v FIRMWARE:dryrun acceptance
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: robot-results
+          path: runs/
+  reuse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: fsfe/reuse-action@v5

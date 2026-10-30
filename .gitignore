@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+/runs/
+*.cs8
+*.u8
+!tests/data/*.u8
+bench/*.local.*
+.claude/
+calibration/*.local.*
+_site/

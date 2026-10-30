@@ -1,0 +1,4 @@
+! The same path as real-imaginary, frequencies in GHz, with trailing comments
+# GHz S RI R 50
+0.14 0.03 0 0.001 0 0.001 0 0.03 0 ! 60 dB
+0.45 0.03 0 0 0.000891251 0 0.000891251 0.03 0

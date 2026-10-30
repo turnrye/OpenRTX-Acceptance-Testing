@@ -1,0 +1,30 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+[project]
+name = "openrtx-acceptance-testing"
+version = "0.1.0"
+description = "Acceptance tests for OpenRTX radios, driven by SDRs and an operator"
+readme = "README.md"
+license = "GPL-3.0-or-later"
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=1.26",
+    "scipy>=1.11",
+    "pyyaml>=6",
+    "robotframework>=7",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/oat"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

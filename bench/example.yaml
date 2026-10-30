@@ -1,0 +1,29 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# A bench: the instruments around the radio under test. The losses of the
+# cables and attenuators between them are in a calibration file instead.
+# Copy to bench/<name>.local.yaml (ignored by git) and edit for your setup.
+
+# Short public name for this bench, recorded in results
+station: my-bench
+
+receiver:
+  type: rtlsdr          # rtlsdr, hackrf, sim or replay
+  gain_db: 0
+  rate: 250000          # samples/s; 2000000 or more for a HackRF
+  # Tune below the signal, so the receiver's DC spike stays off the channel
+  tune_offset_hz: -75000
+
+transmitter:
+  type: hackrf          # hackrf or sim
+  tx_vga_db: 0          # 0-47 dB; the RF amp stays off unless amp: true
+  amp: false
+  rate: 2000000
+  tune_offset_hz: -250000
+
+operator:
+  type: console         # console, or file to answer prompts through files
+  directory: runs/operator
+
