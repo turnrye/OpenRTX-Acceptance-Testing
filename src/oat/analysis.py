@@ -14,6 +14,8 @@ from scipy.io import wavfile
 # Working rate for analysis: wide enough for a 25 kHz channel and its
 # sidebands, small enough to keep minute-long captures fast
 ANALYSIS_RATE = 250e3
+# Low-pass filter length when decimating, per step of the decimation factor
+DECIMATION_TAPS_PER_STEP = 20
 # Smoothing window of the power envelope used to find transmissions
 ENVELOPE_S = 1e-3
 # Key-up and key-down transients skipped at each end of a transmission
@@ -55,19 +57,34 @@ class FmMeasurement:
         return asdict(self)
 
 
-def to_analysis_rate(iq: np.ndarray, rate: float,
+def to_analysis_rate(iq, rate: float,
                      offset_hz: float) -> tuple[np.ndarray, float, float]:
     """
-    Decimate a capture to about ANALYSIS_RATE, first moving a signal at
-    offset_hz to the centre so decimation keeps it. Returns the samples, their
-    rate and the signal's offset in them.
+    Decimate a capture, an array or blocks of one, to about ANALYSIS_RATE,
+    first moving a signal at offset_hz to the centre so decimation keeps it.
+    Returns the samples, their rate and the signal's offset in them.
     """
+    blocks = [iq] if isinstance(iq, np.ndarray) else iq
     factor = int(rate // ANALYSIS_RATE)
     if factor <= 1:
-        return iq, rate, offset_hz
-    n = np.arange(len(iq))
-    centred = iq * np.exp(-2j * np.pi * offset_hz * n / rate)
-    return (signal.resample_poly(centred, 1, factor).astype(np.complex64),
+        parts = list(blocks)
+        return (np.concatenate(parts) if parts
+                else np.zeros(0, dtype=np.complex64)), rate, offset_hz
+    taps = signal.firwin(DECIMATION_TAPS_PER_STEP * factor + 1, 1 / factor)
+    # Overlap-save: each block is filtered with the end of the one before
+    history = np.zeros(len(taps) - 1, dtype=np.complex64)
+    out, done = [], 0
+    for block in blocks:
+        n = done + np.arange(len(block))
+        mixed = block * np.exp(-2j * np.pi * (offset_hz / rate) * n
+                               ).astype(np.complex64)
+        padded = np.concatenate([history, mixed])
+        filtered = signal.oaconvolve(padded, taps.astype(np.float32),
+                                     mode="valid")
+        history = padded[len(padded) - len(history):]
+        out.append(filtered[(-done) % factor::factor].astype(np.complex64))
+        done += len(block)
+    return (np.concatenate(out) if out else np.zeros(0, dtype=np.complex64),
             rate / factor, 0.0)
 
 
@@ -206,12 +223,13 @@ def measure_fm(iq: np.ndarray, rate: float, start: int, stop: int,
     )
 
 
-def measure_capture(iq: np.ndarray, rate: float, nominal_offset_hz: float,
+def measure_capture(iq, rate: float, nominal_offset_hz: float,
                     min_duration_s: float = 1.0,
                     audio_dir: Path | None = None) -> list[FmMeasurement]:
     """
-    Measure every FM transmission in a capture. With audio_dir, also write
-    each one's audio there as tx<N>.wav, counting from 1.
+    Measure every FM transmission in a capture, an array or blocks of one.
+    With audio_dir, also write each one's audio there as tx<N>.wav, counting
+    from 1.
     """
     iq, rate, offset = to_analysis_rate(iq, rate, nominal_offset_hz)
     spans = find_transmissions(iq, rate, min_duration_s)

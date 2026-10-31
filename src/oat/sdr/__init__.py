@@ -17,7 +17,7 @@ def make_receiver(cfg: dict) -> Receiver:
     if kind == "rtlsdr":
         return RtlSdrReceiver(cfg.get("gain_db", 0.0), cfg.get("device", 0))
     if kind == "hackrf":
-        return HackRFReceiver(cfg.get("lna_db", 16), cfg.get("vga_db", 20),
+        return HackRFReceiver(cfg.get("lna_db", 0), cfg.get("vga_db", 0),
                               cfg.get("amp", False), cfg.get("serial"))
     if kind == "sim":
         return SimReceiver()

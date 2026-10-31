@@ -34,6 +34,21 @@ def read_iq(path: Path, fmt: IqFormat) -> np.ndarray:
     return (raw[0::2] + 1j * raw[1::2]).astype(np.complex64)
 
 
+def iter_iq(path: Path, fmt: IqFormat, samples: int = 1 << 20):
+    """Read an IQ file as read_iq does, a block of samples at a time."""
+    dtype = np.uint8 if fmt == IqFormat.CU8 else np.int8
+    with open(path, "rb") as f:
+        while True:
+            raw = np.fromfile(f, dtype=dtype, count=2 * samples)
+            if not len(raw):
+                return
+            raw = raw.astype(np.float32)
+            raw = ((raw - CU8_ZERO) / CU8_ZERO if fmt == IqFormat.CU8
+                   else raw / CS8_FULL)
+            raw = raw[: len(raw) // 2 * 2]
+            yield (raw[0::2] + 1j * raw[1::2]).astype(np.complex64)
+
+
 def write_iq(path: Path, iq: np.ndarray, fmt: IqFormat) -> None:
     """Write complex samples scaled to about +-1, clipping at full scale."""
     out = np.empty(2 * len(iq), dtype=np.float32)

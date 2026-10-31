@@ -58,12 +58,16 @@ class HackRFTransmitter(Transmitter):
 
 
 class HackRFReceiver(Receiver):
-    """HackRF recording to a cs8 file."""
+    """
+    HackRF recording to a cs8 file. Gains start at their minimum: a radio
+    through a bench's attenuators still arrives far above what an 8-bit
+    converter needs.
+    """
 
-    # HackRF One absolute maximum RF input
-    max_input_dbm = 10.0
+    # HackRF One's documented maximum RF input; more can damage it
+    max_input_dbm = -5.0
 
-    def __init__(self, lna_db: int = 16, vga_db: int = 20, amp: bool = False,
+    def __init__(self, lna_db: int = 0, vga_db: int = 0, amp: bool = False,
                  serial: str | None = None):
         self.lna_db = lna_db
         self.vga_db = vga_db

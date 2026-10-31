@@ -58,6 +58,14 @@ without them stops before any instrument starts. Tags select what runs: `--inclu
 Before anything starts, the run shows its plan: the radio and firmware, the bench, each band's
 frequency and calibrated losses, which way the attenuator chain must face, and the tests to run.
 
+### One SDR or two
+
+A HackRF can both capture the radio and transmit into it, so with `type: hackrf` for both the
+receiver and the transmitter (`bench/example.yaml` shows how), the attenuator chain stays between the
+radio and the HackRF for the whole run. With separate instruments, such as an RTL-SDR receiving and
+a HackRF transmitting, the transmit tests on every band run first, then a prompt asks for the chain
+to move, then the receive tests run.
+
 Each run writes Robot's `report.html`, `log.html` and `output.xml` to the output directory, with the
 firmware, radio, station and calibration as suite metadata. Next to them, `bench-<suite>/` holds the
 raw captures, the WAV audio of each transmission and `measurements.json`, with every measurement,
@@ -69,9 +77,10 @@ for each transmission's audio.
 A radio file (`radios/`) says what the radio has: its `bands`, each with the frequency tests use,
 its `modes`, and the limits tests check. Tests say what they need with tags: `mode:fm`, `mode:m17`,
 and `per-band` for tests to repeat on every band. `oat.expand`, the pre-run modifier in the argument
-file, fits the suite to the radio: each per-band test is repeated per band, grouped by band and
-named for it (`2m: FM TX At 25 kHz ...`, tagged `band:2m`), and tests needing a mode the radio lacks
-are left out.
+file, fits the suite to the radio: each per-band test is repeated per band, named for it
+(`2m: FM TX At 25 kHz ...`, tagged `band:2m`), and tests needing a mode the radio lacks are left
+out. Transmit tests (`tx`) on every band come before receive tests (`rx`), grouped by band within
+each.
 
 ### Operator prompts
 
