@@ -1,0 +1,34 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Retevis C2 on GMRS: for its stock firmware, which only transmits on GMRS
+# channels. The same hardware and limits as radios/c62.yaml.
+
+name: Retevis C2 (GMRS)
+max_tx_power_dbm: 37          # 5 W
+
+# GMRS channel 19 (462.650 MHz), the channel stock-firmware measurements
+# have used. FM only: stock C2 firmware has no M17.
+bands:
+  gmrs:
+    frequency_hz: 462650000
+modes: [fm]
+
+fm:
+  # Limits per channel bandwidth, keyed as OpenRTX names them. These are
+  # acceptance criteria, not regulations. Peak deviation is the 99.9th
+  # percentile; occupied bandwidth holds 99% of the power, and its limit is
+  # the necessary bandwidth of the usual emission designators (11K0F3E and
+  # 16K0F3E). CTCSS deviation follows TIA-603-E table 75 (nominal 350 and
+  # 500 Hz).
+  BW_12_5:
+    max_peak_deviation_hz: 2500
+    max_occupied_bandwidth_hz: 11000
+    ctcss_deviation_hz: [350, 600]
+  BW_25:
+    max_peak_deviation_hz: 5000
+    max_occupied_bandwidth_hz: 16000
+    ctcss_deviation_hz: [500, 1000]
+  # Largest CTCSS frequency error, as a fraction of the tone
+  ctcss_frequency_tolerance: 0.005
