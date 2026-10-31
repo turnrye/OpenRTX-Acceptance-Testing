@@ -83,6 +83,7 @@ class OpenRTXAcceptance:
         self.radio = None
         self.radio_file = None
         self.firmware = None
+        self.hardware = None
         self.suite = None
         self.started = None
         self.output_dir = None
@@ -97,16 +98,18 @@ class OpenRTXAcceptance:
 
     @keyword
     def open_bench(self, bench: str, calibration: str, radio: str,
-                   firmware: str):
+                   firmware: str, hardware: str):
         """
         Load the bench, its calibration and the radio file, and prepare the
-        instruments. All four are mandatory and differ from tester to tester,
+        instruments. All five are mandatory and differ from tester to tester,
         so suites take them from the command line (-v BENCH:... and so on).
-        `firmware` names what the radio runs, such as a git describe.
+        `firmware` names what the radio runs, such as a git describe;
+        `hardware` names the unit, by model and serial number, since units of
+        one model measure differently.
         """
         missing = [name for name, value in (
             ("BENCH", bench), ("CALIBRATION", calibration), ("RADIO", radio),
-            ("FIRMWARE", firmware)) if not value]
+            ("FIRMWARE", firmware), ("HARDWARE", hardware)) if not value]
         if missing:
             raise ValueError(
                 "Pass " + " ".join(f"-v {m}:..." for m in missing)
@@ -116,6 +119,7 @@ class OpenRTXAcceptance:
         self.radio = load_yaml(Path(radio))
         self.radio_file = Path(radio)
         self.firmware = str(firmware)
+        self.hardware = str(hardware)
         if self.calibration.expired():
             logger.warn(f"Calibration {calibration} expired on "
                         f"{self.calibration.expires}")
@@ -143,6 +147,7 @@ class OpenRTXAcceptance:
         for name, value in (
                 ("Firmware", self.firmware),
                 ("Radio", f"{self.radio['name']} ({self.radio_file.stem})"),
+                ("Hardware", self.hardware),
                 ("Station", self.bench.get("station", "unnamed")),
                 ("Calibration", f"{cal['method']}, measured "
                                 f"{cal['measured']} ({cal['sha256']})"),
@@ -161,8 +166,8 @@ class OpenRTXAcceptance:
         rx_type = self.bench["receiver"]["type"]
         tx_type = self.bench["transmitter"]["type"]
         lines = [f"Plan for {self.suite}:",
-                 f"  Radio: {self.radio['name']} ({self.radio_file}), "
-                 f"firmware {self.firmware}",
+                 f"  Radio: {self.hardware} as {self.radio['name']} "
+                 f"({self.radio_file}), firmware {self.firmware}",
                  f"  Bench: {self.bench.get('station', 'unnamed')}, receiver "
                  f"{rx_type}, transmitter {tx_type}, calibration "
                  f"{self.calibration.method} of {self.calibration.measured}"]
@@ -242,6 +247,7 @@ class OpenRTXAcceptance:
             "radio": self.radio["name"],
             "radio_file": self.radio_file.stem,
             "firmware": self.firmware,
+            "hardware": self.hardware,
             "suite_commit": suite_commit(),
             "bands": {name: band["frequency_hz"]
                       for name, band in self.radio["bands"].items()},

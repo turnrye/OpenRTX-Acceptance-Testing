@@ -6,10 +6,11 @@
 # (ignored by git), point it at your bench, calibration and radio, then run
 #
 #   uv run robot -A bench/<name>.local.args -v FIRMWARE:<git describe> \
+#       -v "HARDWARE:<model> <serial>" \
 #       -d runs/<name> [--include tx] acceptance/fm/bandwidth.robot
 #
-# The firmware and the output folder change per run, so they stay on the
-# command line. The radio file appears twice: once for the suite, once for
+# The firmware, the radio unit and the output folder change per run, so they
+# stay on the command line. The radio file appears twice: once for the suite, once for
 # oat.expand, which repeats per-band tests on every band it lists.
 
 --prerunmodifier oat.expand.Expand:radios/c62.yaml

@@ -23,7 +23,8 @@ jobs:
           uv run robot --dryrun --outputdir runs/dryrun
           --prerunmodifier oat.expand.Expand:radios/c62.yaml
           -v RADIO:radios/c62.yaml -v BENCH:bench/sim.yaml
-          -v CALIBRATION:calibration/sim.yaml -v FIRMWARE:dryrun acceptance
+          -v CALIBRATION:calibration/sim.yaml -v FIRMWARE:dryrun
+          -v HARDWARE:dryrun acceptance
       - uses: actions/upload-artifact@v4
         if: always()
         with:

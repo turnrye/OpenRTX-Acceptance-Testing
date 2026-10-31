@@ -56,6 +56,9 @@ def test_export_script_publishes_a_clean_run(selftest_run, tmp_path):
     assert folder.name.endswith("-sim-Selftest")
     check_run(folder)
     assert str(selftest_run) not in (folder / "output.xml").read_text()
+    meta = ExecutionResult(str(folder / "output.xml")).suite.metadata
+    measurements = json.loads((folder / "measurements.json").read_text())
+    assert meta["Hardware"] == measurements["hardware"] == "simulated radio"
 
     again = subprocess.run(["bash", str(EXPORT), str(selftest_run),
                             str(results)], capture_output=True, text=True,

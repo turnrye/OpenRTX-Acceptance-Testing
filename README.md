@@ -47,19 +47,21 @@ uv run robot -d runs/selftest acceptance/selftest.robot
 
 # FM bandwidth acceptance on a real bench: the transmit tests, on every band
 uv run robot -A bench/mybench.local.args -v FIRMWARE:v0.4.5-88-g1ceed9f8 \
+    -v "HARDWARE:Retevis C62 2501R0621100413" \
     -d runs/bandwidth-tx --include tx acceptance/fm/bandwidth.robot
 ```
 
 The argument file (`-A`) carries the bench, calibration and radio, and `oat.expand`. `FIRMWARE`
-names what the radio runs, ideally a `git describe` of its build. All four are mandatory: a run
-without them stops before any instrument starts. Tags select what runs: `--include tx`,
+names what the radio runs, ideally a `git describe` of its build, and `HARDWARE` the unit, by model
+and serial number: units of one model measure differently. All five are mandatory: a run without
+them stops before any instrument starts. Tags select what runs: `--include tx`,
 `--include rx`, `--include band:2m`, `--exclude mode:m17`.
 
-Before anything starts, the run shows its plan: the radio and firmware, the bench, each band's
+Before anything starts, the run shows its plan: the radio, its unit and firmware, the bench, each band's
 frequency and calibrated losses, which way the attenuator chain must face, and the tests to run.
 
 Each run writes Robot's `report.html`, `log.html` and `output.xml` to the output directory, with the
-firmware, radio, station and calibration as suite metadata. Next to them, `bench-<suite>/` holds the
+firmware, radio, unit, station and calibration as suite metadata. Next to them, `bench-<suite>/` holds the
 raw captures, the WAV audio of each transmission and `measurements.json`, with every measurement,
 limit check and operator answer. The log shows each capture's measurements as a table with a player
 for each transmission's audio.
