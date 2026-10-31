@@ -13,7 +13,7 @@ from pathlib import Path
 
 import numpy as np
 
-from oat.iq import IqFormat, read_iq
+from oat.iq import IqFormat, iter_iq, read_iq
 
 
 @dataclass
@@ -37,6 +37,15 @@ class Capture:
         if not parts:
             return np.zeros(0, dtype=np.complex64)
         return np.concatenate(parts)
+
+    def blocks(self):
+        """
+        The samples as load() returns them, a block at a time, so a capture
+        at several MS/s needn't fit in memory.
+        """
+        for p in self.paths:
+            if p.exists() and p.stat().st_size:
+                yield from iter_iq(p, self.fmt)
 
 
 class Receiver(ABC):

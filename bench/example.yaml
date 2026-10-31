@@ -16,6 +16,11 @@ receiver:
   # Tune below the signal, so the receiver's DC spike stays off the channel
   tune_offset_hz: -75000
 
+# One HackRF can be both, so the attenuator chain never moves: receiver
+# type: hackrf with lna_db: 0 and vga_db: 0 to start (raise them if the power
+# test reads weak; it fails if the HackRF clips), rate: 2000000 and
+# tune_offset_hz: -250000. Two HackRFs need a serial: each.
+
 transmitter:
   type: hackrf          # hackrf or sim
   tx_vga_db: 0          # 0-47 dB; the RF amp stays off unless amp: true

@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 from oat.analysis import find_transmissions, measure_capture
-from oat.iq import IqFormat, read_iq, write_iq
+from oat.iq import IqFormat, iter_iq, read_iq, write_iq
 from oat.signals import fm_carriers, fm_tone, silence
 
 RATE = 250e3
@@ -64,6 +64,26 @@ def test_measurement_survives_decimation():
                          silence(0.5, rate)])
     m, = measure_capture(iq, rate, 200e3)
     assert m.peak_deviation_hz == pytest.approx(4000, rel=0.03)
+
+
+def test_capture_read_in_blocks_measures_as_read_whole(tmp_path):
+    """A HackRF-rate capture, read in blocks, measures as when read whole."""
+    rate = 2e6
+    iq = np.concatenate([silence(0.5, rate), fm_tone(1000, 4000, 2.0, rate,
+                                                     250e3),
+                         silence(0.5, rate)])
+    path = tmp_path / "capture.cs8"
+    write_iq(path, iq, IqFormat.CS8)
+    whole, = measure_capture(read_iq(path, IqFormat.CS8), rate, 250e3)
+    # An odd block size, so blocks split the decimation steps unevenly
+    blocks, = measure_capture(iter_iq(path, IqFormat.CS8, samples=100_003),
+                              rate, 250e3)
+    assert blocks.peak_deviation_hz == pytest.approx(4000, rel=0.03)
+    assert blocks.peak_deviation_hz == pytest.approx(whole.peak_deviation_hz,
+                                                     rel=0.01)
+    assert blocks.carrier_offset_hz == pytest.approx(whole.carrier_offset_hz,
+                                                     abs=1)
+    assert blocks.start_s == pytest.approx(whole.start_s, abs=1e-3)
 
 
 @pytest.mark.parametrize("fmt", list(IqFormat))

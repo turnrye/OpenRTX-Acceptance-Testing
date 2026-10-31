@@ -17,6 +17,9 @@ Wide
 Narrow
     [Tags]    per-band    mode:fm    tx
     No Operation
+Listen
+    [Tags]    per-band    mode:fm    rx
+    No Operation
 M17 Round Trip
     [Tags]    per-band    mode:fm    mode:m17
     No Operation
@@ -46,11 +49,12 @@ def expanded(tmp_path, suite_text, modes):
     return suite
 
 
-def test_tests_repeat_per_band_grouped_by_band(tmp_path):
+def test_transmit_tests_on_every_band_come_before_receive(tmp_path):
     suite = expanded(tmp_path, SUITE, ["fm", "m17"])
     assert [t.name for t in suite.tests] == [
-        "2m: Wide", "2m: Narrow", "2m: M17 Round Trip",
-        "70cm: Wide", "70cm: Narrow", "70cm: M17 Round Trip", "Once"]
+        "2m: Wide", "2m: Narrow", "70cm: Wide", "70cm: Narrow",
+        "2m: Listen", "70cm: Listen",
+        "2m: M17 Round Trip", "70cm: M17 Round Trip", "Once"]
     first = suite.tests[0]
     assert "band:2m" in first.tags and "tx" in first.tags
     assert first.setup.name == "Use Band" and first.setup.args == ("2m",)
@@ -62,7 +66,7 @@ def test_tests_needing_a_missing_mode_are_dropped(tmp_path):
     names = [t.name for t in suite.tests]
     assert "2m: M17 Round Trip" not in names
     assert not any("DMR" in n for n in names)
-    assert len(names) == 5
+    assert len(names) == 7
 
 
 def test_per_band_tests_cannot_have_their_own_setup(tmp_path):

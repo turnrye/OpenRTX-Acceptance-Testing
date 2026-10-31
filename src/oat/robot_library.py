@@ -39,6 +39,15 @@ MAX_CLIPPED = 0.001
 RESULTS_SCHEMA = 1
 
 
+def chain_direction(tags) -> str | None:
+    """Which way a test needs the attenuator chain, from its tx/rx tag."""
+    if "tx" in tags:
+        return "tx"
+    if "rx" in tags:
+        return "rx"
+    return None
+
+
 def receiver_clipped(capture) -> float:
     """Fraction of a capture's samples at the converter's full scale."""
     sizes = [p.stat().st_size for p in capture.paths]
@@ -92,6 +101,9 @@ class OpenRTXAcceptance:
         self.run_dir = None
         self.records = []
         self._captures = 0
+        # Which way the attenuator chain faces: "tx" from the radio to the
+        # receiver, "rx" from the transmitter to the radio
+        self._chain = None
 
     # Bench --------------------------------------------------------------
 
@@ -154,6 +166,30 @@ class OpenRTXAcceptance:
         """Listener: note the tests this run will execute."""
         self.planned = [(t.name, set(t.tags)) for t in data.tests]
 
+    def start_test(self, data, result):
+        """
+        Listener: when the tests change direction on a bench with separate
+        instruments, ask for the attenuator chain to move first.
+        """
+        need = chain_direction(data.tags)
+        if need is None or self.operator is None or self._one_instrument():
+            return
+        if self._chain is not None and need != self._chain:
+            self.operator.instruct(f"Move the attenuator chain: "
+                                   f"{self._chain_setup(need)}")
+        self._chain = need
+
+    def _one_instrument(self) -> bool:
+        """Whether one SDR both receives and transmits, so the chain stays."""
+        rx, tx = self.bench["receiver"], self.bench["transmitter"]
+        return rx["type"] == tx["type"] and rx.get("serial") == tx.get("serial")
+
+    def _chain_setup(self, direction: str) -> str:
+        """Where the attenuator chain goes for tests in a direction."""
+        if direction == "tx":
+            return f"from the radio to the {self.bench['receiver']['type']}"
+        return f"from the {self.bench['transmitter']['type']} to the radio"
+
     def _plan_summary(self) -> str:
         """What the run will do, and what the bench must look like for it."""
         tags = set().union(*(t for _, t in self.planned)) if self.planned \
@@ -176,12 +212,17 @@ class OpenRTXAcceptance:
         modes = sorted(t[5:] for t in tags if t.startswith("mode:"))
         if modes:
             lines.append(f"  Modes: {', '.join(modes)}")
-        if "tx" in tags:
-            lines.append(f"  Transmit tests: attenuator chain from the radio "
-                         f"to the {rx_type}")
-        if "rx" in tags:
-            lines.append(f"  Receive tests: attenuator chain from the "
-                         f"{tx_type} to the radio")
+        order = list(dict.fromkeys(
+            d for d in (chain_direction(t) for _, t in self.planned) if d))
+        if order and self._one_instrument():
+            lines.append(f"  Every test: attenuator chain between the radio "
+                         f"and the {rx_type}, where it stays")
+        for i, direction in enumerate(order):
+            what = "Transmit" if direction == "tx" else "Receive"
+            when = "first" if i == 0 else "then; you'll be asked to move it"
+            if not self._one_instrument():
+                lines.append(f"  {what} tests ({when}): attenuator chain "
+                             f"{self._chain_setup(direction)}")
         lines.append(f"  Tests ({len(self.planned)}):")
         lines += [f"    - {name}" for name, _ in self.planned]
         lines.append("Check the setup, then continue to begin.")
@@ -308,7 +349,7 @@ class OpenRTXAcceptance:
             logger.warn(f"{name}: {100 * clipped:.2f}% of samples at the "
                         f"receiver's full scale; levels read low")
         results = [{**m.as_dict(), "receiver_clipped": clipped} for m in
-                   measure_capture(capture.load(), capture.rate, -offset,
+                   measure_capture(capture.blocks(), capture.rate, -offset,
                                    audio_dir=audio_dir)]
         self._record("capture", instruction=instruction, files=[
             str(p.relative_to(self.run_dir)) for p in capture.paths],
