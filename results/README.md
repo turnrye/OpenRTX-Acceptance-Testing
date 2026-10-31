@@ -15,7 +15,11 @@ results/<firmware sha>/<radio file>/<yyyymmdd-hhmmss>-<station>-<suite>/
     measurements.json   measurements, limit checks and operator answers
 ```
 
-`scripts/export-run.sh <run>` writes both. Each records its provenance: the firmware, this
+`scripts/export-run.sh <run>` writes both. If some tests had to be run again (a missed key-up, a
+wrong setting), rerun just those into a new output directory with the same firmware and bench, and
+export them together, `scripts/export-run.sh -r <rerun> <run>`: the rerun replaces those tests in
+both files, Robot's log marks them as re-executed with their old status, and `measurements.json`
+lists the reruns. Each records its provenance: the firmware, this
 repository's commit, the station's public name, and the method, dates and fingerprint of the bench
 calibration. They never hold calibration values, absolute paths, serial numbers or raw captures; the
 script and CI both check. The results website shows them (see the README).
@@ -23,6 +27,7 @@ script and CI both check. The results website shows them (see the README).
 ## Rules
 
 - **Append only.** A wrong result is superseded by a new run, never edited.
-- **One folder per run**, added in a PR with the change it supports or with the release.
+- **One folder per run**, added in a PR with the change it supports or with the release. A run's
+  reruns are merged into it, not published beside it.
 - **Results are read against their suite commit.** Limits may change later; a result keeps the meaning
   it had when it ran.
