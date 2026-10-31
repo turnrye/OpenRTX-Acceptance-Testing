@@ -84,7 +84,7 @@ FM RX At 12.5 kHz Is Clean Up To Full Deviation
     Stop Transmitting
     Start Transmitting FM Tone    2500
     Operator Confirms    The radio plays the tone louder and still undistorted
-    Operator Reports    Compared with 25 kHz at 5 kHz deviation, is this quieter, the same, or louder?
+    Operator Reports    Compared with the louder tone at 25 kHz, is this quieter, the same, or louder?
     [Teardown]    Stop Transmitting
 
 FM Bandwidth Survives An M17 Round Trip
