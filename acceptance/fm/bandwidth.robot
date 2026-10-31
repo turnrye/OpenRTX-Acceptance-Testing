@@ -14,7 +14,7 @@ Documentation     FM follows the 12.5/25 kHz channel bandwidth setting, on trans
 ...
 ...               To measure stock firmware as a reference, exclude mode:m17.
 Library           oat.robot_library.OpenRTXAcceptance
-Suite Setup       Open Bench    ${BENCH}    ${CALIBRATION}    ${RADIO}    ${FIRMWARE}
+Suite Setup       Open Bench    ${BENCH}    ${CALIBRATION}    ${RADIO}    ${FIRMWARE}    ${HARDWARE}
 Suite Teardown    Close Bench
 Test Tags         per-band    mode:fm
 
@@ -24,6 +24,7 @@ ${BENCH}          ${EMPTY}
 ${CALIBRATION}    ${EMPTY}
 ${RADIO}          ${EMPTY}
 ${FIRMWARE}       ${EMPTY}
+${HARDWARE}       ${EMPTY}
 # Narrow over wide peak deviation for the same tone at the mic: the BK4819's
 # 12.5 kHz mode halves it (0.47-0.60 measured on a C2, 2026-10-30; the spread
 # is the acoustic tone moving between takes)

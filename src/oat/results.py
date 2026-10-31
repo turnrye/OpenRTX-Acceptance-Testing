@@ -14,7 +14,7 @@ from robot.api import ExecutionResult
 
 # measurements.json fields a rerun must share with the run it repeats
 SAME_RUN = ("schema", "suite", "station", "radio", "radio_file", "firmware",
-            "suite_commit", "calibration")
+            "hardware", "suite_commit", "calibration")
 # Suite metadata that must match too, when either run has it
 SAME_METADATA = ("Firmware", "Radio", "Station", "Calibration", "Hardware",
                  "Suite commit")

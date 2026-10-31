@@ -7,7 +7,7 @@ Documentation     The keywords themselves, on the simulated bench: no hardware.
 Library           OperatingSystem
 Library           oat.robot_library.OpenRTXAcceptance
 Suite Setup       Run Keywords
-...               Open Bench    bench/sim.yaml    calibration/sim.yaml    radios/c62.yaml    sim
+...               Open Bench    bench/sim.yaml    calibration/sim.yaml    radios/c62.yaml    sim    simulated radio
 ...               AND    Use Band    70cm
 Suite Teardown    Close Bench
 

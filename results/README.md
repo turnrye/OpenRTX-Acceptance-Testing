@@ -21,8 +21,8 @@ export them together, `scripts/export-run.sh -r <rerun> <run>`: the rerun replac
 both files, Robot's log marks them as re-executed with their old status, and `measurements.json`
 lists the reruns. Each records its provenance: the firmware, the radio unit, this repository's
 commit, the station's public name, and the method, dates and fingerprint of the bench calibration.
-Units of the same model measure differently, so name the radio with its model and serial number,
-`-M "Hardware:Retevis C62 2501R0621100413"`. The bench stays private: results never hold its
+Units of the same model measure differently, so every run names its radio by model and serial
+number, `-v "HARDWARE:Retevis C62 2501R0621100413"`. The bench stays private: results never hold its
 instruments' serial numbers, its calibration values, absolute paths or raw captures. The script and
 CI check for absolute paths. The results website shows the rest (see the README).
 
