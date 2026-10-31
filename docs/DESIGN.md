@@ -25,7 +25,8 @@ grow into a compliance report: measurements against the regulatory limits, per r
   `sim` and `replay` stand in for hardware in self-tests and for re-analysing recordings.
 - **Signals and analysis** (`signals.py`, `analysis.py`) generate test signals and measure
   captures: transmissions found by their power envelope, then carrier offset, peak and RMS deviation,
-  dominant tone and 99% occupied bandwidth. Unit tests check one against the other.
+  dominant tone, 99% occupied bandwidth and received level. Every capture also records how much
+  of it hit the receiver's full scale, since a clipped capture reads levels low. Unit tests check one against the other.
 - **The operator** (`operator.py`) is the person at the bench. Instructions wait until done;
   confirmations are assertions that fail the test on "no". Prompts go to a terminal, or through files
   so a run without a terminal can be relayed.
@@ -61,7 +62,8 @@ grow into a compliance report: measurements against the regulatory limits, per r
 - Limits live in radio files, never in suites, and name their source.
 - A test either measures or asks; it never guesses a pass.
 - Tests that depend on absolute levels (sensitivity, power, spurious emissions) will need a measured
-  calibration, not an assumed one; relative tests such as deviation and bandwidth do not.
+  calibration, not an assumed one; relative tests such as deviation, bandwidth and the power
+  steps do not.
 - Suites tag their tests `tx`, `rx` and `manual`, so a run can pick what the bench can do, and
   declare what they need from the radio: `mode:<mode>` per operating mode, `per-band` to repeat on
   every band. `oat.expand` fits a suite to the radio file before it runs; tests never name a
