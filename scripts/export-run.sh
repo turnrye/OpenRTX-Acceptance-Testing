@@ -7,14 +7,32 @@
 #   <results>/<firmware sha>/<radio>/<yyyymmdd-hhmmss>-<station>-<suite>/
 #     output.xml         Robot's output, through rebot with oat.sanitize
 #     measurements.json  the run's measurements and operator answers
-# Refuses to overwrite a run, and removes the export again if an absolute path
-# survived, so nothing from the tester's machine reaches a commit.
+# With -r, a rerun of some of the run's tests (robot -d <rerun> --include ...,
+# same firmware, radio and bench) replaces those tests in both files, as
+# rebot --merge does. Refuses to overwrite a run, and removes the export again
+# if an absolute path survived, so nothing from the tester's machine reaches a
+# commit.
 #
-# Usage: scripts/export-run.sh <robot outputdir> [results dir]
+# Usage: scripts/export-run.sh [-r rerun outputdir]... <robot outputdir> [results dir]
 
 set -euo pipefail
-run=${1:?usage: scripts/export-run.sh <robot outputdir> [results dir]}
+usage="usage: scripts/export-run.sh [-r rerun]... <robot outputdir> [results dir]"
+reruns=()
+while getopts "r:" opt; do
+    case $opt in
+        r) reruns+=("$OPTARG") ;;
+        *) echo "$usage" >&2; exit 1 ;;
+    esac
+done
+shift $((OPTIND - 1))
+run=${1:?$usage}
 results=${2:-results}
+outputs=("$run/output.xml")
+merge=()
+for r in ${reruns[@]+"${reruns[@]}"}; do
+    outputs+=("$r/output.xml")
+    merge=(--merge)
+done
 
 shopt -s nullglob
 measurements=("$run"/bench-*/measurements.json)
@@ -45,14 +63,21 @@ trap 'rm -rf "$dest"' ERR
 
 # rebot exits with the number of failed tests; only above 250 is an error
 rc=0
-uv run rebot --prerebotmodifier oat.sanitize.Sanitize \
+uv run rebot ${merge[@]+"${merge[@]}"} --prerebotmodifier oat.sanitize.Sanitize \
     --output "$dest/output.xml" --log NONE --report NONE \
-    "$run/output.xml" >/dev/null || rc=$?
+    "${outputs[@]}" >/dev/null || rc=$?
 if [ "$rc" -gt 250 ]; then
     echo "rebot failed ($rc)" >&2
     false
 fi
-cp "${measurements[0]}" "$dest/measurements.json"
+uv run python - "$dest/measurements.json" "$run" ${reruns[@]+"${reruns[@]}"} <<'PY'
+import json, sys
+from pathlib import Path
+from oat.results import merge_reruns
+from oat.sanitize import scrub
+merged = merge_reruns(Path(sys.argv[2]), [Path(p) for p in sys.argv[3:]])
+Path(sys.argv[1]).write_text(scrub(json.dumps(merged, indent=2)) + "\n")
+PY
 
 uv run python - "$dest" <<'PY'
 import sys
