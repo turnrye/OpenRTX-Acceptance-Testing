@@ -19,10 +19,12 @@ results/<firmware sha>/<radio file>/<yyyymmdd-hhmmss>-<station>-<suite>/
 wrong setting), rerun just those into a new output directory with the same firmware and bench, and
 export them together, `scripts/export-run.sh -r <rerun> <run>`: the rerun replaces those tests in
 both files, Robot's log marks them as re-executed with their old status, and `measurements.json`
-lists the reruns. Each records its provenance: the firmware, this
-repository's commit, the station's public name, and the method, dates and fingerprint of the bench
-calibration. They never hold calibration values, absolute paths, serial numbers or raw captures; the
-script and CI both check. The results website shows them (see the README).
+lists the reruns. Each records its provenance: the firmware, the radio unit, this repository's
+commit, the station's public name, and the method, dates and fingerprint of the bench calibration.
+Units of the same model measure differently, so name the radio with its model and serial number,
+`-M "Hardware:Retevis C62 2501R0621100413"`. The bench stays private: results never hold its
+instruments' serial numbers, its calibration values, absolute paths or raw captures. The script and
+CI check for absolute paths. The results website shows the rest (see the README).
 
 ## Rules
 
