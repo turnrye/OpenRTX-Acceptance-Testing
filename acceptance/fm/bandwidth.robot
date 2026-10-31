@@ -120,6 +120,20 @@ CTCSS Level Meets Limits
     ...    FM Transmission CTCSS Should Meet Limits    ${wide}    BW_25    ${CTCSS_HZ}
     FM Transmission CTCSS Should Meet Limits    ${narrow}    BW_12_5    ${CTCSS_HZ}
 
+FM TX Power Rises With Each Setting
+    [Documentation]    Relative levels through the bench: no power meter needed. For
+    ...                stock firmware, name its settings: -v POWER_SETTINGS:Low,High
+    [Tags]    tx    power
+    ${settings}=    Power Settings
+    ${order}=    Evaluate    ", then ".join($settings)
+    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, power ${settings}[0]
+    ${tx}=    Capture Radio Transmissions
+    ...    For each power setting in turn (${order}): set it, key PTT for 3 s without speaking, release.
+    ...    expected=${{len($settings)}}
+    TX Power Should Rise With Setting    ${settings}    ${tx}
+    [Teardown]    Run Keyword If    $TEST_STATUS != 'SKIP'
+    ...    Operator Does    Set the power back to ${settings}[0]
+
 FM RX At 12.5 kHz Rejects An Adjacent Channel
     [Tags]    rx    manual    adjacent
     Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, volume comfortable

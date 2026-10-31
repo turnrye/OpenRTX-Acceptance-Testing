@@ -84,6 +84,15 @@ or `no: crackles on peaks`.
 
 A suite runs the same way on any firmware: flash the stock firmware and run it with
 `-v FIRMWARE:stock-1.2 --exclude mode:m17`. The results website compares runs side by side.
+Stock firmware names its power settings differently from OpenRTX; pass them lowest first with
+`-v "POWER_SETTINGS:Low,High"`.
+
+### Transmit power
+
+The power test keys up once at each of the radio file's `power_settings` and checks that each
+transmits at least `power_min_step_db` above the one before, as received through the bench. The
+levels are relative, so no power meter is needed, and the test fails if the receiver clipped,
+which would hide the higher settings: add attenuation if it does.
 
 ### Measuring a recording
 

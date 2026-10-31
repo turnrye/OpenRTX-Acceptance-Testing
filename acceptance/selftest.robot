@@ -54,6 +54,26 @@ CTCSS Is Measured And Checked
     Run Keyword And Expect Error    BW_12_5: ctcss_hz*
     ...    FM Transmission CTCSS Should Meet Limits    ${tx}[0]    BW_12_5    103.5
 
+Power Steps Are Checked And Clipping Fails
+    Simulate Radio Transmissions    2500@-12    2500@-8    2500@-4
+    ${tx}=    Capture Radio Transmissions    Key up at three settings    expected=3
+    TX Power Should Rise With Setting    ${{["1 W", "2.5 W", "5 W"]}}    ${tx}
+    Simulate Radio Transmissions    2500@-12    2500@-11.5
+    ${flat}=    Capture Radio Transmissions    Key up at two settings    expected=2
+    Run Keyword And Expect Error    *only +0.5 dB over*
+    ...    TX Power Should Rise With Setting    ${{["Low", "High"]}}    ${flat}
+    Simulate Radio Transmissions    2500@-6    2500@6
+    ${clip}=    Capture Radio Transmissions    Key up at two settings    expected=2
+    Run Keyword And Expect Error    *receiver clipped*
+    ...    TX Power Should Rise With Setting    ${{["Low", "High"]}}    ${clip}
+
+Power Settings Come From The Radio File Or The Command Line
+    ${settings}=    Power Settings
+    Should Be Equal    ${settings}    ${{["1 W", "2.5 W", "5 W"]}}
+    Set Test Variable    ${POWER_SETTINGS}    Low, High
+    ${stock}=    Power Settings
+    Should Be Equal    ${stock}    ${{["Low", "High"]}}
+
 Interferer Transmits
     Start Transmitting With Interferer    1500    12500    30    2500    interferer=off
     Operator Confirms    The wanted tone alone

@@ -29,6 +29,7 @@ class SimBurst:
     offset_hz: float = 0.0  # from the frequency under test
     ctcss_hz: float = 0.0
     ctcss_deviation_hz: float = 0.0
+    level_db: float = 0.0  # relative to the usual simulated carrier
 
 
 class SimReceiver(Receiver):
@@ -63,8 +64,9 @@ class SimReceiver(Receiver):
         scene = self.scenes.popleft() if self.scenes else []
         parts = [silence(self.gap_s, rate)]
         for b in scene:
-            parts += [fm_tone(b.tone_hz, b.deviation_hz, b.duration_s, rate,
-                              b.offset_hz, b.ctcss_hz, b.ctcss_deviation_hz),
+            parts += [10 ** (b.level_db / 20)
+                      * fm_tone(b.tone_hz, b.deviation_hz, b.duration_s, rate,
+                                b.offset_hz, b.ctcss_hz, b.ctcss_deviation_hz),
                       silence(self.gap_s, rate)]
         iq = np.concatenate(parts)
         noise = self._rng.normal(scale=SIM_NOISE, size=(len(iq), 2))

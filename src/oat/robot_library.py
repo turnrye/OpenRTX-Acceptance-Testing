@@ -19,7 +19,7 @@ from scipy.io import wavfile
 from oat.analysis import measure_capture
 from oat.calibration import load_calibration
 from oat.config import check_receiver_safe, load_yaml
-from oat.iq import write_iq
+from oat.iq import clipped_fraction, write_iq
 from oat.sanitize import scrub
 from oat.operator import make_operator
 from oat.sdr import make_receiver, make_transmitter
@@ -32,8 +32,20 @@ TX_LOOP_S = 2.0
 # noise between them, and stopping the receiver loses its last moments
 CAPTURE_GUIDANCE = ("Leave a second of silence before keying up and after the "
                     "last release, then press Enter.")
+# Fraction of a capture's samples at full scale above which its levels read
+# low: the receiver needs more attenuation
+MAX_CLIPPED = 0.001
 # Version of the measurements.json layout
 RESULTS_SCHEMA = 1
+
+
+def receiver_clipped(capture) -> float:
+    """Fraction of a capture's samples at the converter's full scale."""
+    sizes = [p.stat().st_size for p in capture.paths]
+    if not sum(sizes):
+        return 0.0
+    return sum(clipped_fraction(p, capture.fmt) * n
+               for p, n in zip(capture.paths, sizes)) / sum(sizes)
 
 
 def suite_commit() -> str:
@@ -291,7 +303,11 @@ class OpenRTXAcceptance:
             capture = self.receiver.stop()
         audio_dir = self.run_dir / name
         audio_dir.mkdir(exist_ok=True)
-        results = [m.as_dict() for m in
+        clipped = receiver_clipped(capture)
+        if clipped > MAX_CLIPPED:
+            logger.warn(f"{name}: {100 * clipped:.2f}% of samples at the "
+                        f"receiver's full scale; levels read low")
+        results = [{**m.as_dict(), "receiver_clipped": clipped} for m in
                    measure_capture(capture.load(), capture.rate, -offset,
                                    audio_dir=audio_dir)]
         self._record("capture", instruction=instruction, files=[
@@ -385,6 +401,64 @@ class OpenRTXAcceptance:
         if not ok:
             raise AssertionError(f"{what} {ratio:.2f} not in [{low}, {high}]")
         return ratio
+
+    @keyword
+    def power_settings(self) -> list:
+        """
+        The radio's TX power settings, lowest first: ${POWER_SETTINGS}
+        (comma-separated, e.g. for stock firmware: Low,High) or the radio
+        file's power_settings. Skips the test when neither lists any.
+        """
+        given = BuiltIn().get_variable_value("${POWER_SETTINGS}", "")
+        settings = ([s.strip() for s in str(given).split(",") if s.strip()]
+                    if given else list(self.radio.get("power_settings", [])))
+        if not settings:
+            BuiltIn().skip("No power settings: list power_settings in the "
+                           "radio file or pass -v POWER_SETTINGS:Low,High")
+        return settings
+
+    @keyword
+    def tx_power_should_rise_with_setting(self, settings: list,
+                                          measurements: list):
+        """
+        Check that each power setting, lowest first, transmits at least the
+        radio file's power_min_step_db (default 1 dB) above the one before,
+        as received through the bench: relative levels, so no power meter is
+        needed. Fails if the receiver clipped, which hides the top settings.
+        """
+        if len(settings) != len(measurements):
+            raise AssertionError(f"{len(settings)} settings but "
+                                 f"{len(measurements)} transmissions")
+        clipped = max(m.get("receiver_clipped", 0.0) for m in measurements)
+        step = float(self.radio.get("power_min_step_db", 1.0))
+        base = measurements[0]["power_db"]
+        levels = [m["power_db"] - base for m in measurements]
+        self._record("power", settings=list(settings), relative_db=levels,
+                     received_dbfs=[m["power_db"] for m in measurements],
+                     receiver_clipped=clipped)
+        logger.info("<table border=1><tr><th>Setting</th><th>Received dBFS"
+                    "</th><th>Relative dB</th></tr>" + "".join(
+                        f"<tr><td>{s}</td><td>{m['power_db']:.1f}</td>"
+                        f"<td>{lvl:+.1f}</td></tr>"
+                        for s, m, lvl in zip(settings, measurements, levels))
+                    + "</table>", html=True)
+        failures = []
+        if clipped > MAX_CLIPPED:
+            failures.append(f"receiver clipped on {100 * clipped:.2f}% of "
+                            f"samples; add attenuation")
+        for lower, higher, a, b in zip(settings, settings[1:], levels,
+                                       levels[1:]):
+            ok = b - a >= step
+            self._record("limit", field=f"power step {lower} -> {higher}",
+                         value=b - a, limit=f">= {step} dB", passed=ok)
+            if not ok:
+                failures.append(f"{higher} only {b - a:+.1f} dB over {lower}")
+        if failures:
+            raise AssertionError("; ".join(failures))
+        BuiltIn().set_test_message(
+            "Received levels: " + ", ".join(f"{s} {lvl:+.1f} dB"
+                                            for s, lvl in zip(settings, levels)),
+            append=True)
 
     # Transmitting into the radio ----------------------------------------
 
@@ -483,16 +557,18 @@ class OpenRTXAcceptance:
         With the simulated receiver, make the next capture hold one FM
         transmission per argument, on the test frequency. Each argument is the
         deviation in Hz, optionally followed by a CTCSS tone and its
-        deviation: 2500 or 0:100:400.
+        deviation, and by @ and a level in dB: 2500, 0:100:400, 2500@-6.
         """
         if not isinstance(self.receiver, SimReceiver):
             raise RuntimeError("only the sim receiver can simulate a radio")
         scene = []
         for spec in bursts:
-            dev, _, ctcss = str(spec).partition(":")
+            spec, _, level = str(spec).partition("@")
+            dev, _, ctcss = spec.partition(":")
             ctcss_hz, _, ctcss_dev = ctcss.partition(":")
             scene.append(SimBurst(float(dev),
                                   ctcss_hz=float(ctcss_hz or 0),
-                                  ctcss_deviation_hz=float(ctcss_dev or 0)))
+                                  ctcss_deviation_hz=float(ctcss_dev or 0),
+                                  level_db=float(level or 0)))
         self.receiver.queue_scene(scene, -self.bench["receiver"].get(
             "tune_offset_hz", 0))

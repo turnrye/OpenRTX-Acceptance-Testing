@@ -17,6 +17,11 @@ bands:
     frequency_hz: 445975000
 modes: [fm, m17]
 
+# TX power settings as OpenRTX names them, lowest first. Each must transmit
+# at least power_min_step_db above the one before, as received on the bench.
+power_settings: [1 W, 2.5 W, 5 W]
+power_min_step_db: 1.0
+
 fm:
   # Limits per channel bandwidth, keyed as OpenRTX names them. These are
   # acceptance criteria, not regulations. Peak deviation is the 99.9th
