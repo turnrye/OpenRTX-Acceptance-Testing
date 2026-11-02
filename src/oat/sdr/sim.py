@@ -12,6 +12,7 @@ from pathlib import Path
 import numpy as np
 
 from oat.iq import IqFormat, write_iq
+from oat.m17 import codec, phy, tools
 from oat.sdr.base import Capture, Receiver, Transmitter
 from oat.signals import fm_tone, silence
 
@@ -30,6 +31,26 @@ class SimBurst:
     ctcss_hz: float = 0.0
     ctcss_deviation_hz: float = 0.0
     level_db: float = 0.0  # relative to the usual simulated carrier
+    # An M17 voice stream instead of FM: deviation_hz is then the outer
+    # deviation, and this holds source, frames, inverted, preamble_symbols
+    # and inner_deviation_hz, each optional
+    m17: dict | None = None
+
+    def iq(self, rate: float) -> np.ndarray:
+        """The burst's samples at a rate."""
+        gain = 10 ** (self.level_db / 20)
+        if self.m17 is None:
+            return gain * fm_tone(self.tone_hz, self.deviation_hz,
+                                  self.duration_s, rate, self.offset_hz,
+                                  self.ctcss_hz, self.ctcss_deviation_hz)
+        m = self.m17
+        symbols = codec.stream_symbols(
+            codec.Lsf(source=m.get("source", "N0CALL")),
+            tools.random_payloads(int(m.get("frames", 25))),
+            int(m.get("preamble_symbols", codec.SYMBOLS_PER_FRAME)))
+        return gain * phy.m17_iq(symbols, rate, self.deviation_hz,
+                                 self.offset_hz, bool(m.get("inverted")),
+                                 m.get("inner_deviation_hz"))
 
 
 class SimReceiver(Receiver):
@@ -64,10 +85,7 @@ class SimReceiver(Receiver):
         scene = self.scenes.popleft() if self.scenes else []
         parts = [silence(self.gap_s, rate)]
         for b in scene:
-            parts += [10 ** (b.level_db / 20)
-                      * fm_tone(b.tone_hz, b.deviation_hz, b.duration_s, rate,
-                                b.offset_hz, b.ctcss_hz, b.ctcss_deviation_hz),
-                      silence(self.gap_s, rate)]
+            parts += [b.iq(rate), silence(self.gap_s, rate)]
         iq = np.concatenate(parts)
         noise = self._rng.normal(scale=SIM_NOISE, size=(len(iq), 2))
         iq = iq + (noise[:, 0] + 1j * noise[:, 1]).astype(np.complex64)

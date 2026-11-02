@@ -39,3 +39,23 @@ fm:
     ctcss_deviation_hz: [500, 1000]
   # Largest CTCSS frequency error, as a fraction of the tone
   ctcss_frequency_tolerance: 0.005
+
+m17:
+  # The M17 Protocol Specification (part I, v2.0.2, sections "4-level
+  # Frequency-shift Keying Modulation" and "Dibit, Symbol, and
+  # Frequency-shift") sets the nominal values: outer symbols at +-2.4 kHz,
+  # inner at +-0.8 kHz (a ratio of 3), 4800 symbols/s, a 40 ms preamble and a
+  # 12.5 kHz minimum channel spacing. It gives no tolerances: the ranges here
+  # are acceptance criteria. Deviations are read at the symbol instants after
+  # the receive RRC filter.
+  outer_deviation_hz: [2280, 2520]    # 2400 Hz +-5%
+  deviation_ratio: [2.85, 3.15]       # 3 +-5%
+  max_symbol_rate_error_ppm: 100
+  # Keeps the 9 kHz the specification gives M17 inside a 12.5 kHz channel,
+  # which leaves (12.5 - 9) / 2 = 1.75 kHz
+  max_frequency_error_hz: 1000
+  max_evm_percent: 10
+  # The necessary bandwidth of a 12.5 kHz channel, as for FM BW_12_5 (11K0);
+  # an ideal signal at nominal deviation measures about 9.3 kHz
+  max_occupied_bandwidth_hz: 11000
+  min_preamble_s: 0.04                # the specification's "shall"

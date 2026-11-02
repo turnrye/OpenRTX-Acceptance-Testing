@@ -24,7 +24,11 @@ from oat.sanitize import scrub
 from oat.operator import make_operator
 from oat.sdr import make_receiver, make_transmitter
 from oat.sdr.sim import SimBurst, SimReceiver
-from oat.signals import fm_carriers, fm_tone, tone
+from oat.m17 import codec as m17_codec
+from oat.m17 import phy as m17_phy
+from oat.m17 import tools as m17_tools
+from oat.m17.phy import measure_m17_capture
+from oat.signals import fm_carriers, fm_tone, silence, tone
 
 # Length of the looped transmitter signal; whole cycles of 1 kHz and CTCSS
 TX_LOOP_S = 2.0
@@ -59,6 +63,18 @@ def receiver_clipped(capture) -> float:
         return 0.0
     return sum(clipped_fraction(p, capture.fmt) * n
                for p, n in zip(capture.paths, sizes)) / sum(sizes)
+
+
+def voice_levels(pcm: np.ndarray) -> dict:
+    """Peak and near-full-scale fraction of decoded 16-bit voice."""
+    x = np.abs(np.asarray(pcm, dtype=float))
+    if not len(x):
+        return {"voice_peak_dbfs": float("-inf"), "voice_clipped": 0.0}
+    return {"voice_peak_dbfs": float(20 * np.log10(max(x.max(), 1) / 32767)),
+            "voice_rms_dbfs": float(10 * np.log10(
+                max(np.mean(x ** 2), 1) / 32767 ** 2)),
+            # Within 0.1 dB of full scale
+            "voice_clipped": float(np.mean(x >= 32767 * 10 ** (-0.1 / 20)))}
 
 
 def suite_commit() -> str:
@@ -343,41 +359,132 @@ class OpenRTXAcceptance:
         FM transmission. Fails unless exactly `expected` are found. Returns
         the measurements, oldest first; each one's audio is saved as a WAV.
         """
+        name, capture, audio_dir, clipped = self._capture(instruction)
+        results = self._measure_fm(capture, audio_dir, clipped)
+        self._record("capture", instruction=instruction, files=[
+            str(p.relative_to(self.run_dir)) for p in capture.paths],
+            restarts=capture.restarts, transmissions=results)
+        self._log_table(name, results)
+        self._expect(results, expected)
+        return results
+
+    def _capture(self, instruction: str):
+        """
+        Record while the operator follows an instruction. Returns the
+        capture's name, the capture, a folder for its audio, and the
+        fraction of samples at full scale.
+        """
         rx = self.bench["receiver"]
-        freq = self._frequency()
-        offset = rx.get("tune_offset_hz", 0)
         self._captures += 1
         name = f"capture{self._captures:02d}"
         path = self.run_dir / f"{name}.{self._iq_suffix()}"
-        self.receiver.start(freq + offset, rx["rate"], path)
+        self.receiver.start(self._frequency() + rx.get("tune_offset_hz", 0),
+                            rx["rate"], path)
         try:
             self.operator.instruct(f"{instruction} {CAPTURE_GUIDANCE}")
         finally:
             capture = self.receiver.stop()
+        return (name, capture) + self._after_capture(name, capture)
+
+    def _after_capture(self, name: str, capture):
+        """A capture's audio folder and its clipped fraction, warned of."""
         audio_dir = self.run_dir / name
         audio_dir.mkdir(exist_ok=True)
         clipped = receiver_clipped(capture)
         if clipped > MAX_CLIPPED:
             logger.warn(f"{name}: {100 * clipped:.2f}% of samples at the "
                         f"receiver's full scale; levels read low")
-        results = [self._absolute({**m.as_dict(), "receiver_clipped": clipped,
-                                   "frequency_error_hz":
-                                       m.carrier_offset_hz + offset,
-                                   "audio_file": str(
-                                       (audio_dir / f"tx{i}.wav").relative_to(
-                                           self.run_dir))})
-                   for i, m in enumerate(measure_capture(
-                       capture.blocks(), capture.rate, -offset,
-                       audio_dir=audio_dir, center_hz=freq + offset,
-                       frequency_correction_ppm=self._ppm(rx) or 0.0), 1)]
-        self._record("capture", instruction=instruction, files=[
-            str(p.relative_to(self.run_dir)) for p in capture.paths],
-            restarts=capture.restarts, transmissions=results)
-        self._log_table(name, results)
+        return audio_dir, clipped
+
+    def _measure_fm(self, capture, audio_dir: Path, clipped: float,
+                    min_duration_s: float = 1.0) -> list[dict]:
+        """Measurements of every FM transmission in a capture."""
+        rx = self.bench["receiver"]
+        offset = rx.get("tune_offset_hz", 0)
+        return [self._absolute({**m.as_dict(), "receiver_clipped": clipped,
+                                "frequency_error_hz":
+                                    m.carrier_offset_hz + offset,
+                                "audio_file": str(
+                                    (audio_dir / f"tx{i}.wav").relative_to(
+                                        self.run_dir))})
+                for i, m in enumerate(measure_capture(
+                    capture.blocks(), capture.rate, -offset,
+                    min_duration_s=min_duration_s, audio_dir=audio_dir,
+                    center_hz=self._frequency() + offset,
+                    frequency_correction_ppm=self._ppm(rx) or 0.0), 1)]
+
+    @staticmethod
+    def _expect(results: list, expected) -> None:
         if len(results) != int(expected):
             raise AssertionError(f"Expected {expected} transmission(s), "
                                  f"found {len(results)}")
+
+    @keyword
+    def capture_radio_m17_transmissions(self, instruction: str,
+                                        expected: int = 1):
+        """
+        Record while the operator follows the instruction, then measure and
+        decode each M17 transmission (oat.m17.phy). Fails unless exactly
+        `expected` are found. Each one's demodulated baseband is saved as a
+        48 kHz WAV, and its voice, through c2dec when Codec2 is installed.
+        """
+        name, capture, audio_dir, clipped = self._capture(instruction)
+        results = self._measure_m17(capture, audio_dir, clipped)
+        self._record("m17-capture", instruction=instruction, files=[
+            str(p.relative_to(self.run_dir)) for p in capture.paths],
+            restarts=capture.restarts, transmissions=results)
+        self._log_m17_table(name, results)
+        self._expect(results, expected)
         return results
+
+    def _measure_m17(self, capture, audio_dir: Path,
+                     clipped: float) -> list[dict]:
+        """Measurements of every M17 transmission in a capture."""
+        rx = self.bench["receiver"]
+        offset = rx.get("tune_offset_hz", 0)
+        results = []
+        for i, m in enumerate(measure_m17_capture(
+                capture.blocks(), capture.rate, -offset, audio_dir=audio_dir,
+                center_hz=self._frequency() + offset,
+                frequency_correction_ppm=self._ppm(rx) or 0.0), 1):
+            d = {**m.as_dict(), "receiver_clipped": clipped,
+                 "frequency_error_hz": m.carrier_offset_hz + offset,
+                 "baseband_file": str((audio_dir / f"tx{i}-baseband.wav")
+                                      .relative_to(self.run_dir))}
+            if m.payload and m17_tools.available("c2dec"):
+                voice = audio_dir / f"tx{i}-voice.wav"
+                d.update(voice_levels(m17_tools.write_codec2_wav(
+                    voice, m.payload)))
+                d["voice_file"] = str(voice.relative_to(self.run_dir))
+            demod = m17_tools.m17_demod(m.baseband)
+            if demod is not None:
+                d["m17_demod_sources"] = [x["source"] for x in demod["lsfs"]]
+            results.append(self._absolute(d))
+        return results
+
+    def _log_m17_table(self, name: str, results: list[dict]):
+        """Log M17 measurements as a table, with each one's voice."""
+        cols = [("outer_deviation_hz", "outer Hz", ".0f"),
+                ("inner_deviation_hz", "inner Hz", ".0f"),
+                ("deviation_ratio", "ratio", ".2f"),
+                ("evm_percent", "EVM %", ".1f"),
+                ("symbol_rate_error_ppm", "symbols ppm", ".1f"),
+                ("frequency_error_hz", "freq error Hz", ".0f"),
+                ("preamble_s", "preamble s", ".3f"),
+                ("stream_frames", "frames", "d"), ("source", "source", "s"),
+                ("lsf_crc_ok", "LSF CRC", ""), ("polarity", "polarity", "s")]
+        head = "".join(f"<th>{c}</th>" for _, c, _ in cols)
+        rows = []
+        for i, m in enumerate(results, 1):
+            cells = "".join(f"<td>{format(m[k], f)}</td>" for k, _, f in cols)
+            voice = ""
+            if "voice_file" in m:
+                src = (self.run_dir / m["voice_file"]).relative_to(
+                    self.output_dir)
+                voice = f'<audio controls src="{src}"></audio>'
+            rows.append(f"<tr><td>tx{i}</td>{cells}<td>{voice}</td></tr>")
+        logger.info(f"<b>{name}</b><table border=1><tr><th></th>{head}"
+                    f"<th>voice</th></tr>{''.join(rows)}</table>", html=True)
 
     def _ppm(self, cfg: dict) -> float | None:
         """An instrument's calibrated reference error, ppm, if known."""
@@ -468,6 +575,97 @@ class OpenRTXAcceptance:
                 failures.append(f"{field} {value:.1f} Hz outside {limit}")
         if failures:
             raise AssertionError(f"{bandwidth}: " + "; ".join(failures))
+
+    @keyword
+    def m17_transmission_should_meet_limits(self, measurement: dict,
+                                            checks: str = "all"):
+        """
+        Check an M17 transmission against the radio file's m17 limits.
+        `checks` names some of deviation, ratio, symbol_rate, frequency,
+        evm, bandwidth, preamble and polarity, comma-separated, or all.
+        """
+        limits = self.radio["m17"]
+        m = measurement
+        low, high = limits["outer_deviation_hz"]
+        rlow, rhigh = limits["deviation_ratio"]
+        table = {
+            "deviation": ("outer_deviation_hz", m["outer_deviation_hz"],
+                          low <= m["outer_deviation_hz"] <= high,
+                          f"{low}-{high} Hz"),
+            "ratio": ("deviation_ratio", m["deviation_ratio"],
+                      rlow <= m["deviation_ratio"] <= rhigh,
+                      f"{rlow}-{rhigh}"),
+            "symbol_rate": ("symbol_rate_error_ppm", m["symbol_rate_error_ppm"],
+                            abs(m["symbol_rate_error_ppm"])
+                            <= limits["max_symbol_rate_error_ppm"],
+                            f"+-{limits['max_symbol_rate_error_ppm']} ppm"),
+            "frequency": ("frequency_error_hz", m["frequency_error_hz"],
+                          abs(m["frequency_error_hz"])
+                          <= limits["max_frequency_error_hz"],
+                          f"+-{limits['max_frequency_error_hz']} Hz"),
+            "evm": ("evm_percent", m["evm_percent"],
+                    m["evm_percent"] <= limits["max_evm_percent"],
+                    f"<= {limits['max_evm_percent']}%"),
+            "bandwidth": ("occupied_bandwidth_hz", m["occupied_bandwidth_hz"],
+                          m["occupied_bandwidth_hz"]
+                          <= limits["max_occupied_bandwidth_hz"],
+                          f"<= {limits['max_occupied_bandwidth_hz']} Hz"),
+            "preamble": ("preamble_s", m["preamble_s"],
+                         m["preamble_s"] >= limits["min_preamble_s"],
+                         f">= {limits['min_preamble_s']} s"),
+            "polarity": ("polarity", m["polarity"],
+                         m["polarity"] == "normal", "normal"),
+        }
+        names = (list(table) if checks == "all"
+                 else [c.strip() for c in str(checks).split(",")])
+        unknown = [n for n in names if n not in table]
+        if unknown:
+            raise ValueError(f"unknown M17 checks: {', '.join(unknown)}")
+        failures = []
+        for name in names:
+            field, value, ok, limit = table[name]
+            self._record("limit", field=field, value=value, limit=limit,
+                         mode="m17", passed=bool(ok))
+            if not ok:
+                shown = f"{value:.4g}" if isinstance(value, float) else value
+                failures.append(f"{field} {shown} outside {limit}")
+        if failures:
+            raise AssertionError("M17: " + "; ".join(failures))
+
+    @keyword
+    def m17_transmissions_should_decode(self, measurements: list,
+                                        source: str = ""):
+        """
+        Check that every M17 transmission decodes: an LSF that passes its
+        CRC, from `source` when given, stream frames numbered in sequence
+        with the last one flagged, and an EOT. Reports the decode rate.
+        """
+        failures = []
+        for i, m in enumerate(measurements, 1):
+            problems = []
+            if not m["lsf_crc_ok"]:
+                problems.append("no LSF with a good CRC")
+            elif source and m["source"] != source.upper():
+                problems.append(f"source {m['source']!r}, not {source!r}")
+            if not m["stream_frames"]:
+                problems.append("no stream frames")
+            if m["frame_number_errors"]:
+                problems.append(f"{m['frame_number_errors']} frames out of "
+                                f"sequence")
+            if m["stream_frames"] and not m["last_frame_flagged"]:
+                problems.append("last frame not flagged")
+            if not m["eot_found"]:
+                problems.append("no EOT")
+            if problems:
+                failures.append(f"tx{i}: " + ", ".join(problems))
+        decoded = len(measurements) - len(failures)
+        self._record("m17-decode", source=source, transmissions=len(
+            measurements), decoded=decoded, failures=failures,
+            passed=not failures)
+        BuiltIn().set_test_message(f"{decoded}/{len(measurements)} M17 "
+                                   f"transmissions decode", append=True)
+        if failures:
+            raise AssertionError("; ".join(failures))
 
     @keyword
     def ratio_should_be_between(self, numerator: float, denominator: float,
@@ -699,6 +897,57 @@ class OpenRTXAcceptance:
                      wanted_shortfall_db=max(0.0, wanted_db - applied))
 
     @keyword
+    def start_transmitting_m17_stream(self, source: str = "N0CALL",
+                                      destination: str = "@ALL",
+                                      audio: str = "tone:1000",
+                                      frames: int = 50,
+                                      deviation_hz: float = 2400.0,
+                                      offset_hz: float = 0.0,
+                                      inverted: bool = False,
+                                      preamble_ms: float = 40.0,
+                                      gap_s: float = 1.0,
+                                      level_dbm: float | None = None):
+        """
+        Loop an M17 voice stream on the test frequency until stopped:
+        preamble, LSF from `source` to `destination`, stream frames, EOT,
+        then gap_s without carrier, so the radio sees separate
+        transmissions. `audio` is tone:<Hz> or tone:<Hz>:<dBFS> (Codec2,
+        `frames` long), a WAV file (Codec2, its whole length), or random
+        (random payload bytes, for decoding without Codec2). offset_hz moves
+        the carrier off the channel; inverted sends the symbols with the
+        wrong sign; level_dbm sets the level at the radio's antenna port.
+        """
+        payloads = self._m17_payloads(str(audio), int(frames))
+        preamble = int(round(float(preamble_ms) / 1000 * m17_codec.SYMBOL_RATE))
+        symbols = m17_codec.stream_symbols(
+            m17_codec.Lsf(destination, source), payloads, preamble)
+        tx = self.bench["transmitter"]
+        iq = np.concatenate([
+            m17_phy.m17_iq(symbols, tx["rate"], float(deviation_hz),
+                           self._tx_baseband_offset(float(offset_hz)),
+                           bool(inverted)),
+            silence(float(gap_s), tx["rate"])])
+        level = self._play(iq, f"tx-m17-{source.replace('/', '_')}-"
+                               f"{int(float(offset_hz))}hz", level_dbm)
+        self._record("transmit", mode="m17", source=source,
+                     destination=destination, audio=str(audio),
+                     frames=len(payloads), deviation_hz=float(deviation_hz),
+                     offset_hz=float(offset_hz), inverted=bool(inverted),
+                     preamble_ms=float(preamble_ms), **level)
+
+    @staticmethod
+    def _m17_payloads(audio: str, frames: int) -> list[bytes]:
+        """Stream payloads for an audio argument of the M17 keyword."""
+        if audio == "random":
+            return m17_tools.random_payloads(frames)
+        if audio.startswith("tone:"):
+            parts = audio.split(":")
+            level = float(parts[2]) if len(parts) > 2 else -20.0
+            return m17_tools.tone_payloads(
+                float(parts[1]), frames * 0.04, level)[:frames]
+        return m17_tools.wav_payloads(Path(audio))
+
+    @keyword
     def stop_transmitting(self):
         """Stop the transmitter."""
         self.transmitter.stop()
@@ -738,3 +987,32 @@ class OpenRTXAcceptance:
                                   level_db=float(level or 0)))
         self.receiver.queue_scene(scene, -self.bench["receiver"].get(
             "tune_offset_hz", 0))
+
+    @keyword
+    def simulate_radio_m17_transmissions(self, count: int = 1,
+                                         deviation_hz: float = 2400.0,
+                                         inner_deviation_hz: float | None = None,
+                                         source: str = "N0CALL",
+                                         frames: int = 25,
+                                         inverted: bool = False,
+                                         preamble_ms: float = 40.0,
+                                         offset_hz: float = 0.0,
+                                         level_db: float = 0.0):
+        """
+        With the simulated receiver, make the next capture hold `count` M17
+        transmissions, as a radio would send them.
+        """
+        if not isinstance(self.receiver, SimReceiver):
+            raise RuntimeError("only the sim receiver can simulate a radio")
+        m17 = {"source": source, "frames": int(frames),
+               "inverted": bool(inverted),
+               "preamble_symbols": int(round(float(preamble_ms) / 1000
+                                             * m17_codec.SYMBOL_RATE)),
+               "inner_deviation_hz": (None if inner_deviation_hz in
+                                      (None, "", "None")
+                                      else float(inner_deviation_hz))}
+        self.receiver.queue_scene(
+            [SimBurst(float(deviation_hz), offset_hz=float(offset_hz),
+                      level_db=float(level_db), m17=m17)
+             for _ in range(int(count))],
+            -self.bench["receiver"].get("tune_offset_hz", 0))
