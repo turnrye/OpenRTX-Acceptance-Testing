@@ -7,7 +7,7 @@ Documentation     The keywords themselves, on the simulated bench: no hardware.
 Library           OperatingSystem
 Library           oat.robot_library.OpenRTXAcceptance
 Suite Setup       Run Keywords
-...               Open Bench    bench/sim.yaml    calibration/sim.yaml    radios/c62.yaml    sim    simulated radio
+...               Open Bench    bench/sim.yaml    calibration/sim.yaml    radios/c62.yaml    sim    simulated radio    dsp=sim
 ...               AND    Use Band    70cm
 Suite Teardown    Close Bench
 
@@ -133,3 +133,7 @@ Bad M17 Fails Its Limits
 M17 Stream Transmits
     Start Transmitting M17 Stream    source=K0RET    audio=random    frames=5
     Stop Transmitting
+
+DSP Image Is Mandatory For Radios That Have One
+    Run Keyword And Expect Error    *Pass -v DSP:...;*
+    ...    Open Bench    bench/sim.yaml    calibration/sim.yaml    radios/c62.yaml    sim    simulated radio

@@ -18,13 +18,20 @@ jobs:
       - run: uv run pytest
       - name: Robot self-test on the simulated bench
         run: uv run robot --outputdir runs/selftest --xunit xunit.xml acceptance/selftest.robot
+      - name: Bench self-test, looped back on the simulated bench
+        run: >-
+          uv run robot --outputdir runs/selftest-bench
+          --prerunmodifier oat.expand.Expand:radios/c62.yaml
+          -v RADIO:radios/c62.yaml -v BENCH:bench/sim.yaml
+          -v CALIBRATION:calibration/sim.yaml -v FIRMWARE:sim
+          -v HARDWARE:sim -v DSP:sim acceptance/selftest-bench.robot
       - name: Suites resolve their keywords
         run: >-
           uv run robot --dryrun --outputdir runs/dryrun
           --prerunmodifier oat.expand.Expand:radios/c62.yaml
           -v RADIO:radios/c62.yaml -v BENCH:bench/sim.yaml
           -v CALIBRATION:calibration/sim.yaml -v FIRMWARE:dryrun
-          -v HARDWARE:dryrun acceptance
+          -v HARDWARE:dryrun -v DSP:dryrun acceptance
       - uses: actions/upload-artifact@v4
         if: always()
         with:

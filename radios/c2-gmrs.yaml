@@ -7,6 +7,10 @@
 
 name: Retevis C2 (GMRS)
 max_tx_power_dbm: 37          # 5 W
+# The audio path runs through a CSK6 DSP whose image is flashed separately
+# from the firmware, so firmware states can differ in it alone: every run
+# names it, -v DSP:<sha256 of the image>, or DSP:stock for factory firmware
+dsp_image: true
 
 # GMRS channel 19 (462.650 MHz), the channel stock-firmware measurements
 # have used. FM only: stock C2 firmware has no M17.

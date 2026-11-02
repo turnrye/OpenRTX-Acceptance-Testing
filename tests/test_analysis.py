@@ -170,3 +170,13 @@ def test_carrier_offset_is_corrected_for_the_receiver_reference():
                              frequency_correction_ppm=2.0)
     assert fixed.carrier_offset_hz - plain.carrier_offset_hz == \
         pytest.approx(892, abs=0.01)
+
+
+def test_carrier_vanishes_at_the_first_bessel_zero():
+    # J0(beta) = 0 at beta = 2.4048: 2404.8 Hz deviation for a 1 kHz tone
+    null, = measure_capture(burst_capture([2404.8]), RATE, 75e3)
+    off, = measure_capture(burst_capture([1500]), RATE, 75e3)
+    assert null.carrier_level_db < -30
+    # J0(1.5)^2 is -5.82 dB
+    assert off.carrier_level_db == pytest.approx(-5.82, abs=0.2)
+    assert null.tone_deviation_hz == pytest.approx(2404.8, rel=0.003)
