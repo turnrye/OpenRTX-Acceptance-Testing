@@ -32,3 +32,15 @@ operator:
   type: console         # console, or file to answer prompts through files
   directory: runs/operator
 
+# The USB sound interface on the radio's accessory connector, for the tests
+# tagged needs:audio: test audio into the mic input, the speaker captured.
+# ALSA device names from `aplay -L` and `arecord -L`. An AIOC also keys the
+# radio: ptt names its serial port and the line that keys (DTR on an AIOC,
+# with RTS low). Without ptt, the operator keys. Leave the section out on a
+# bench without an interface and run with --exclude needs:audio.
+#audio:
+#  type: alsa
+#  playback_device: plughw:CARD=AllInOneCable,DEV=0
+#  capture_device: plughw:CARD=AllInOneCable,DEV=0
+#  rate: 48000
+#  ptt: {device: /dev/ttyACM0, line: dtr}

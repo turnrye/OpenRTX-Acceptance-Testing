@@ -137,3 +137,40 @@ M17 Stream Transmits
 DSP Image Is Mandatory For Radios That Have One
     Run Keyword And Expect Error    *Pass -v DSP:...;*
     ...    Open Bench    bench/sim.yaml    calibration/sim.yaml    radios/c62.yaml    sim    simulated radio
+
+Audio Is Injected And Measured
+    Inject Audio Tone    1000    -12    duration_s=1
+    ${a}=    Capture Radio Audio    2
+    Should Be True    -12.2 < ${a}[level_dbfs] < -11.8
+    Should Be True    ${a}[level_mvrms] > 200
+    Audio SINAD Should Be At Least    ${a}    40
+    Stop Injecting Audio
+    ${speech}=    Create Speech-Like Audio    2
+    Inject Audio File    ${speech}    gain_db=-6
+    Inject Audio Tones    500,1000,2000    -20    tone_s=0.5    loop=True
+    ${sweep}=    Capture Radio Audio    4
+    ${levels}=    Measure Audio Response    ${sweep}
+    Should Be True    abs(${levels}[0][level_db]) < 0.2
+    Stop Injecting Audio
+    Key Radio
+    Release Radio
+
+Simulated Radio Plays What It Receives
+    Start Transmitting FM Tone    3000    level_dbm=-80
+    ${a}=    Capture Radio Audio    2    1000    psophometric
+    Should Be True    990 < ${a}[tone_hz] < 1010
+    Audio Distortion Should Meet Limits    ${a}    rx
+    Audio Should Have No Dropouts    ${a}
+    Stop Transmitting
+    ${s}=    Find RX Sensitivity    3000    start_dbm=-110    stop_dbm=-126    step_db=2
+    Should Be True    -124 < ${s}[sensitivity_dbm] < -115
+
+Transmitted Audio Is Measured
+    Simulate Radio Transmissions    3000
+    ${tx}=    Capture Radio Transmissions    Key up with a tone
+    ${a}=    Measure Transmitted Audio    ${tx}[0]
+    Should Be True    2950 < ${a}[tone_amplitude] < 3050
+    ${m}=    Mic Sensitivity    ${tx}[0]    -30    1500
+    Should Be True    -36.1 < ${m}[sensitivity_dbfs] < -35.9
+    Spread Should Be At Most    deviation    1.0    3000    3050    2980
+    Run Keyword And Expect Error    *spreads over*    Spread Should Be At Most    deviation    1.0    3000    3500

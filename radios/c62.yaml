@@ -43,6 +43,30 @@ fm:
     ctcss_deviation_hz: [500, 1000]
   # Largest CTCSS frequency error, as a fraction of the tone
   ctcss_frequency_tolerance: 0.005
+  # Audio, through an interface on the accessory connector (needs:audio).
+  # The response limits follow the shape TIA-603-E gives for FM voice
+  # radios: within +1/-3 dB of a 6 dB/octave pre-emphasis on transmit, and
+  # of the matching de-emphasis on receive, from 300 to 3000 Hz, referred to
+  # 1 kHz. They, the distortion limit (TIA-603-E's 5%) and the rest are used
+  # as acceptance criteria.
+  tx_audio_response:
+    band_hz: [300, 3000]
+    slope_db_per_octave: 6
+    tolerance_db: [-3, 1]
+  rx_audio_response:
+    band_hz: [300, 3000]
+    slope_db_per_octave: -6
+    tolerance_db: [-3, 1]
+  tx_max_thd_n_percent: 5
+  rx_max_thd_n_percent: 5
+  # Spread of the deviation one injected tone gives after each of several
+  # cold boots: the mic path must come up the same every time
+  mic_level_max_spread_db: 1.0
+  # Longest dropout in received audio, as when a key press interrupts it
+  rx_max_dropout_s: 0.05
+  # Deviation for sensitivity and level tests, per bandwidth: 60% of the
+  # peak limit, the usual reference modulation
+  test_deviation_hz: {BW_12_5: 1500, BW_25: 3000}
 
 m17:
   # The M17 Protocol Specification (part I, v2.0.2, sections "4-level

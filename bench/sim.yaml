@@ -20,3 +20,7 @@ operator:
   type: scripted
   default: "yes"
 
+# A simulated audio interface and radio: the radio's speaker plays what the
+# simulated transmitter sends, with noise that follows its level
+audio:
+  type: sim
