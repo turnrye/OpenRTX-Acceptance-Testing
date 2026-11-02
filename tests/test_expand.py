@@ -73,3 +73,35 @@ def test_per_band_tests_cannot_have_their_own_setup(tmp_path):
     text = SUITE.replace("Wide\n    [Tags]", "Wide\n    [Setup]    No Operation\n    [Tags]")
     with pytest.raises(ValueError, match="own \\[Setup\\]"):
         expanded(tmp_path, text, ["fm"])
+
+
+def test_bands_can_limit_their_modes(tmp_path):
+    radio = tmp_path / "c2.yaml"
+    radio.write_text("name: Test\nmax_tx_power_dbm: 37\nbands:\n"
+                     "  gmrs: {frequency_hz: 462650000, modes: [fm]}\n"
+                     "  70cm: {frequency_hz: 445975000}\n"
+                     "modes: [fm, m17]\n")
+    path = tmp_path / "suite.robot"
+    path.write_text(SUITE)
+    suite = RobotSuite.from_file_system(path)
+    suite.visit(Expand(str(radio)))
+    names = [t.name for t in suite.tests]
+    assert "gmrs: Wide" in names and "70cm: Wide" in names
+    assert "70cm: M17 Round Trip" in names
+    assert "gmrs: M17 Round Trip" not in names
+
+
+def test_band_modes_must_be_the_radios(tmp_path):
+    radio = tmp_path / "bad.yaml"
+    radio.write_text("name: Test\nbands:\n"
+                     "  2m: {frequency_hz: 146580000, modes: [dmr]}\n"
+                     "modes: [fm]\n")
+    with pytest.raises(ValueError, match="dmr"):
+        Expand(str(radio))
+
+
+def test_shipped_radio_files_expand(tmp_path):
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    for radio in sorted((root / "radios").glob("*.yaml")):
+        Expand(str(radio))
