@@ -8,7 +8,9 @@ Robot Framework pre-run modifier that fits a suite to the radio under test.
 Tests declare what they need with tags: `mode:<mode>` for an operating mode,
 and `per-band` to run once on every band. The radio file declares what the
 radio has (`bands`, `modes`). Before the run, tests needing a mode the radio
-lacks are dropped, and each per-band test is copied once per band. Transmit
+lacks are dropped, and each per-band test is copied once per band, on the
+bands that have its modes: a band may list its own `modes`, a subset of the
+radio's, as when a band allows FM only. Transmit
 tests (`tx`) on every band come first, then receive tests (`rx`), then the
 rest, so a bench moving its attenuator chain between instruments moves it
 once; within each, tests are grouped by band. Use it as
@@ -53,6 +55,13 @@ class Expand(SuiteVisitor):
         self.modes = set(self.radio.get("modes", []))
         if not self.bands:
             raise ValueError(f"{radio}: no bands declared")
+        self.band_modes = {}
+        for name, band in self.radio["bands"].items():
+            modes = set(band.get("modes", self.modes))
+            if not modes <= self.modes:
+                raise ValueError(f"{radio}: band {name} lists modes the radio "
+                                 f"lacks: {', '.join(sorted(modes - self.modes))}")
+            self.band_modes[name] = modes
 
     def start_suite(self, suite):
         runnable = [t for t in suite.tests
@@ -63,7 +72,8 @@ class Expand(SuiteVisitor):
         for group in DIRECTIONS:
             for band in self.bands:
                 for test in per_band:
-                    if direction_group(test.tags) == group:
+                    if direction_group(test.tags) == group and \
+                            required_modes(test.tags) <= self.band_modes[band]:
                         expanded.append(self._copy(test, band))
         suite.tests = expanded + once
 

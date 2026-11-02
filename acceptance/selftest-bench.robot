@@ -89,28 +89,35 @@ Known FM Deviation Reads Back
     Value Should Be Within    ${tx}[rms_deviation_hz]    ${{3000 / 2 ** 0.5}}    0.03    RMS deviation (Hz)
 
 Known M17 Stream Reads Back
+    [Tags]    mode:m17
     ${tx}=    Loop Back M17
     Value Should Be Within    ${tx}[outer_deviation_hz]    2400    ${DEVIATION_TOLERANCE}    M17 outer deviation (Hz)
     Value Should Be Within    ${tx}[deviation_ratio]    3    0.02    M17 deviation ratio
     M17 Transmissions Should Decode    ${{[$tx]}}    OAT1
 
-Readings Repeat
-    [Documentation]    ${REPEATS} loopbacks of the FM tone and the M17 stream: the spread
-    ...                of each reading is the bench's repeatability.
+FM Readings Repeat
+    [Documentation]    ${REPEATS} loopbacks of the FM tone, at 3 kHz and at the Bessel null:
+    ...                the spread of each reading is the bench's repeatability.
     ${fm}=    Create List
-    ${m17}=    Create List
-    ${ratio}=    Create List
     ${null}=    Create List
     FOR    ${i}    IN RANGE    ${REPEATS}
         ${tx}=    Loop Back FM    3000    1000
         Append To List    ${fm}    ${tx}[tone_deviation_hz]
         ${tx}=    Loop Back FM    ${BESSEL_NULL_HZ}    1000
         Append To List    ${null}    ${tx}[carrier_level_db]
+    END
+    Report Repeatability    FM tone deviation (Hz)    @{fm}
+    Report Repeatability    carrier at the Bessel null (dB)    @{null}
+
+M17 Readings Repeat
+    [Documentation]    ${REPEATS} loopbacks of the M17 stream.
+    [Tags]    mode:m17
+    ${m17}=    Create List
+    ${ratio}=    Create List
+    FOR    ${i}    IN RANGE    ${REPEATS}
         ${tx}=    Loop Back M17
         Append To List    ${m17}    ${tx}[outer_deviation_hz]
         Append To List    ${ratio}    ${tx}[deviation_ratio]
     END
-    Report Repeatability    FM tone deviation (Hz)    @{fm}
-    Report Repeatability    carrier at the Bessel null (dB)    @{null}
     Report Repeatability    M17 outer deviation (Hz)    @{m17}
     Report Repeatability    M17 deviation ratio    @{ratio}
