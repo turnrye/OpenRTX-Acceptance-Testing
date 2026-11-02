@@ -17,6 +17,15 @@ STALL_S = 3.0
 POLL_S = 0.5
 
 
+def manual_gain(gain_db: float) -> float:
+    """
+    The gain to pass to rtl_sdr -g. It takes 0 as automatic gain, which a
+    nearby transmitter drives into clipping, and rounds anything else to the
+    nearest gain the tuner has: 0.1 selects its lowest manual gain, 0 dB.
+    """
+    return max(float(gain_db), 0.1)
+
+
 class RtlSdrReceiver(Receiver):
     """
     RTL-SDR recording to cu8 files. Some dongles drop off USB when a nearby
@@ -50,7 +59,7 @@ class RtlSdrReceiver(Receiver):
         # nearby transmitter keys up
         cmd = [require_tool("rtl_sdr"), "-S", "-d", str(self.device),
                "-f", str(int(center_hz)), "-s", str(int(rate)),
-               "-g", str(self.gain_db), str(path)]
+               "-g", str(manual_gain(self.gain_db)), str(path)]
         self._proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL,
                                       stderr=subprocess.DEVNULL)
 

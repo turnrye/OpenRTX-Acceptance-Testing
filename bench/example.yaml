@@ -11,7 +11,7 @@ station: my-bench
 
 receiver:
   type: rtlsdr          # rtlsdr, hackrf, sim or replay
-  gain_db: 0
+  gain_db: 0           # 0 means the lowest manual gain, not rtl_sdr's automatic gain
   rate: 250000          # samples/s; 2000000 or more for a HackRF
   # Tune below the signal, so the receiver's DC spike stays off the channel
   tune_offset_hz: -75000
