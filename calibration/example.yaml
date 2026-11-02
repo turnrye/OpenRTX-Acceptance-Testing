@@ -4,8 +4,11 @@
 
 # A bench calibration: the loss of each RF path, by frequency, as measured on
 # that bench. Copy to calibration/<name>.local.yaml (ignored by git), measure
-# your own paths and fill them in. Results record the method and dates, and a
-# fingerprint of this file, but never its values.
+# your own paths and fill them in. Results record the method and dates, which
+# optional sections the file has, and a fingerprint of this file, but never
+# its values. Only the paths are needed for relative tests; the other
+# sections enable the tests tagged needs:abs-level and needs:audio, and
+# frequency error readings to better than the instruments' crystals.
 
 # How the losses were found: vna, power-meter, or assumed (from attenuator
 # labels; fine for tests that don't depend on absolute levels)
@@ -26,3 +29,50 @@ paths:
     points:
       - [144000000, 60.1]
       - [440000000, 60.4]
+  # Audio interface levels (needs:audio): the RMS millivolts of a 1 kHz sine
+  # at full scale (0 dBFS peak). audio_out is what the interface puts into
+  # the radio's mic input, measured with a true-RMS meter or scope across
+  # the mic input impedance; audio_in is the input voltage that reads as a
+  # full-scale sine on the capture side.
+  audio_out:
+    mvrms_at_0dbfs: 12.0
+  audio_in:
+    mvrms_at_0dbfs: 950.0
+
+# Instrument levels (needs:abs-level). Measure them with a spectrum analyser
+# or a calibrated generator (acceptance/calibration/measure.robot walks
+# through it with a LibreVNA).
+levels:
+  # The transmitter's output, in dBm, by gain setting (tx_vga_db for a
+  # HackRF), at each frequency measured. Measured with the RF amp as stated;
+  # a bench with the other amp setting can't use it. Interpolated linearly
+  # in gain and in frequency, never extrapolated. With the from_transmitter
+  # loss it gives the level at the radio's antenna port.
+  transmitter:
+    instrument: hackrf     # bench transmitter type, or type:serial
+    amp: false
+    points:
+      146580000: [[0, -58.0], [10, -48.1], [20, -38.0], [30, -28.2], [40, -18.4], [47, -11.9]]
+      445975000: [[0, -60.5], [10, -50.4], [20, -40.6], [30, -30.5], [40, -20.9], [47, -14.6]]
+      462650000: [[0, -60.9], [10, -50.8], [20, -41.0], [30, -30.9], [40, -21.3], [47, -15.0]]
+  # Per receiver and gain settings: the input level, in dBm, of a carrier
+  # that reads 0 dBFS (a complex sinusoid at full scale), by frequency. The
+  # settings must equal the bench file's receiver section for the table to
+  # apply.
+  receiver:
+    - instrument: rtlsdr
+      settings: {gain_db: 0}
+      full_scale_dbm: [[146580000, -9.8], [445975000, -11.6], [462650000, -11.9]]
+    - instrument: hackrf
+      settings: {lna_db: 0, vga_db: 0, amp: false}
+      full_scale_dbm: [[146580000, 1.5], [445975000, 0.2], [462650000, 0.1]]
+
+# Each instrument's reference oscillator error, in ppm, positive when it runs
+# fast: a receiver then reads carriers low by ppm x f, a transmitter puts them
+# out high by it. Keyed by bench type, or type:serial. Carrier offsets and
+# frequency errors are corrected with it, and the transmitter's signals moved
+# by it. With a shared 10 MHz reference (HackRF CLKIN), measure the others
+# against a carrier from the referenced instrument.
+frequency_correction_ppm:
+  hackrf: 0.0
+  rtlsdr: 1.8

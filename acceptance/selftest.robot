@@ -97,3 +97,17 @@ Results Are Remembered Per Band
     ${other}=    Recall Result    wide tone
     Should Be Equal    ${other}    ${NONE}
     [Teardown]    Use Band    70cm
+
+Absolute Levels Come From The Calibration
+    Simulate Radio Transmissions    2500
+    ${tx}=    Capture Radio Transmissions    Key up once
+    ${dbm}=    Radio Power In dBm    ${tx}[0]
+    Should Be True    33 < ${dbm} < 35
+    Radio Power Should Be Between    ${tx}[0]    30    37
+    ${setting}=    Transmit Level    -100
+    Should Be Equal    ${setting}    ${{(20, 0.0)}}
+    ${low}=    Transmit Level    -125
+    Should Be Equal As Numbers    ${low}[1]    5
+    Run Keyword And Expect Error    *step attenuator*    Transmit Level    -140
+    Start Transmitting FM Tone    3000    level_dbm=-110
+    Stop Transmitting

@@ -83,3 +83,118 @@ paths: {{to_receiver: {{points: [[0, {loss}]]}}}}
     check_receiver_safe(RADIO, cal(60), 10.0, 446e6)
     with pytest.raises(ValueError, match="add at least 10 dB"):
         check_receiver_safe(RADIO, cal(27), 10.0, 446e6)
+
+
+LEVELS = """
+method: vna
+measured: 2026-11-01
+expires: 2027-05-01
+paths:
+  to_receiver: {points: [[0, 60]]}
+  from_transmitter: {points: [[100000000, 50], [500000000, 52]]}
+  audio_out: {mvrms_at_0dbfs: 12.5}
+levels:
+  transmitter:
+    instrument: hackrf
+    amp: false
+    points:
+      146580000: [[0, -58], [10, -48], [47, -11]]
+      445975000: [[47, -15], [0, -62], [10, -52]]
+  receiver:
+    - instrument: rtlsdr
+      settings: {gain_db: 0}
+      full_scale_dbm: [[146580000, -10], [445975000, -12]]
+    - instrument: rtlsdr
+      settings: {gain_db: 20}
+      full_scale_dbm: [[0, -30]]
+frequency_correction_ppm:
+  rtlsdr: 1.5
+  hackrf: -0.5
+  hackrf:abc: 0.25
+"""
+
+
+def test_old_calibrations_load_without_levels(tmp_path):
+    cal = load_calibration(write_cal(tmp_path, """
+method: assumed
+measured: 2026-10-20
+expires: 2099-01-01
+paths: {to_receiver: {points: [[0, 60]]}}
+"""))
+    assert cal.calibrated() == []
+    assert "calibrated" not in cal.summary()
+    assert cal.frequency_correction_ppm({"type": "rtlsdr"}) is None
+    with pytest.raises(LookupError, match="levels.transmitter"):
+        cal.transmitter_setting({"type": "hackrf"}, 446e6, -60, 10)
+    with pytest.raises(LookupError, match="levels.receiver"):
+        cal.receiver_full_scale_dbm({"type": "rtlsdr"}, 446e6)
+
+
+def test_summary_names_sections_never_values(tmp_path):
+    cal = load_calibration(write_cal(tmp_path, LEVELS))
+    summary = cal.summary()
+    assert summary["calibrated"] == [
+        "levels.transmitter", "levels.receiver", "frequency_correction_ppm",
+        "paths.audio_out"]
+    assert "12.5" not in str(summary) and "-58" not in str(summary)
+    # Audio levels are not RF paths
+    assert set(cal.paths) == {"to_receiver", "from_transmitter"}
+    assert cal.audio_full_scale_mvrms("audio_out") == 12.5
+    with pytest.raises(LookupError, match="audio_in"):
+        cal.audio_full_scale_mvrms("audio_in")
+
+
+def test_transmitter_levels_interpolate_in_gain_and_frequency(tmp_path):
+    table = load_calibration(write_cal(tmp_path, LEVELS)).transmitter_levels
+    assert table.level(146.58e6, 5) == pytest.approx(-53)
+    assert table.level(445.975e6, 0) == pytest.approx(-62)
+    middle = (146.58e6 + 445.975e6) / 2
+    assert table.level(middle, 10) == pytest.approx(-50)
+    with pytest.raises(ValueError, match="outside the transmitter level"):
+        table.level(900e6, 10)
+
+
+def test_transmitter_setting_reaches_a_level(tmp_path):
+    cal = load_calibration(write_cal(tmp_path, LEVELS))
+    hackrf = {"type": "hackrf", "serial": "xyz"}
+    gain, backoff = cal.transmitter_setting(hackrf, 146.58e6, -50.5, 10)
+    assert gain == 8 and backoff == pytest.approx(0.5)
+    # Below the lowest gain, the rest is digital back-off, within limits
+    gain, backoff = cal.transmitter_setting(hackrf, 146.58e6, -65, 10)
+    assert gain == 0 and backoff == pytest.approx(7)
+    with pytest.raises(ValueError, match="step attenuator"):
+        cal.transmitter_setting(hackrf, 146.58e6, -75, 10)
+    with pytest.raises(ValueError, match="above the transmitter"):
+        cal.transmitter_setting(hackrf, 146.58e6, -5, 10)
+    with pytest.raises(LookupError, match="amp off"):
+        cal.transmitter_setting({**hackrf, "amp": True}, 146.58e6, -50, 10)
+    with pytest.raises(LookupError, match="not this bench"):
+        cal.transmitter_setting({"type": "sim"}, 146.58e6, -50, 10)
+
+
+def test_receiver_levels_match_instrument_and_settings(tmp_path):
+    cal = load_calibration(write_cal(tmp_path, LEVELS))
+    assert cal.receiver_full_scale_dbm({"type": "rtlsdr"}, 146.58e6) == -10
+    assert cal.receiver_full_scale_dbm(
+        {"type": "rtlsdr", "gain_db": 20}, 146.58e6) == -30
+    with pytest.raises(LookupError, match="gain_db"):
+        cal.receiver_full_scale_dbm({"type": "rtlsdr", "gain_db": 10}, 446e6)
+    with pytest.raises(LookupError):
+        cal.receiver_full_scale_dbm({"type": "hackrf"}, 446e6)
+
+
+def test_frequency_correction_per_instrument(tmp_path):
+    cal = load_calibration(write_cal(tmp_path, LEVELS))
+    assert cal.frequency_correction_ppm({"type": "rtlsdr"}) == 1.5
+    assert cal.frequency_correction_ppm({"type": "hackrf"}) == -0.5
+    assert cal.frequency_correction_ppm(
+        {"type": "hackrf", "serial": "abc"}) == 0.25
+    assert cal.frequency_correction_ppm({"type": "sim"}) is None
+
+
+def test_example_calibration_loads(tmp_path):
+    example = (Path(__file__).parents[1] / "calibration" / "example.yaml")
+    (tmp_path / "to_receiver.local.s2p").write_text(
+        (DATA / "path-db.s2p").read_text())
+    cal = load_calibration(write_cal(tmp_path, example.read_text()))
+    assert len(cal.calibrated()) == 5
