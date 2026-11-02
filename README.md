@@ -54,6 +54,28 @@ Tests that need them are tagged `needs:abs-level` or `needs:audio`; a bench with
 those tags. `calibration/example.yaml` shows every section.
 
 The SDR backends call `hackrf_transfer` and `rtl_sdr`, so `hackrf` and `librtlsdr` must be installed.
+The audio interface goes through ALSA's `aplay` and `arecord` (`alsa-utils`). For M17 voice,
+Codec2's `c2enc` and `c2dec` (the `codec2` package) encode generated payloads and decode the
+radio's; without them, tests that need voice skip and the rest still run. `m17-demod` from
+m17-cxx-demod, when on the PATH, decodes each M17 capture a second time, independently.
+
+### Measuring a calibration
+
+`python -m oat.calibrate` measures a calibration with a LibreVNA, through LibreVNA-GUI's SCPI
+server (port 19542; `LibreVNA-GUI --no-gui` runs it without a window). It walks through five
+steps: C1 sweeps both RF paths into `.s2p` files, C2 reads the transmitter's output at each gain
+on the spectrum analyser, C3 feeds the receiver a known carrier for its full-scale level, C4
+measures the receiver's reference error against the generator or a known carrier, and C5 records
+the audio voltages measured by hand. It writes `calibration/<station>.local.yaml` and keeps the
+sections not measured again:
+
+```sh
+uv run python -m oat.calibrate --bench bench/mybench.local.yaml --radio radios/c62.yaml \
+    --steps C2,C3 --pad-db 30
+```
+
+The LibreVNA's command names come from its GUI; their argument and reply formats are marked
+UNVERIFIED in `src/oat/sdr/librevna.py` until checked against the hardware.
 
 ## Running
 
@@ -61,17 +83,42 @@ The SDR backends call `hackrf_transfer` and `rtl_sdr`, so `hackrf` and `librtlsd
 # The keywords on a simulated bench, without hardware
 uv run robot -d runs/selftest acceptance/selftest.robot
 
+# The bench measuring itself through the attenuator chain, no radio connected
+uv run robot -A bench/mybench.local.args -v FIRMWARE:v0.4.5-88-g1ceed9f8 \
+    -v "HARDWARE:Retevis C62 2501R0621100413" -v DSP:9579b617 \
+    -d runs/selftest-bench acceptance/selftest-bench.robot
+
 # FM bandwidth acceptance on a real bench: the transmit tests, on every band
 uv run robot -A bench/mybench.local.args -v FIRMWARE:v0.4.5-88-g1ceed9f8 \
-    -v "HARDWARE:Retevis C62 2501R0621100413" \
+    -v "HARDWARE:Retevis C62 2501R0621100413" -v DSP:9579b617 \
     -d runs/bandwidth-tx --include tx acceptance/fm/bandwidth.robot
 ```
 
 The argument file (`-A`) carries the bench, calibration and radio, and `oat.expand`. `FIRMWARE`
 names what the radio runs, ideally a `git describe` of its build, and `HARDWARE` the unit, by model
 and serial number: units of one model measure differently. All five are mandatory: a run without
-them stops before any instrument starts. Tags select what runs: `--include tx`,
-`--include rx`, `--include band:2m`, `--exclude mode:m17`.
+them stops before any instrument starts. Radios whose audio runs through a separately flashed DSP,
+such as the C62 and C2 (`dsp_image: true` in the radio file), also need `DSP`, the image's sha256
+or enough of it to tell images apart: two firmware states can differ in their DSP image alone. On
+the C62, for example, the 16 kHz image starts `7dd697c9` and the 48 kHz one `9579b617`; factory
+firmware is `-v DSP:stock`. Tags select what runs: `--include tx`, `--include rx`,
+`--include band:2m`, `--exclude mode:m17`, and `--exclude needs:audio` or
+`--exclude needs:abs-level` on a bench without an audio interface or absolute level calibration.
+
+### The suites
+
+| Suite | What it covers |
+|---|---|
+| `selftest.robot` | The keywords, on the simulated bench |
+| `selftest-bench.robot` | The bench through its attenuator chain, no radio: the deviation scale at the Bessel null, a known FM deviation and a known M17 stream read back, and their spread over five repeats, which sets the tolerance for comparing firmware states. Needs separate receiver and transmitter. Run it at the start of every evidence session |
+| `fm/bandwidth.robot` | FM deviation, bandwidth, CTCSS and power steps at both bandwidths, adjacent channels, and FM restored after M17 |
+| `fm/audio.robot` | FM audio through the audio interface: mic sensitivity, response, distortion, speech deviation, mic level after cold boots, 12 dB SINAD sensitivity, receive response and dropouts |
+| `m17/tx.robot` | M17 transmit: deviations and ratio, symbol rate, carrier, bandwidth, EVM, decode rate, preamble, long transmissions, power, Codec2 input level and aliasing |
+| `m17/rx.robot` | M17 receive of a generated stream: callsign, Codec2 tone, sensitivity, carrier offset, speaker images |
+
+On `bench/sim.yaml` the simulated radio transmits what the audio interface plays into its mic,
+plays at its speaker what the simulated transmitter sends, and the transmitter loops back into
+the receiver, so every suite except `m17/tx.robot` runs without hardware.
 
 Before anything starts, the run shows its plan: the radio, its unit and firmware, the bench, each band's
 frequency and calibrated losses, which way the attenuator chain must face, and the tests to run.
@@ -97,7 +144,8 @@ its `modes`, and the limits tests check. Tests say what they need with tags: `mo
 and `per-band` for tests to repeat on every band. `oat.expand`, the pre-run modifier in the argument
 file, fits the suite to the radio: each per-band test is repeated per band, named for it
 (`2m: FM TX At 25 kHz ...`, tagged `band:2m`), and tests needing a mode the radio lacks are left
-out. Transmit tests (`tx`) on every band come before receive tests (`rx`), grouped by band within
+out. A band may list its own `modes`, as `radios/c2.yaml` keeps GMRS to FM; per-band tests then
+run only on the bands with their modes. Transmit tests (`tx`) on every band come before receive tests (`rx`), grouped by band within
 each.
 
 ### Operator prompts
@@ -110,9 +158,38 @@ or `no: crackles on peaks`.
 ### Stock firmware as a reference
 
 A suite runs the same way on any firmware: flash the stock firmware and run it with
-`-v FIRMWARE:stock-1.2 --exclude mode:m17`. The results website compares runs side by side.
-Stock firmware names its power settings differently from OpenRTX; pass them lowest first with
-`-v "POWER_SETTINGS:Low,High"`.
+`-v FIRMWARE:stock-1.2 -v DSP:stock --exclude mode:m17`; don't assume stock firmware has M17. The
+results website compares runs side by side. Stock firmware names its power settings differently
+from OpenRTX; pass them lowest first with `-v "POWER_SETTINGS:Low,High"`.
+
+To compare firmware states in a pull request, print their runs side by side:
+
+```sh
+uv run python -m oat.compare runs/stock runs/before runs/after
+```
+
+gives a Markdown table per suite, a row per measurement and a column per run, headed by its
+firmware, DSP image and date. `--all` shows every number recorded.
+
+### The audio interface
+
+A USB sound interface on the radio's accessory connector replaces the acoustic tone and the ear:
+an AIOC, or a CM108 dongle with a resistive pad to the mic pin and a loaded speaker tap. Its
+`audio` section in the bench file names the ALSA devices, and with an AIOC the serial port whose
+DTR line keys the radio (`bench/example.yaml`); without a PTT line the operator keys on request.
+Keywords inject tones, tone sequences and WAV files, record the speaker, and measure level, SINAD
+and THD+N (optionally psophometrically weighted), response and dropouts. With `paths.audio_out`
+and `paths.audio_in` calibrated, levels read in millivolts.
+
+### M17
+
+M17 captures are measured from the IQ: FM demodulation at 48 kHz, the receive RRC filter, symbol
+timing, then the outer and inner deviation and their ratio, EVM, symbol rate error, carrier,
+bandwidth, preamble and polarity. Every frame is decoded in Python (LSF with its CRC and callsign,
+LICH, stream frames, frame numbers, EOT), so no outside decoder is needed; the encoder and decoder
+are checked symbol for symbol against libm17 (`scripts/m17-reference-vectors.py`). The bench
+generates M17 streams the same way, with a Codec2 tone, a WAV file or random payload, at any
+deviation, offset or polarity. Limits are the radio file's `m17` block.
 
 ### Transmit power
 
@@ -128,7 +205,7 @@ uv run python -m oat.analysis capture.cu8 --rate 250000 --offset 75000 --audio-d
 ```
 
 lists each transmission's carrier offset, peak and RMS deviation, dominant tone, 99% occupied
-bandwidth, and CTCSS tone and deviation.
+bandwidth, and CTCSS tone and deviation. `oat.m17.phy.measure_m17_capture` does the same for M17.
 
 ## Sharing results
 
@@ -164,6 +241,7 @@ links to the suite on `main` instead, so push before you run.
 | `radios/` | Radio files: bands, modes, limits |
 | `results/` | Published evidence runs, append-only |
 | `scripts/export-run.sh` | Adds a run to `results/` |
-| `src/oat/` | The Robot library: SDR backends, signals, analysis, operator, keywords, modifiers |
+| `scripts/m17-reference-vectors.py` | Writes the M17 test vectors from a libm17 build |
+| `src/oat/` | The Robot library: SDR and VNA backends, signals, FM and M17 analysis, audio, operator, keywords, modifiers, calibration and comparison tools |
 | `tests/` | Unit tests of the library (`uv run pytest`) |
 | `docs/DESIGN.md` | Goals and how the pieces fit |
