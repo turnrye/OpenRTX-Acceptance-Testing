@@ -968,7 +968,7 @@ class OpenRTXAcceptance:
                 - ppm * 1e-6 * self._frequency())
 
     def _play(self, iq: np.ndarray, name: str, level_dbm=None,
-              repeat: bool = True) -> dict:
+              repeat: bool = True, mode: str = "fm") -> dict:
         """
         Write a signal and start the transmitter on it, at the bench's gain
         or at level_dbm at the radio's antenna port. Returns what to record
@@ -991,7 +991,8 @@ class OpenRTXAcceptance:
         if abs(applied - gain_offset) > 0.5:
             raise RuntimeError(f"transmitter applied {applied:+.0f} dB "
                                f"instead of {gain_offset:+.0f} dB")
-        self._tx_state = {"path": path, "level_dbm": record.get("level_dbm")}
+        self._tx_state = {"path": path, "level_dbm": record.get("level_dbm"),
+                          "mode": mode}
         return record
 
     @keyword
@@ -1102,7 +1103,7 @@ class OpenRTXAcceptance:
             silence(float(gap_s), tx["rate"])])
         level = self._play(iq, f"tx-m17-{source.replace('/', '_')}-"
                                f"{int(float(offset_hz))}hz", level_dbm,
-                           repeat=bool(loop))
+                           repeat=bool(loop), mode="m17")
         self._record("transmit", mode="m17", source=source,
                      destination=destination, audio=str(audio),
                      frames=len(payloads), deviation_hz=float(deviation_hz),
@@ -1625,6 +1626,25 @@ class OpenRTXAcceptance:
             f"{result['sensitivity_dbm']:.1f} dBm", append=True)
         return result
 
+    def _sim_m17_voice(self, path: Path, rate: int) -> np.ndarray:
+        """
+        The simulated radio's M17 voice: the stream decoded, its Codec2
+        frames through c2dec, and the 8 kHz audio held for each output
+        sample, as an unfiltered rate change does; silence without c2dec.
+        """
+        from oat.iq import read_iq
+        tx = self.bench["transmitter"]
+        # Quiet around it, as transmissions are found against the noise
+        quiet = silence(1.0, tx["rate"])
+        found = measure_m17_capture(
+            np.concatenate([quiet, read_iq(path, IqFormat.CS8), quiet]),
+            tx["rate"], -tx.get("tune_offset_hz", 0))
+        payload = b"".join(m.payload for m in found)
+        if not payload or not m17_tools.available("c2dec"):
+            return np.zeros(rate)
+        voice = m17_tools.codec2_decode(payload) / 32767.0
+        return np.repeat(voice, rate // m17_tools.CODEC2_RATE)
+
     def _sim_speaker(self, n: int, rate: int) -> np.ndarray:
         """
         The simulated radio's speaker: FM demodulation of what the
@@ -1637,7 +1657,11 @@ class OpenRTXAcceptance:
             # Nothing received: the interface loops back what it plays
             return None
         path = state["path"]
-        if path not in self._sim_cache:
+        # A file rewritten under the same name is a new signal
+        key = (path, path.stat().st_mtime_ns)
+        if key not in self._sim_cache and state["mode"] == "m17":
+            self._sim_cache[key] = self._sim_m17_voice(path, rate)
+        if key not in self._sim_cache:
             from oat.iq import IqFormat, read_iq
             from scipy.signal import resample_poly, sosfilt, butter
             tx = self.bench["transmitter"]
@@ -1651,9 +1675,9 @@ class OpenRTXAcceptance:
             dev = resample_poly(dev, rate // g, 48000 // g)
             # De-emphasis, 6 dB/octave above 300 Hz, unity at 1 kHz
             deemph = butter(1, 300, fs=rate, output="sos")
-            self._sim_cache[path] = sosfilt(deemph, dev) * (1000 / 300) \
+            self._sim_cache[key] = sosfilt(deemph, dev) * (1000 / 300) \
                 * 0.3 / 3000
-        speaker = np.resize(self._sim_cache[path], n)
+        speaker = np.resize(self._sim_cache[key], n)
         level = state.get("level_dbm")
         sinad = 40.0 if level is None else min(40.0, 12 + level + 118)
         rms = np.sqrt(np.mean(speaker ** 2)) or 1e-6
