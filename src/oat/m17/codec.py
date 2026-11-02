@@ -160,8 +160,8 @@ def _syndrome(word: int) -> int:
 
 
 def _golay_table() -> dict[int, int]:
-    """Error pattern of each syndrome: the code is perfect, so every one of
-    the 4096 syndromes belongs to exactly one pattern of up to 3 errors."""
+    """Error pattern of each syndrome of up to 3 errors; the others mean 4
+    or more, which the extended Golay code detects but can't correct."""
     table = {0: 0}
     for a in range(24):
         table[_syndrome(1 << a)] = 1 << a
@@ -177,8 +177,13 @@ _GOLAY_ERRORS = _golay_table()
 
 
 def golay_decode(word: int) -> tuple[int, int]:
-    """The 12 data bits of a received codeword, and the errors corrected."""
-    error = _GOLAY_ERRORS[_syndrome(word)]
+    """
+    The 12 data bits of a received codeword and the errors corrected, or
+    the bits as received and -1 when there are too many to correct.
+    """
+    error = _GOLAY_ERRORS.get(_syndrome(word))
+    if error is None:
+        return (word >> 12) & 0xFFF, -1
     return ((word ^ error) >> 12) & 0xFFF, bin(error).count("1")
 
 
@@ -368,7 +373,7 @@ class StreamFrame:
     last: bool
     payload: bytes
     metric: float  # Viterbi path metric of the payload
-    lich_errors: int  # bits the Golay code corrected
+    lich_errors: int  # bits the Golay code corrected; -1 if it couldn't
 
 
 def decode_stream_frame(payload_symbols: np.ndarray) -> StreamFrame:
@@ -380,7 +385,7 @@ def decode_stream_frame(payload_symbols: np.ndarray) -> StreamFrame:
         word = int("".join(map(str, hard[24 * i:24 * i + 24])), 2)
         data, e = golay_decode(word)
         raw = (raw << 12) | data
-        errors += e
+        errors = -1 if e < 0 or errors < 0 else errors + e
     lich = raw.to_bytes(6, "big")
     bits, metric = viterbi_decode(soft[96:], P2, 144)
     data = _bytes(bits)
@@ -393,7 +398,7 @@ def lsf_from_lich(frames: list[StreamFrame]) -> tuple[Lsf, bool] | None:
     """The LSF reassembled from the LICH of six consecutive counters."""
     chunks = {}
     for f in frames:
-        if f.counter < 6:
+        if f.counter < 6 and f.lich_errors >= 0:
             chunks.setdefault(f.counter, f.lich)
     if len(chunks) < 6:
         return None
