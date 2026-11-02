@@ -152,3 +152,18 @@ def test_lsf_line_parsing():
     text = "\nSRC: K0RET, DEST: @ALL, TYPE: 0005, NONCE: 00, CRC: 1234\n"
     m = tools.LSF_LINE.search(text)
     assert (m.group(1), m.group(2)) == ("K0RET", "@ALL")
+
+
+def test_symbols_before_the_first_frame_dont_derail_the_walk():
+    # A real radio's carrier carries symbols before its preamble, and random
+    # symbols loosely match some sync burst every few thousand symbols. The
+    # walk used to start at such a match, find nothing 192 symbols later and
+    # stop after one bogus frame (a C62 capture, 2026-11-01).
+    rng = np.random.default_rng(5)
+    lead = rng.choice([-3, -1, 1, 3], size=6000)
+    symbols = np.concatenate([lead, transmission(40)])
+    (m,) = phy.measure_m17_capture(capture((symbols, dict(offset_hz=75e3))),
+                                   RATE, 75e3)
+    assert m.lsf_found and m.lsf_crc_ok and m.source == "K0RET"
+    assert m.stream_frames == 40 and m.frame_number_errors == 0
+    assert m.eot_found
