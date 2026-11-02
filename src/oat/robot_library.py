@@ -300,7 +300,9 @@ class OpenRTXAcceptance:
         Skip unless the bench receives and transmits with different
         instruments, as a loopback through the attenuator chain needs.
         """
-        if self._one_instrument():
+        # The simulated pair is one type, but loops back by design
+        if self._one_instrument() and not isinstance(self.receiver,
+                                                     SimReceiver):
             BuiltIn().skip("The receiver and the transmitter are one "
                            "instrument, which can't loop back into itself")
 
