@@ -14,6 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
+      - name: Codec2, for the M17 voice tests
+        run: sudo apt-get update && sudo apt-get install -y codec2
       - run: uv sync
       - run: uv run pytest
       - name: Robot self-test on the simulated bench
@@ -25,6 +27,14 @@ jobs:
           -v RADIO:radios/c62.yaml -v BENCH:bench/sim.yaml
           -v CALIBRATION:calibration/sim.yaml -v FIRMWARE:sim
           -v HARDWARE:sim -v DSP:sim acceptance/selftest-bench.robot
+      - name: Audio and M17 receive suites on the simulated bench
+        run: >-
+          uv run robot --outputdir runs/sim-suites
+          --prerunmodifier oat.expand.Expand:radios/c62.yaml
+          -v RADIO:radios/c62.yaml -v BENCH:bench/sim.yaml
+          -v CALIBRATION:calibration/sim.yaml -v FIRMWARE:sim
+          -v HARDWARE:sim -v DSP:sim acceptance/fm/audio.robot
+          acceptance/m17/rx.robot
       - name: Suites resolve their keywords
         run: >-
           uv run robot --dryrun --outputdir runs/dryrun
