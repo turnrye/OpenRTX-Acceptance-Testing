@@ -21,7 +21,7 @@ from oat import audio as audio_mod
 from oat.analysis import demodulated_audio, measure_capture, to_analysis_rate
 from oat.calibration import load_calibration
 from oat.config import check_receiver_safe, load_yaml
-from oat.iq import clipped_fraction, write_iq
+from oat.iq import IqFormat, clipped_fraction, write_iq
 from oat.sanitize import scrub
 from oat.operator import make_operator
 from oat.sdr import make_receiver, make_transmitter
@@ -65,6 +65,17 @@ def receiver_clipped(capture) -> float:
         return 0.0
     return sum(clipped_fraction(p, capture.fmt) * n
                for p, n in zip(capture.paths, sizes)) / sum(sizes)
+
+
+def plain(value):
+    """numpy values as the Python ones json can write."""
+    if isinstance(value, np.generic):
+        return value.item()
+    if isinstance(value, np.ndarray):
+        return value.tolist()
+    if isinstance(value, Path):
+        return str(value)
+    raise TypeError(f"{type(value).__name__} isn't JSON serializable")
 
 
 def voice_levels(pcm: np.ndarray) -> dict:
@@ -361,7 +372,7 @@ class OpenRTXAcceptance:
             "records": self.records,
             "operator": self.operator.exchanges(),
         }
-        text = scrub(json.dumps(report, indent=2))
+        text = scrub(json.dumps(report, indent=2, default=plain))
         (self.run_dir / "measurements.json").write_text(text + "\n")
 
     def _record(self, kind: str, **data):
@@ -1307,6 +1318,9 @@ class OpenRTXAcceptance:
             self.ptt.key()
         else:
             self.operator.instruct("Key PTT and hold it, then continue.")
+        if isinstance(self.audio, audio_mod.SimAudio) and isinstance(
+                self.receiver, SimReceiver):
+            self._sim_keyed = self.receiver.clock.now
 
     @keyword
     def release_radio(self):
@@ -1315,6 +1329,43 @@ class OpenRTXAcceptance:
             self.ptt.unkey()
         else:
             self.operator.instruct("Release PTT, then continue.")
+        if getattr(self, "_sim_keyed", None) is not None:
+            self._sim_radio_transmits(self._sim_keyed,
+                                      self.receiver.clock.now)
+            self._sim_keyed = None
+
+    def _sim_radio_transmits(self, start: float, stop: float):
+        """
+        The simulated radio's transmission while it was keyed: what the
+        audio interface plays into its mic, pre-emphasized 6 dB/octave,
+        -40 dBFS at 1 kHz deviating 1 kHz, limited at 5 kHz.
+        """
+        from oat.signals import fm_modulate
+        from oat.sdr.sim import SimPlay
+        rx = self.bench["receiver"]
+        rate = rx["rate"]
+        n = int((stop - start) * audio_mod.RATE)
+        if n <= 0:
+            return
+        mic = np.zeros(n)
+        if self.audio.playing is not None:
+            played, r = audio_mod.read_wav(self.audio.playing)
+            mic = (np.resize(played, n) if self.audio.repeat
+                   else np.pad(played[:n], (0, max(0, n - len(played)))))
+        spec = np.fft.rfft(mic)
+        freqs = np.fft.rfftfreq(n, 1 / audio_mod.RATE)
+        spec *= np.where(freqs <= 3500, freqs / 1000, 0.0)
+        dev = np.clip(np.fft.irfft(spec, n) * 1000 / 10 ** (-40 / 20),
+                      -5000, 5000)
+        from scipy.signal import resample_poly
+        g = np.gcd(int(rate), audio_mod.RATE)
+        dev = resample_poly(dev, int(rate) // g, audio_mod.RATE // g)
+        iq = fm_modulate(dev, rate, 1.0)
+        self._captures_sim = getattr(self, "_captures_sim", 0) + 1
+        path = self.run_dir / f"sim-radio-{self._captures_sim:02d}.cs8"
+        write_iq(path, iq, IqFormat.CS8)
+        self.receiver.emissions.append(SimPlay(
+            path, self._frequency(), rate, False, 0.0, start, stop))
 
     def _audio_result(self, samples: np.ndarray, rate: int, unit: str,
                       file: Path, tone_hz=None,
@@ -1612,3 +1663,113 @@ class OpenRTXAcceptance:
                                output="sos"), rng.normal(size=n))
         noise *= noise_rms / (np.sqrt(np.mean(noise ** 2)) or 1.0)
         return speaker + noise
+
+    @keyword
+    def test_deviation(self, bandwidth: str) -> float:
+        """The radio file's reference deviation for a channel bandwidth."""
+        return float(self.radio["fm"]["test_deviation_hz"][bandwidth])
+
+    @keyword
+    def mic_level_spread_should_meet_limits(self, *deviations):
+        """
+        Fail unless the deviations one injected tone gave, take after take,
+        spread over no more than the radio file's mic_level_max_spread_db.
+        """
+        self.spread_should_be_at_most(
+            "mic level", float(self.radio["fm"]["mic_level_max_spread_db"]),
+            *deviations)
+
+    @keyword
+    def report_ratio_in_db(self, what: str, numerator: float,
+                           denominator: float) -> float:
+        """Record 20 log10 of a ratio of amplitudes, as hum and noise is."""
+        db = float(20 * np.log10(float(numerator) / float(denominator)))
+        self._record("ratio-db", what=what, value=db)
+        BuiltIn().set_test_message(f"{what}: {db:.1f} dB", append=True)
+        return db
+
+    @keyword
+    def start_transmitting_fm_tones(self, deviation_hz: float,
+                                    freqs_hz: str = "300,500,1000,2000,3000",
+                                    tone_s: float = 1.0, gap_s: float = 0.3,
+                                    level_dbm: float | None = None):
+        """
+        Loop FM tones in turn, each at the same deviation and followed by
+        unmodulated carrier, for the radio's receive audio response.
+        """
+        tx = self.bench["transmitter"]
+        rate = tx["rate"]
+        freqs = [float(f) for f in str(freqs_hz).split(",")]
+        mod = np.concatenate([np.concatenate([
+            tone(f, float(tone_s), rate), np.zeros(int(float(gap_s) * rate))])
+            for f in freqs])
+        from oat.signals import fm_modulate
+        iq = fm_modulate(mod, rate, float(deviation_hz),
+                         self._tx_baseband_offset())
+        level = self._play(iq, f"tx-tones-{int(float(deviation_hz))}hz",
+                           level_dbm)
+        self._record("transmit", deviation_hz=float(deviation_hz),
+                     freqs_hz=freqs, **level)
+
+    @keyword
+    def codec2_alias_level(self, reference: dict, measurement: dict,
+                           alias_hz: float, reference_hz: float = 1000.0
+                           ) -> float:
+        """
+        How loud an alias is in a transmission's decoded voice, in dB
+        relative to the reference tone in another take's voice: an injected
+        tone above 4 kHz that the 8 kHz Codec2 input folds back.
+        """
+        for m in (reference, measurement):
+            if "voice_file" not in m:
+                BuiltIn().skip("No decoded voice: install codec2 (c2dec)")
+        ref, rate = audio_mod.read_wav(self.run_dir / reference["voice_file"])
+        got, rate2 = audio_mod.read_wav(self.run_dir
+                                        / measurement["voice_file"])
+        a_ref = audio_mod.tone_amplitude(ref, rate, float(reference_hz), 40)
+        a_alias = audio_mod.tone_amplitude(got, rate2, float(alias_hz), 40)
+        db = float(20 * np.log10(max(a_alias, 1e-9) / max(a_ref, 1e-9)))
+        self._record("alias", alias_hz=float(alias_hz),
+                     reference_hz=float(reference_hz), level_db=db)
+        BuiltIn().set_test_message(f"{float(alias_hz):.0f} Hz alias at "
+                                   f"{db:+.1f} dB", append=True)
+        return db
+
+    @keyword
+    def find_m17_rx_sensitivity(self, start_dbm: float = -100.0,
+                                stop_dbm: float = -130.0,
+                                step_db: float = 2.0,
+                                min_sinad_db: float = 10.0,
+                                source: str = "OAT1",
+                                seconds: float = 3.0,
+                                tone_hz: float = 1000.0) -> dict:
+        """
+        Step a looped M17 stream carrying a Codec2 tone down from start_dbm,
+        recording the speaker at each level, until the tone's SINAD falls
+        below min_sinad_db. The sensitivity is the lowest level that still
+        reached it.
+        """
+        points, last_good = [], None
+        level = float(start_dbm)
+        try:
+            while level >= float(stop_dbm) - 1e-9:
+                self.start_transmitting_m17_stream(
+                    source, audio=f"tone:{tone_hz:g}", frames=50, gap_s=0.2,
+                    level_dbm=level)
+                self.wait_seconds(0.5)
+                a = self.capture_radio_audio(seconds, tone_hz)
+                points.append((level, a["sinad_db"]))
+                if a["sinad_db"] < float(min_sinad_db):
+                    break
+                last_good = level
+                level -= float(step_db)
+        finally:
+            self.stop_transmitting()
+        result = {"min_sinad_db": float(min_sinad_db), "points": points,
+                  "sensitivity_dbm": last_good}
+        self._record("m17-rx-sensitivity", **result)
+        if last_good is None:
+            raise AssertionError(f"No audio at {start_dbm} dBm already")
+        BuiltIn().set_test_message(f"M17 audio down to {last_good:.0f} dBm",
+                                   append=True)
+        return result

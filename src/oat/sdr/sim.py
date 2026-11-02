@@ -106,6 +106,8 @@ class SimReceiver(Receiver):
         # transmitted while the capture ran: a loopback through the bench
         self.transmitter = transmitter
         self._started = 0.0
+        # Transmissions of the simulated radio, played like the transmitter's
+        self.emissions: list["SimPlay"] = []
 
     def queue_scene(self, bursts: list[SimBurst],
                     frequency_offset_hz: float) -> None:
@@ -123,8 +125,7 @@ class SimReceiver(Receiver):
             raise RuntimeError("receiver not started")
         center_hz, rate, path = self._args
         self._args = None
-        if not self.scenes and self.transmitter is not None \
-                and self.transmitter.played(self._started, self.clock.now):
+        if not self.scenes and self._played(self._started, self.clock.now):
             iq = self._loopback(center_hz, rate)
         else:
             scene = self.scenes.popleft() if self.scenes else []
@@ -138,11 +139,20 @@ class SimReceiver(Receiver):
         return Capture([path], rate, center_hz, IqFormat.CU8)
 
 
+    def _played(self, start: float, stop: float) -> list["SimPlay"]:
+        """What the transmitter and the radio sent during a span of time."""
+        plays = [p for p in self.emissions
+                 if p.started < stop and (p.stopped is None
+                                          or p.stopped > start)]
+        if self.transmitter is not None:
+            plays += self.transmitter.played(start, stop)
+        return plays
+
     def _loopback(self, center_hz: float, rate: float) -> np.ndarray:
-        """What the transmitter sent while this capture ran, at its rate."""
+        """What was sent while this capture ran, at its rate."""
         start, stop = self._started, self.clock.now
         out = np.zeros(int((stop - start) * rate), dtype=np.complex64)
-        for play in self.transmitter.played(start, stop):
+        for play in self._played(start, stop):
             period = loop_to_rate(read_iq(play.path, IqFormat.CS8),
                                   play.rate, rate, play.center_hz - center_hz)
             a = int((max(play.started, start) - start) * rate)
