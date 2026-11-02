@@ -6,6 +6,10 @@
 
 name: Retevis C62/C2
 max_tx_power_dbm: 37          # 5 W
+# The audio path runs through a CSK6 DSP whose image is flashed separately
+# from the firmware, so firmware states can differ in it alone: every run
+# names it, -v DSP:<sha256 of the image>, or DSP:stock for factory firmware
+dsp_image: true
 
 # What the radio has; oat.expand runs per-band tests on every band and drops
 # tests needing a mode not listed. Test frequencies are simplex, clear of

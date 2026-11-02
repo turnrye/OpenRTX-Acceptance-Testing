@@ -8,6 +8,7 @@ import datetime
 import json
 import shutil
 import subprocess
+import time
 from pathlib import Path
 
 import numpy as np
@@ -23,7 +24,7 @@ from oat.iq import clipped_fraction, write_iq
 from oat.sanitize import scrub
 from oat.operator import make_operator
 from oat.sdr import make_receiver, make_transmitter
-from oat.sdr.sim import SimBurst, SimReceiver
+from oat.sdr.sim import SimBurst, SimReceiver, SimTransmitter, link_loopback
 from oat.m17 import codec as m17_codec
 from oat.m17 import phy as m17_phy
 from oat.m17 import tools as m17_tools
@@ -113,6 +114,7 @@ class OpenRTXAcceptance:
         self.radio_file = None
         self.firmware = None
         self.hardware = None
+        self.dsp = None
         self.suite = None
         self.started = None
         self.output_dir = None
@@ -122,6 +124,8 @@ class OpenRTXAcceptance:
         self.run_dir = None
         self.records = []
         self._captures = 0
+        # A capture from Start Capture, until it's stopped
+        self._open_capture = None
         # Which way the attenuator chain faces: "tx" from the radio to the
         # receiver, "rx" from the transmitter to the radio
         self._chain = None
@@ -130,23 +134,30 @@ class OpenRTXAcceptance:
 
     @keyword
     def open_bench(self, bench: str, calibration: str, radio: str,
-                   firmware: str, hardware: str):
+                   firmware: str, hardware: str, dsp: str = ""):
         """
         Load the bench, its calibration and the radio file, and prepare the
         instruments. All five are mandatory and differ from tester to tester,
         so suites take them from the command line (-v BENCH:... and so on).
         `firmware` names what the radio runs, such as a git describe;
         `hardware` names the unit, by model and serial number, since units of
-        one model measure differently.
+        one model measure differently. `dsp` names the DSP image the radio's
+        audio processor runs, such as its sha256; it is mandatory for radio
+        files with dsp_image: true, whose firmware states can differ in it
+        alone.
         """
         missing = [name for name, value in (
             ("BENCH", bench), ("CALIBRATION", calibration), ("RADIO", radio),
             ("FIRMWARE", firmware), ("HARDWARE", hardware)) if not value]
+        if not missing and load_yaml(Path(radio)).get("dsp_image") \
+                and not dsp:
+            missing.append("DSP")
         if missing:
             raise ValueError(
                 "Pass " + " ".join(f"-v {m}:..." for m in missing)
                 + "; see bench/example.yaml and calibration/example.yaml")
         self.bench = load_yaml(Path(bench))
+        self.dsp = str(dsp) if dsp else None
         self.calibration = load_calibration(Path(calibration))
         self.radio = load_yaml(Path(radio))
         self.radio_file = Path(radio)
@@ -157,6 +168,9 @@ class OpenRTXAcceptance:
                         f"{self.calibration.expires}")
         self.receiver = make_receiver(self.bench["receiver"])
         self.transmitter = make_transmitter(self.bench["transmitter"])
+        if isinstance(self.receiver, SimReceiver) and isinstance(
+                self.transmitter, SimTransmitter):
+            link_loopback(self.receiver, self.transmitter)
         self.operator = make_operator(self.bench.get("operator", {}))
         for band in self.radio["bands"].values():
             check_receiver_safe(self.radio, self.calibration,
@@ -180,6 +194,7 @@ class OpenRTXAcceptance:
                 ("Firmware", self.firmware),
                 ("Radio", f"{self.radio['name']} ({self.radio_file.stem})"),
                 ("Hardware", self.hardware),
+                *((("DSP", self.dsp),) if self.dsp else ()),
                 ("Station", self.bench.get("station", "unnamed")),
                 ("Calibration", f"{cal['method']}, measured "
                                 f"{cal['measured']} ({cal['sha256']})"),
@@ -223,7 +238,8 @@ class OpenRTXAcceptance:
         tx_type = self.bench["transmitter"]["type"]
         lines = [f"Plan for {self.suite}:",
                  f"  Radio: {self.hardware} as {self.radio['name']} "
-                 f"({self.radio_file}), firmware {self.firmware}",
+                 f"({self.radio_file}), firmware {self.firmware}"
+                 + (f", DSP image {self.dsp}" if self.dsp else ""),
                  f"  Bench: {self.bench.get('station', 'unnamed')}, receiver "
                  f"{rx_type}, transmitter {tx_type}, calibration "
                  f"{self.calibration.method} of {self.calibration.measured}"
@@ -254,6 +270,16 @@ class OpenRTXAcceptance:
         lines += [f"    - {name}" for name, _ in self.planned]
         lines.append("Check the setup, then continue to begin.")
         return "\n".join(lines)
+
+    @keyword
+    def require_separate_instruments(self):
+        """
+        Skip unless the bench receives and transmits with different
+        instruments, as a loopback through the attenuator chain needs.
+        """
+        if self._one_instrument():
+            BuiltIn().skip("The receiver and the transmitter are one "
+                           "instrument, which can't loop back into itself")
 
     @keyword
     def use_band(self, band: str):
@@ -311,6 +337,7 @@ class OpenRTXAcceptance:
             "radio_file": self.radio_file.stem,
             "firmware": self.firmware,
             "hardware": self.hardware,
+            **({"dsp": self.dsp} if self.dsp else {}),
             "suite_commit": suite_commit(),
             "bands": {name: band["frequency_hz"]
                       for name, band in self.radio["bands"].items()},
@@ -418,6 +445,65 @@ class OpenRTXAcceptance:
         if len(results) != int(expected):
             raise AssertionError(f"Expected {expected} transmission(s), "
                                  f"found {len(results)}")
+
+    @keyword
+    def start_capture(self):
+        """
+        Start recording on the test frequency, for a capture that keywords
+        rather than the operator time: Stop Capture And Measure FM or M17
+        ends it.
+        """
+        if self._open_capture is not None:
+            raise RuntimeError("a capture is already running")
+        rx = self.bench["receiver"]
+        self._captures += 1
+        name = f"capture{self._captures:02d}"
+        path = self.run_dir / f"{name}.{self._iq_suffix()}"
+        self.receiver.start(self._frequency() + rx.get("tune_offset_hz", 0),
+                            rx["rate"], path)
+        self._open_capture = name
+
+    @keyword
+    def wait_seconds(self, seconds: float):
+        """Let time pass on the bench (at once on the simulated one)."""
+        if isinstance(self.receiver, SimReceiver):
+            self.receiver.clock.sleep(float(seconds))
+        else:
+            time.sleep(float(seconds))
+
+    def _stop_capture(self):
+        name = self._open_capture
+        if name is None:
+            raise RuntimeError("no capture running: Start Capture first")
+        self._open_capture = None
+        capture = self.receiver.stop()
+        return (name, capture) + self._after_capture(name, capture)
+
+    @keyword
+    def stop_capture_and_measure_fm(self, expected: int = 1,
+                                    min_duration_s: float = 1.0):
+        """End a capture from Start Capture and measure its FM transmissions."""
+        name, capture, audio_dir, clipped = self._stop_capture()
+        results = self._measure_fm(capture, audio_dir, clipped,
+                                   float(min_duration_s))
+        self._record("capture", instruction="timed capture", files=[
+            str(p.relative_to(self.run_dir)) for p in capture.paths],
+            restarts=capture.restarts, transmissions=results)
+        self._log_table(name, results)
+        self._expect(results, expected)
+        return results
+
+    @keyword
+    def stop_capture_and_measure_m17(self, expected: int = 1):
+        """End a capture from Start Capture and measure its M17 transmissions."""
+        name, capture, audio_dir, clipped = self._stop_capture()
+        results = self._measure_m17(capture, audio_dir, clipped)
+        self._record("m17-capture", instruction="timed capture", files=[
+            str(p.relative_to(self.run_dir)) for p in capture.paths],
+            restarts=capture.restarts, transmissions=results)
+        self._log_m17_table(name, results)
+        self._expect(results, expected)
+        return results
 
     @keyword
     def capture_radio_m17_transmissions(self, instruction: str,
@@ -668,6 +754,63 @@ class OpenRTXAcceptance:
             raise AssertionError("; ".join(failures))
 
     @keyword
+    def value_should_be_within(self, value: float, nominal: float,
+                               tolerance: float, what: str = "value",
+                               relative: bool = True):
+        """
+        Fail unless a value is within tolerance of nominal: a fraction of it
+        when relative, otherwise in the value's own unit.
+        """
+        value, nominal, tolerance = float(value), float(nominal), \
+            float(tolerance)
+        error = abs(value - nominal) / abs(nominal) if relative \
+            else abs(value - nominal)
+        ok = error <= tolerance
+        limit = (f"{nominal:g} +-{100 * tolerance:g}%" if relative
+                 else f"{nominal:g} +-{tolerance:g}")
+        self._record("limit", field=what, value=value, limit=limit, passed=ok)
+        if not ok:
+            raise AssertionError(f"{what} {value:.5g} outside {limit}")
+        return value
+
+    @keyword
+    def value_should_be_at_most(self, value: float, limit: float,
+                                what: str = "value"):
+        """Fail unless a value is no more than a limit."""
+        ok = float(value) <= float(limit)
+        self._record("limit", field=what, value=float(value),
+                     limit=f"<= {float(limit):g}", passed=ok)
+        if not ok:
+            raise AssertionError(f"{what} {float(value):.5g} above "
+                                 f"{float(limit):g}")
+        return float(value)
+
+    @keyword
+    def report_repeatability(self, what: str, *values) -> dict:
+        """
+        Record the spread of repeated readings of one quantity: mean,
+        standard deviation and the range, also in percent and dB of the
+        mean. The A-versus-B tolerance of the comparisons comes from these.
+        """
+        x = np.array([float(v) for v in values])
+        if len(x) < 2:
+            raise ValueError("repeatability needs two readings or more")
+        mean = float(np.mean(x))
+        stats = {"what": what, "values": x.tolist(), "mean": mean,
+                 "std": float(np.std(x, ddof=1)),
+                 "spread": float(np.ptp(x)),
+                 "spread_percent": float(100 * np.ptp(x) / abs(mean))
+                 if mean else float("nan"),
+                 "spread_db": float(20 * np.log10(x.max() / x.min()))
+                 if x.min() > 0 else float("nan")}
+        self._record("repeatability", **stats)
+        BuiltIn().set_test_message(
+            f"{what}: mean {mean:.4g}, std {stats['std']:.3g}, spread "
+            f"{stats['spread']:.3g} ({stats['spread_percent']:.2f}%)",
+            append=True)
+        return stats
+
+    @keyword
     def ratio_should_be_between(self, numerator: float, denominator: float,
                                 low: float, high: float, what: str = "ratio"):
         """Fail unless numerator / denominator is within [low, high]."""
@@ -906,7 +1049,8 @@ class OpenRTXAcceptance:
                                       inverted: bool = False,
                                       preamble_ms: float = 40.0,
                                       gap_s: float = 1.0,
-                                      level_dbm: float | None = None):
+                                      level_dbm: float | None = None,
+                                      loop: bool = True):
         """
         Loop an M17 voice stream on the test frequency until stopped:
         preamble, LSF from `source` to `destination`, stream frames, EOT,
@@ -916,6 +1060,7 @@ class OpenRTXAcceptance:
         (random payload bytes, for decoding without Codec2). offset_hz moves
         the carrier off the channel; inverted sends the symbols with the
         wrong sign; level_dbm sets the level at the radio's antenna port.
+        With loop=False the stream plays once.
         """
         payloads = self._m17_payloads(str(audio), int(frames))
         preamble = int(round(float(preamble_ms) / 1000 * m17_codec.SYMBOL_RATE))
@@ -928,7 +1073,8 @@ class OpenRTXAcceptance:
                            bool(inverted)),
             silence(float(gap_s), tx["rate"])])
         level = self._play(iq, f"tx-m17-{source.replace('/', '_')}-"
-                               f"{int(float(offset_hz))}hz", level_dbm)
+                               f"{int(float(offset_hz))}hz", level_dbm,
+                           repeat=bool(loop))
         self._record("transmit", mode="m17", source=source,
                      destination=destination, audio=str(audio),
                      frames=len(payloads), deviation_hz=float(deviation_hz),

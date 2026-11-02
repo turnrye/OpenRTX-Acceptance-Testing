@@ -31,6 +31,10 @@ TONE_BAND_HZ = (300.0, 5000.0)
 MIN_TONE_HZ = 50.0
 # Sub-audible band holding every standard CTCSS tone, 67.0 to 254.1 Hz
 CTCSS_BAND_HZ = (60.0, 260.0)
+# Blocks over which the carrier's own phasor is averaged: long enough to
+# average out tones down to CTCSS, short enough that a carrier estimate
+# off by a few Hz loses little
+CARRIER_BLOCK_S = 0.05
 # Span searched for occupied bandwidth around the carrier
 OBW_SPAN_HZ = 50e3
 OBW_FRACTION = 0.99
@@ -47,10 +51,14 @@ class FmMeasurement:
     max_deviation_hz: float
     rms_deviation_hz: float
     tone_hz: float  # dominant audio tone
+    tone_deviation_hz: float  # its peak deviation, from the spectrum
     ctcss_hz: float  # strongest sub-audible tone
     ctcss_deviation_hz: float  # its peak deviation
     occupied_bandwidth_hz: float  # 99% power
     power_db: float  # relative to converter full scale
+    # Power left in the carrier, relative to the whole signal: 0 dB
+    # unmodulated, and deep at a zero of the Bessel function J0
+    carrier_level_db: float
 
     def as_dict(self) -> dict:
         """Plain dictionary, for reports."""
@@ -141,14 +149,43 @@ def dominant_tone(audio: np.ndarray, rate: float) -> float:
     Frequency of the strongest component in TONE_BAND_HZ, or 0 when nothing
     there reaches MIN_TONE_HZ of deviation (only noise, as with CTCSS alone).
     """
+    freq, amplitude = spectral_peak(audio, rate, TONE_BAND_HZ)
+    return freq if amplitude >= MIN_TONE_HZ else 0.0
+
+
+def spectral_peak(audio: np.ndarray, rate: float,
+                  band: tuple[float, float]) -> tuple[float, float]:
+    """
+    Frequency and amplitude of the strongest sine in a band, refined with a
+    parabola through the peak and its neighbours (Hann window, 4x zero
+    padding, so the amplitude is good to a fraction of a percent).
+    """
     window = np.hanning(len(audio))
-    spec = np.abs(np.fft.rfft(audio * window))
-    freqs = np.fft.rfftfreq(len(audio), 1 / rate)
-    band = (freqs >= TONE_BAND_HZ[0]) & (freqs <= TONE_BAND_HZ[1])
-    k = np.argmax(spec[band])
-    if 2 * spec[band][k] / np.sum(window) < MIN_TONE_HZ:
+    n = 1 << int(np.ceil(np.log2(len(audio) * 4)))
+    spec = np.abs(np.fft.rfft(audio * window, n))
+    freqs = np.fft.rfftfreq(n, 1 / rate)
+    idx = np.flatnonzero((freqs >= band[0]) & (freqs <= band[1]))
+    k = idx[np.argmax(spec[idx])]
+    a, b, c = np.log(spec[k - 1:k + 2] + 1e-12)
+    curve = a - 2 * b + c
+    shift = 0.5 * (a - c) / curve if curve else 0.0
+    peak = np.exp(b - 0.25 * (a - c) * shift)
+    return float((k + shift) * rate / n), float(2 * peak / np.sum(window))
+
+
+def carrier_level(iq: np.ndarray, rate: float) -> float:
+    """
+    Power in the carrier itself, relative to the whole signal, in dB, for a
+    signal centred on its carrier: the mean phasor over short blocks.
+    """
+    block = max(1, int(CARRIER_BLOCK_S * rate))
+    m = len(iq) // block
+    if not m:
         return 0.0
-    return float(freqs[band][k])
+    means = iq[:m * block].reshape(m, block).mean(axis=1)
+    total = np.mean(np.abs(iq[:m * block]) ** 2)
+    return float(10 * np.log10(max(np.mean(np.abs(means) ** 2), 1e-20)
+                               / total))
 
 
 def subaudible_tone(audio: np.ndarray, rate: float) -> tuple[float, float]:
@@ -209,6 +246,7 @@ def measure_fm(iq: np.ndarray, rate: float, start: int, stop: int,
         save_audio(audio_path, audio)
     dev = np.abs(audio)
     ctcss_hz, ctcss_dev = subaudible_tone(audio, AUDIO_RATE)
+    tone_hz = dominant_tone(audio, AUDIO_RATE)
     return FmMeasurement(
         start_s=start / rate,
         duration_s=(stop - start) / rate,
@@ -216,11 +254,14 @@ def measure_fm(iq: np.ndarray, rate: float, start: int, stop: int,
         peak_deviation_hz=float(np.percentile(dev, 99.9)),
         max_deviation_hz=float(np.max(dev)),
         rms_deviation_hz=float(np.sqrt(np.mean(audio ** 2))),
-        tone_hz=dominant_tone(audio, AUDIO_RATE),
+        tone_hz=tone_hz,
+        tone_deviation_hz=(spectral_peak(audio, AUDIO_RATE, TONE_BAND_HZ)[1]
+                           if tone_hz else 0.0),
         ctcss_hz=ctcss_hz,
         ctcss_deviation_hz=ctcss_dev,
         occupied_bandwidth_hz=occupied_bandwidth(centred, rate),
         power_db=float(10 * np.log10(np.mean(np.abs(seg) ** 2))),
+        carrier_level_db=carrier_level(channel, rate),
     )
 
 
