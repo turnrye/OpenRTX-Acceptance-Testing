@@ -5,7 +5,7 @@
 """
 Write the M17 reference vectors that tests/test_m17_codec.py checks oat.m17
 against, from libm17, the M17 Foundation's reference C library: callsign
-encodings, CRCs, Golay codewords, and the symbols of Link Setup Frames,
+encodings, CRCs, Golay codewords, the 48 kHz RRC filter, and the symbols of Link Setup Frames,
 stream frames, the preamble and the End of Transmission marker.
 
 Build libm17 as a shared library anywhere outside this repository, then
@@ -91,6 +91,8 @@ def main() -> None:
                 "payload": PAYLOAD.hex(),
                 "symbols": symbols(lib.gen_frame_i8, payload, 1,
                                    ctypes.byref(lsf), i % 6, fn)})
+    out["rrc_taps_10"] = [round(float(t), 9) for t in
+                          (ctypes.c_float * 81).in_dll(lib, "rrc_taps_10")]
     json.dump(out, sys.stdout, indent=None, separators=(",", ":"))
     sys.stdout.write("\n")
 
