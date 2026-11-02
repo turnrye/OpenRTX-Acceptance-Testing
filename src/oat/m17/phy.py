@@ -48,6 +48,10 @@ TIMING_BLOCK_S = 0.25
 # Mean squared distance, in symbol units, below which 8 symbols match a sync
 # burst: an RMS error of one unit, halfway between neighbouring levels
 SYNC_MATCH = 1.0
+# A walk starts only from a burst this close: random symbols get under
+# SYNC_MATCH every few thousand symbols, which made a walk start in the
+# noise before a real radio's first frame and stop one frame later
+START_MATCH = 0.25
 # How far, in symbols, a frame boundary is searched around where it should be
 FRAME_SLIP = 1
 # A preamble symbol must reach this far toward the outer level, in units
@@ -264,24 +268,8 @@ FOLLOWS = {None: {"lsf", "stream", "packet", "bert"},
            "bert": {"bert", "eot"}, "eot": set()}
 
 
-def walk_frames(z: np.ndarray) -> list[M17Frame]:
-    """
-    The frames of a transmission in order: from the first sync burst, one
-    every 192 symbols, until the EOT, a frame that can't follow the one
-    before, or the end. Each boundary may slip by FRAME_SLIP symbols.
-    """
-    dist = sync_distances(z)
-    if not len(dist["lsf"]):
-        return []
-    starts = ("lsf", "stream", "packet", "bert")
-    best = np.min([dist[k] for k in starts], axis=0)
-    hits = np.flatnonzero(best < SYNC_MATCH)
-    if not len(hits):
-        return []
-    k = hits[0]
-    # The best match of the first run of hits
-    run = hits[(hits >= k) & (hits <= k + codec.SYNC_SYMBOLS)]
-    k = int(run[np.argmin(best[run])])
+def _walk_from(dist: dict[str, np.ndarray], k: int) -> list[M17Frame]:
+    """The frames of a walk that starts with a sync burst at symbol k."""
     frames, prev = [], None
     while k < len(dist["lsf"]):
         lo, hi = max(0, k - FRAME_SLIP), min(len(dist["lsf"]),
@@ -299,6 +287,37 @@ def walk_frames(z: np.ndarray) -> list[M17Frame]:
             break
         prev, k = kind, j + codec.SYMBOLS_PER_FRAME
     return frames
+
+
+def walk_frames(z: np.ndarray) -> list[M17Frame]:
+    """
+    The frames of a transmission in order: from a sync burst, one every 192
+    symbols, until the EOT, a frame that can't follow the one before, or the
+    end. Each boundary may slip by FRAME_SLIP symbols.
+
+    Noise and data before the first frame match some sync burst loosely now
+    and then, so the walk starts only from close matches (START_MATCH), and
+    of those keeps the walk that explains the most frames, the earliest on a
+    tie.
+    """
+    dist = sync_distances(z)
+    if not len(dist["lsf"]):
+        return []
+    starts = ("lsf", "stream", "packet", "bert")
+    best = np.min([dist[k] for k in starts], axis=0)
+    candidates = np.flatnonzero(best < START_MATCH)
+    walked: list[M17Frame] = []
+    covered = -1
+    for k in candidates:
+        # Frames a longer walk already passed through start no better walk
+        if k <= covered:
+            continue
+        frames = _walk_from(dist, int(k))
+        if len(frames) > len(walked):
+            walked = frames
+        if frames:
+            covered = frames[-1].symbol + FRAME_SLIP
+    return walked
 
 
 def preamble_symbols(z: np.ndarray, sync_at: int) -> int:
