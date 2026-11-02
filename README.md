@@ -34,8 +34,24 @@ cp bench/example.args bench/mybench.local.args              # points Robot at bo
 
 Benches, calibrations and argument files belong to each tester and stay out of git (`*.local.*`). A
 calibration lists each RF path's loss by frequency, as points or as a two-port Touchstone (`.s2p`)
-export from a VNA, with how and when it was measured. Results record the method, dates and a
-fingerprint of the file, never its values.
+export from a VNA, with how and when it was measured. Results record the method, dates, which
+optional sections the file has and a fingerprint of the file, never its values.
+
+The losses are enough for relative tests. A calibration can also hold, each optional:
+
+- `levels.transmitter`: the transmitter's output in dBm against its gain setting, at a few
+  frequencies. With the `from_transmitter` loss, keywords transmit at a level in dBm at the radio's
+  antenna port (`level_dbm=`), and fail clearly when it's out of reach.
+- `levels.receiver`: per receiver and gain setting, the input level that reads full scale. Captures
+  then report each transmission's power in dBm, at the receiver and at the radio
+  (`Radio Power In dBm`).
+- `frequency_correction_ppm`: each instrument's reference error. Carrier offsets and frequency errors
+  are corrected with it, and transmitted signals moved by it. At 446 MHz one ppm is 446 Hz.
+- `paths.audio_out` and `paths.audio_in`: the voltage of a full-scale tone on the audio interface,
+  for audio levels in millivolts.
+
+Tests that need them are tagged `needs:abs-level` or `needs:audio`; a bench without them excludes
+those tags. `calibration/example.yaml` shows every section.
 
 The SDR backends call `hackrf_transfer` and `rtl_sdr`, so `hackrf` and `librtlsdr` must be installed.
 

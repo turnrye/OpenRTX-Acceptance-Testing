@@ -2,7 +2,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Calibration of the simulated bench: flat, assumed losses.
+# Calibration of the simulated bench: flat, assumed losses, and made-up
+# instrument levels so the keywords that need them can be tried.
 
 method: assumed
 measured: 2026-10-30
@@ -15,3 +16,20 @@ paths:
   from_transmitter:
     points:
       - [0, 60]
+  audio_out:
+    mvrms_at_0dbfs: 1000
+  audio_in:
+    mvrms_at_0dbfs: 1000
+
+levels:
+  transmitter:
+    instrument: sim
+    amp: false
+    points:
+      0: [[0, -60], [47, -13]]
+  receiver:
+    - instrument: sim
+      full_scale_dbm: [[0, -25]]
+
+frequency_correction_ppm:
+  sim: 0.0

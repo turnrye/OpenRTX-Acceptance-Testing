@@ -160,3 +160,13 @@ def test_capture_skips_segments_never_written(tmp_path):
     capture = Capture([first, empty, tmp_path / "c-03.cu8"], RATE, 0.0,
                       IqFormat.CU8, restarts=2)
     assert len(capture.load()) == int(0.1 * RATE)
+
+
+def test_carrier_offset_is_corrected_for_the_receiver_reference():
+    iq = burst_capture([2500])
+    plain, = measure_capture(iq, RATE, 75e3)
+    # A receiver 2 ppm fast at 446 MHz reads carriers 892 Hz low
+    fixed, = measure_capture(iq, RATE, 75e3, center_hz=446e6,
+                             frequency_correction_ppm=2.0)
+    assert fixed.carrier_offset_hz - plain.carrier_offset_hz == \
+        pytest.approx(892, abs=0.01)

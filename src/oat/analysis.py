@@ -89,9 +89,10 @@ def to_analysis_rate(iq, rate: float,
 
 
 def find_transmissions(iq: np.ndarray, rate: float,
-                       min_duration_s: float = 1.0) -> list[tuple[int, int]]:
+                       min_duration_s: float = 1.0,
+                       settle_s: float = SETTLE_S) -> list[tuple[int, int]]:
     """
-    Sample ranges of the carriers in a capture.
+    Sample ranges of the carriers in a capture, settle_s in from each end.
 
     The threshold sits halfway, in dB, between the noise floor and the
     strongest carrier, so it adapts to the attenuation in the chain.
@@ -108,10 +109,10 @@ def find_transmissions(iq: np.ndarray, rate: float,
         edges = np.r_[0, edges]
     if on[-1]:
         edges = np.r_[edges, len(on)]
-    settle = int(SETTLE_S * rate)
+    settle = int(settle_s * rate)
     return [(int(a) + settle, int(b) - settle)
             for a, b in zip(edges[0::2], edges[1::2])
-            if (b - a) / rate >= min_duration_s + 2 * SETTLE_S]
+            if (b - a) / rate >= min_duration_s + 2 * settle_s]
 
 
 def fm_demodulate(iq: np.ndarray, rate: float) -> np.ndarray:
@@ -225,11 +226,16 @@ def measure_fm(iq: np.ndarray, rate: float, start: int, stop: int,
 
 def measure_capture(iq, rate: float, nominal_offset_hz: float,
                     min_duration_s: float = 1.0,
-                    audio_dir: Path | None = None) -> list[FmMeasurement]:
+                    audio_dir: Path | None = None,
+                    center_hz: float = 0.0,
+                    frequency_correction_ppm: float = 0.0
+                    ) -> list[FmMeasurement]:
     """
     Measure every FM transmission in a capture, an array or blocks of one.
     With audio_dir, also write each one's audio there as tx<N>.wav, counting
-    from 1.
+    from 1. A receiver whose reference runs frequency_correction_ppm fast,
+    tuned to center_hz, reads carriers low by ppm * center_hz; the carrier
+    offsets returned are corrected for it.
     """
     iq, rate, offset = to_analysis_rate(iq, rate, nominal_offset_hz)
     spans = find_transmissions(iq, rate, min_duration_s)
@@ -239,8 +245,15 @@ def measure_capture(iq, rate: float, nominal_offset_hz: float,
                for i, (a, b) in enumerate(spans)]
     # Offsets stay relative to the capture centre
     for m in results:
-        m.carrier_offset_hz += nominal_offset_hz - offset
+        m.carrier_offset_hz += (nominal_offset_hz - offset
+                                + reference_error_hz(center_hz,
+                                                     frequency_correction_ppm))
     return results
+
+
+def reference_error_hz(center_hz: float, ppm: float) -> float:
+    """How far low a receiver ppm fast, tuned to center_hz, reads carriers."""
+    return ppm * 1e-6 * center_hz
 
 
 def save_audio(path: Path, audio: np.ndarray,

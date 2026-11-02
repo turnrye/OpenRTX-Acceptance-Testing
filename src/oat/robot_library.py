@@ -37,6 +37,10 @@ CAPTURE_GUIDANCE = ("Leave a second of silence before keying up and after the "
 MAX_CLIPPED = 0.001
 # Version of the measurements.json layout
 RESULTS_SCHEMA = 1
+# Most the transmitter may scale its samples below full scale to reach a
+# level under its lowest gain setting; more costs the 8-bit converter
+# too much of its resolution
+MAX_DIGITAL_BACKOFF_DB = 10.0
 
 
 def chain_direction(tags) -> str | None:
@@ -206,7 +210,9 @@ class OpenRTXAcceptance:
                  f"({self.radio_file}), firmware {self.firmware}",
                  f"  Bench: {self.bench.get('station', 'unnamed')}, receiver "
                  f"{rx_type}, transmitter {tx_type}, calibration "
-                 f"{self.calibration.method} of {self.calibration.measured}"]
+                 f"{self.calibration.method} of {self.calibration.measured}"
+                 + (f" with {', '.join(self.calibration.calibrated())}"
+                    if self.calibration.calibrated() else "")]
         bands = [b for b in self.radio["bands"] if f"band:{b}" in tags]
         for band in bands:
             freq = self.radio["bands"][band]["frequency_hz"]
@@ -354,9 +360,16 @@ class OpenRTXAcceptance:
         if clipped > MAX_CLIPPED:
             logger.warn(f"{name}: {100 * clipped:.2f}% of samples at the "
                         f"receiver's full scale; levels read low")
-        results = [{**m.as_dict(), "receiver_clipped": clipped} for m in
-                   measure_capture(capture.blocks(), capture.rate, -offset,
-                                   audio_dir=audio_dir)]
+        results = [self._absolute({**m.as_dict(), "receiver_clipped": clipped,
+                                   "frequency_error_hz":
+                                       m.carrier_offset_hz + offset,
+                                   "audio_file": str(
+                                       (audio_dir / f"tx{i}.wav").relative_to(
+                                           self.run_dir))})
+                   for i, m in enumerate(measure_capture(
+                       capture.blocks(), capture.rate, -offset,
+                       audio_dir=audio_dir, center_hz=freq + offset,
+                       frequency_correction_ppm=self._ppm(rx) or 0.0), 1)]
         self._record("capture", instruction=instruction, files=[
             str(p.relative_to(self.run_dir)) for p in capture.paths],
             restarts=capture.restarts, transmissions=results)
@@ -365,6 +378,25 @@ class OpenRTXAcceptance:
             raise AssertionError(f"Expected {expected} transmission(s), "
                                  f"found {len(results)}")
         return results
+
+    def _ppm(self, cfg: dict) -> float | None:
+        """An instrument's calibrated reference error, ppm, if known."""
+        return self.calibration.frequency_correction_ppm(cfg)
+
+    def _absolute(self, m: dict) -> dict:
+        """
+        A measurement with its received level in dBm, at the receiver input
+        and at the radio's antenna port, when the receiver's levels are
+        calibrated at its settings; otherwise as it was.
+        """
+        try:
+            full_scale = self.calibration.receiver_full_scale_dbm(
+                self.bench["receiver"], self._frequency())
+        except LookupError:
+            return m
+        dbm = m["power_db"] + full_scale
+        return {**m, "power_dbm": dbm, "radio_power_dbm": dbm
+                + self.calibration.loss("to_receiver", self._frequency())}
 
     def _log_table(self, name: str, results: list[dict]):
         """Log the measurements as a table, with each transmission's audio."""
@@ -450,6 +482,33 @@ class OpenRTXAcceptance:
         return ratio
 
     @keyword
+    def radio_power_in_dbm(self, measurement: dict) -> float:
+        """
+        A transmission's power at the radio's antenna port, in dBm: the
+        received level through the calibrated receiver levels and the
+        to_receiver loss. Fails when the receiver's levels aren't
+        calibrated at its settings.
+        """
+        if "radio_power_dbm" not in measurement:
+            raise AssertionError(
+                "No absolute level: the calibration has no levels.receiver "
+                "table for this receiver and its gain settings")
+        return measurement["radio_power_dbm"]
+
+    @keyword
+    def radio_power_should_be_between(self, measurement: dict,
+                                      low_dbm: float, high_dbm: float):
+        """Fail unless a transmission's absolute power is in the range."""
+        dbm = self.radio_power_in_dbm(measurement)
+        ok = float(low_dbm) <= dbm <= float(high_dbm)
+        self._record("limit", field="radio_power_dbm", value=dbm,
+                     limit=f"{low_dbm}-{high_dbm} dBm", passed=ok)
+        if not ok:
+            raise AssertionError(f"radio power {dbm:.1f} dBm outside "
+                                 f"{low_dbm}-{high_dbm} dBm")
+        return dbm
+
+    @keyword
     def power_settings(self) -> list:
         """
         The radio's TX power settings, lowest first: ${POWER_SETTINGS}
@@ -513,18 +572,77 @@ class OpenRTXAcceptance:
     def start_transmitting_fm_tone(self, deviation_hz: float,
                                    tone_hz: float = 1000.0,
                                    ctcss_hz: float = 0.0,
-                                   ctcss_deviation_hz: float = 0.0):
-        """Loop an FM tone on the test frequency until stopped."""
+                                   ctcss_deviation_hz: float = 0.0,
+                                   level_dbm: float | None = None):
+        """
+        Loop an FM tone on the test frequency until stopped. With level_dbm,
+        at that level at the radio's antenna port (see Transmit Level).
+        """
         tx = self.bench["transmitter"]
-        offset = tx.get("tune_offset_hz", 0)
         iq = fm_tone(float(tone_hz), float(deviation_hz), TX_LOOP_S, tx["rate"],
-                     -offset, float(ctcss_hz), float(ctcss_deviation_hz))
-        path = self.run_dir / f"tx-{int(deviation_hz)}hz-{int(tone_hz)}.cs8"
-        write_iq(path, iq, self.transmitter.fmt)
-        self.transmitter.start(path, self._frequency() + offset,
-                               tx["rate"])
+                     self._tx_baseband_offset(), float(ctcss_hz),
+                     float(ctcss_deviation_hz))
+        level = self._play(iq, f"tx-{int(deviation_hz)}hz-{int(tone_hz)}",
+                           level_dbm)
         self._record("transmit", deviation_hz=float(deviation_hz),
-                     tone_hz=float(tone_hz), ctcss_hz=float(ctcss_hz))
+                     tone_hz=float(tone_hz), ctcss_hz=float(ctcss_hz),
+                     **level)
+
+    def _tx_baseband_offset(self, offset_hz: float = 0.0) -> float:
+        """
+        Where a signal offset_hz from the test frequency sits in the
+        transmitter's baseband: past its tune offset, and corrected for its
+        reference error, so it leaves on frequency.
+        """
+        tx = self.bench["transmitter"]
+        ppm = self._ppm(tx) or 0.0
+        return (-tx.get("tune_offset_hz", 0) + offset_hz
+                - ppm * 1e-6 * self._frequency())
+
+    def _play(self, iq: np.ndarray, name: str, level_dbm=None,
+              repeat: bool = True) -> dict:
+        """
+        Write a signal and start the transmitter on it, at the bench's gain
+        or at level_dbm at the radio's antenna port. Returns what to record
+        about the level.
+        """
+        tx = self.bench["transmitter"]
+        gain_offset, record = 0.0, {}
+        if level_dbm not in (None, "", "None"):
+            gain, backoff = self.transmit_level(level_dbm)
+            iq = iq * np.float32(10 ** (-backoff / 20))
+            gain_offset = gain - tx.get("tx_vga_db", 0)
+            record = {"level_dbm": float(level_dbm), "tx_gain_db": gain,
+                      "digital_backoff_db": backoff}
+        path = self.run_dir / f"{name}.cs8"
+        write_iq(path, iq, self.transmitter.fmt)
+        applied = self.transmitter.start(path, self._frequency()
+                                         + tx.get("tune_offset_hz", 0),
+                                         tx["rate"], repeat=repeat,
+                                         gain_offset_db=gain_offset)
+        if abs(applied - gain_offset) > 0.5:
+            raise RuntimeError(f"transmitter applied {applied:+.0f} dB "
+                               f"instead of {gain_offset:+.0f} dB")
+        return record
+
+    @keyword
+    def transmit_level(self, level_dbm: float) -> tuple[int, float]:
+        """
+        The transmitter gain setting and digital back-off for level_dbm at
+        the radio's antenna port on the test frequency: the transmitter's
+        calibrated output table, less the from_transmitter loss. Fails
+        clearly when the bench isn't calibrated for it or the level is out
+        of reach.
+        """
+        freq = self._frequency()
+        out = float(level_dbm) + self.calibration.loss("from_transmitter",
+                                                       freq)
+        try:
+            return self.calibration.transmitter_setting(
+                self.bench["transmitter"], freq, out, MAX_DIGITAL_BACKOFF_DB)
+        except (LookupError, ValueError) as e:
+            raise AssertionError(f"Can't transmit {float(level_dbm):.1f} dBm "
+                                 f"at the radio: {e}") from None
 
     @keyword
     def start_transmitting_with_interferer(self, deviation_hz: float,
@@ -548,11 +666,12 @@ class OpenRTXAcceptance:
         offset = tx.get("tune_offset_hz", 0)
         db = float(interferer_db)
         wanted = {"tone_hz": float(tone_hz),
-                  "deviation_hz": float(deviation_hz), "offset_hz": -offset,
-                  "level_db": -db}
+                  "deviation_hz": float(deviation_hz),
+                  "offset_hz": self._tx_baseband_offset(), "level_db": -db}
         unwanted = {"tone_hz": float(interferer_tone_hz),
                     "deviation_hz": float(interferer_deviation_hz),
-                    "offset_hz": -offset + float(interferer_offset_hz),
+                    "offset_hz": self._tx_baseband_offset(
+                        float(interferer_offset_hz)),
                     "level_db": 0.0, "on": bool(interferer)}
         iq = fm_carriers([wanted, unwanted], TX_LOOP_S, tx["rate"])
         state = "on" if interferer else "off"

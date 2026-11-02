@@ -39,7 +39,8 @@ class HackRFTransmitter(Transmitter):
               repeat: bool = True, gain_offset_db: float = 0.0) -> float:
         if rate < MIN_RATE:
             raise ValueError(f"HackRF rate must be at least {MIN_RATE:g}")
-        vga = int(round(min(MAX_TX_VGA_DB, self.tx_vga_db + gain_offset_db)))
+        vga = int(round(min(MAX_TX_VGA_DB,
+                            max(0, self.tx_vga_db + gain_offset_db))))
         cmd = [require_tool("hackrf_transfer"), "-t", str(path),
                "-f", str(int(center_hz)), "-s", str(int(rate)),
                "-x", str(vga), "-a", "1" if self.amp else "0"]
