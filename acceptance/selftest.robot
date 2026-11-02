@@ -111,3 +111,25 @@ Absolute Levels Come From The Calibration
     Run Keyword And Expect Error    *step attenuator*    Transmit Level    -140
     Start Transmitting FM Tone    3000    level_dbm=-110
     Stop Transmitting
+
+M17 Transmissions Are Measured And Decoded
+    Simulate Radio M17 Transmissions    2    source=K0RET    frames=10
+    ${tx}=    Capture Radio M17 Transmissions    Key up twice in M17    expected=2
+    Should Be True    2350 < ${tx}[0][outer_deviation_hz] < 2450
+    Should Be Equal    ${tx}[1][source]    K0RET
+    M17 Transmission Should Meet Limits    ${tx}[0]
+    M17 Transmissions Should Decode    ${tx}    K0RET
+    Run Keyword And Expect Error    *not 'N0CALL'*
+    ...    M17 Transmissions Should Decode    ${tx}    N0CALL
+
+Bad M17 Fails Its Limits
+    Simulate Radio M17 Transmissions    deviation_hz=2000    inner_deviation_hz=800    inverted=True
+    ${tx}=    Capture Radio M17 Transmissions    Key up once in M17
+    Should Be Equal    ${tx}[0][polarity]    inverted
+    Run Keyword And Expect Error    M17: outer_deviation_hz*deviation_ratio*polarity*
+    ...    M17 Transmission Should Meet Limits    ${tx}[0]    deviation,ratio,polarity
+    M17 Transmission Should Meet Limits    ${tx}[0]    symbol_rate, evm
+
+M17 Stream Transmits
+    Start Transmitting M17 Stream    source=K0RET    audio=random    frames=5
+    Stop Transmitting
