@@ -17,7 +17,8 @@ from robot.api.deco import keyword, library
 from robot.libraries.BuiltIn import BuiltIn
 from scipy.io import wavfile
 
-from oat.analysis import measure_capture
+from oat import audio as audio_mod
+from oat.analysis import demodulated_audio, measure_capture, to_analysis_rate
 from oat.calibration import load_calibration
 from oat.config import check_receiver_safe, load_yaml
 from oat.iq import clipped_fraction, write_iq
@@ -115,6 +116,12 @@ class OpenRTXAcceptance:
         self.firmware = None
         self.hardware = None
         self.dsp = None
+        self.audio = None
+        self.ptt = None
+        # What the transmitter is sending, for the simulated radio's speaker
+        self._tx_state = None
+        self._sim_cache = {}
+        self._audio_files = 0
         self.suite = None
         self.started = None
         self.output_dir = None
@@ -172,6 +179,11 @@ class OpenRTXAcceptance:
                 self.transmitter, SimTransmitter):
             link_loopback(self.receiver, self.transmitter)
         self.operator = make_operator(self.bench.get("operator", {}))
+        self.audio = audio_mod.make_audio(self.bench.get("audio"))
+        self.ptt = audio_mod.make_ptt(self.bench.get("audio"))
+        if isinstance(self.audio, audio_mod.SimAudio) and isinstance(
+                self.transmitter, SimTransmitter):
+            self.audio.source = self._sim_speaker
         for band in self.radio["bands"].values():
             check_receiver_safe(self.radio, self.calibration,
                                 self.receiver.max_input_dbm,
@@ -326,6 +338,10 @@ class OpenRTXAcceptance:
         """
         if self.transmitter is not None:
             self.transmitter.stop()
+        if self.audio is not None:
+            self.audio.stop_playing()
+        if self.ptt is not None:
+            self.ptt.close()
         if self.run_dir is None:
             return
         report = {
@@ -964,6 +980,7 @@ class OpenRTXAcceptance:
         if abs(applied - gain_offset) > 0.5:
             raise RuntimeError(f"transmitter applied {applied:+.0f} dB "
                                f"instead of {gain_offset:+.0f} dB")
+        self._tx_state = {"path": path, "level_dbm": record.get("level_dbm")}
         return record
 
     @keyword
@@ -1097,6 +1114,7 @@ class OpenRTXAcceptance:
     def stop_transmitting(self):
         """Stop the transmitter."""
         self.transmitter.stop()
+        self._tx_state = None
 
     @keyword
     def create_audio_tone(self, tone_hz: float = 1000.0,
@@ -1162,3 +1180,435 @@ class OpenRTXAcceptance:
                       level_db=float(level_db), m17=m17)
              for _ in range(int(count))],
             -self.bench["receiver"].get("tune_offset_hz", 0))
+
+    # Audio --------------------------------------------------------------
+
+    def _need_audio(self) -> audio_mod.AudioInterface:
+        if self.audio is None:
+            raise AssertionError("No audio interface: add an audio section to "
+                                 "the bench file, or exclude needs:audio")
+        return self.audio
+
+    def _audio_path(self, stem: str) -> Path:
+        self._audio_files += 1
+        return self.run_dir / f"audio{self._audio_files:02d}-{stem}.wav"
+
+    def _injected_dbfs(self, level_dbfs, level_mv) -> float:
+        """A level for the interface's output: dBFS, or from millivolts."""
+        if level_mv not in (None, "", "None"):
+            try:
+                full = self.calibration.audio_full_scale_mvrms("audio_out")
+            except LookupError as e:
+                raise AssertionError(str(e)) from None
+            return float(20 * np.log10(float(level_mv) / full))
+        return float(level_dbfs)
+
+    def _audio_out_mv(self, level_dbfs: float) -> float | None:
+        try:
+            return self.calibration.audio_full_scale_mvrms("audio_out") \
+                * 10 ** (level_dbfs / 20)
+        except LookupError:
+            return None
+
+    def _inject(self, samples: np.ndarray, stem: str, loop, wait,
+                **record) -> str:
+        interface = self._need_audio()
+        path = audio_mod.write_wav(self._audio_path(stem), samples,
+                                   interface.rate)
+        interface.play(path, repeat=bool(loop))
+        self._record("inject", file=str(path.relative_to(self.run_dir)),
+                     loop=bool(loop), **record)
+        if wait and not loop:
+            interface.wait_playing()
+        return str(path)
+
+    @keyword
+    def inject_audio_tone(self, tone_hz: float = 1000.0,
+                          level_dbfs: float = -20.0,
+                          level_mv: float | None = None,
+                          duration_s: float = 4.0, loop: bool = True):
+        """
+        Play a tone into the radio's mic input through the audio interface,
+        looping until Stop Injecting Audio unless loop=False. level_mv sets
+        its RMS millivolts at the mic input, through the calibrated
+        paths.audio_out level; otherwise level_dbfs sets it.
+        """
+        dbfs = self._injected_dbfs(level_dbfs, level_mv)
+        rate = self._need_audio().rate
+        return self._inject(audio_mod.tone(float(tone_hz), float(duration_s),
+                                           dbfs, rate),
+                            f"tone-{int(float(tone_hz))}hz", loop, True,
+                            tone_hz=float(tone_hz), level_dbfs=dbfs,
+                            level_mv=self._audio_out_mv(dbfs))
+
+    @keyword
+    def inject_audio_tones(self, freqs_hz: str = "300,500,1000,2000,3000",
+                           level_dbfs: float = -30.0,
+                           level_mv: float | None = None,
+                           tone_s: float = 1.0, gap_s: float = 0.3,
+                           loop: bool = False):
+        """
+        Play tones in turn, each followed by silence, into the mic input,
+        for a frequency response; waits for the end unless loop=True.
+        """
+        freqs = [float(f) for f in str(freqs_hz).split(",")]
+        dbfs = self._injected_dbfs(level_dbfs, level_mv)
+        rate = self._need_audio().rate
+        return self._inject(audio_mod.tone_sequence(
+            freqs, float(tone_s), float(gap_s), dbfs, rate), "tones", loop,
+            True, freqs_hz=freqs, level_dbfs=dbfs,
+            level_mv=self._audio_out_mv(dbfs))
+
+    @keyword
+    def inject_audio_file(self, path: str, gain_db: float = 0.0,
+                          loop: bool = False, wait: bool = True):
+        """
+        Play a WAV file into the mic input, its samples scaled by gain_db;
+        waits for the end unless loop=True or wait=False.
+        """
+        samples, rate = audio_mod.read_wav(Path(path))
+        interface = self._need_audio()
+        if rate != interface.rate:
+            g = np.gcd(rate, interface.rate)
+            from scipy.signal import resample_poly
+            samples = resample_poly(samples, interface.rate // g, rate // g)
+        samples = samples * 10 ** (float(gain_db) / 20)
+        clipped = float(np.mean(np.abs(samples) >= 1.0))
+        if clipped:
+            logger.warn(f"{100 * clipped:.2f}% of {path} clips at this gain")
+        return self._inject(samples, Path(path).stem, loop, wait,
+                            source=Path(path).name, gain_db=float(gain_db))
+
+    @keyword("Create Speech-Like Audio")
+    def create_speech_like_audio(self, duration_s: float = 10.0,
+                                 level_dbfs: float = -20.0) -> str:
+        """
+        Write a repeatable speech-shaped test signal (audio.speech_like) as a
+        WAV, for when no speech recording is given.
+        """
+        path = self._audio_path("speech-like")
+        audio_mod.write_wav(path, audio_mod.speech_like(
+            float(duration_s), level_dbfs=float(level_dbfs)))
+        return str(path)
+
+    @keyword
+    def stop_injecting_audio(self):
+        """Stop playing into the mic input."""
+        if self.audio is not None:
+            self.audio.stop_playing()
+
+    @keyword
+    def key_radio(self):
+        """
+        Key the radio: through the audio interface's PTT line when the bench
+        has one, otherwise by asking the operator to hold PTT.
+        """
+        if self.ptt is not None:
+            self.ptt.key()
+        else:
+            self.operator.instruct("Key PTT and hold it, then continue.")
+
+    @keyword
+    def release_radio(self):
+        """Release PTT, as Key Radio keyed it."""
+        if self.ptt is not None:
+            self.ptt.unkey()
+        else:
+            self.operator.instruct("Release PTT, then continue.")
+
+    def _audio_result(self, samples: np.ndarray, rate: int, unit: str,
+                      file: Path, tone_hz=None,
+                      weighting: str = "none") -> dict:
+        """Level, tone, distortion and dropouts of a stretch of audio."""
+        tone = float(tone_hz) if tone_hz not in (None, "", "None") else None
+        d = audio_mod.distortion(samples, rate, tone, weighting)
+        result = {"file": str(file.relative_to(self.run_dir)), "unit": unit,
+                  "rate": rate, "tone_hz": d.tone_hz,
+                  "tone_amplitude": audio_mod.tone_amplitude(samples, rate,
+                                                             d.tone_hz),
+                  "sinad_db": d.sinad_db, "thd_n_percent": d.thd_n_percent,
+                  "weighting": weighting,
+                  "longest_gap_s": audio_mod.longest_gap(samples, rate)}
+        if unit == "dBFS":
+            result["level_dbfs"] = d.level_dbfs
+            try:
+                full = self.calibration.audio_full_scale_mvrms("audio_in")
+                result["level_mvrms"] = full * 10 ** (d.level_dbfs / 20)
+            except LookupError:
+                pass
+        return result
+
+    @keyword
+    def capture_radio_audio(self, seconds: float = 3.0, tone_hz=None,
+                            weighting: str = "none") -> dict:
+        """
+        Record the radio's speaker output through the audio interface and
+        measure it: level (in mVrms too with a calibrated paths.audio_in),
+        the tone, SINAD and THD+N (weighting none or psophometric), and the
+        longest dropout. Returns the measurements.
+        """
+        interface = self._need_audio()
+        path = interface.record(self._audio_path("speaker"), float(seconds))
+        samples, rate = audio_mod.read_wav(path)
+        result = self._audio_result(samples, rate, "dBFS", path, tone_hz,
+                                    weighting)
+        self._record("audio", **result)
+        logger.info(f'<audio controls src="{path.relative_to(self.output_dir)}">'
+                    f'</audio> {result["tone_hz"]:.0f} Hz, SINAD '
+                    f'{result["sinad_db"]:.1f} dB', html=True)
+        return result
+
+    @keyword
+    def measure_transmitted_audio(self, measurement: dict, tone_hz=None,
+                                  weighting: str = "none") -> dict:
+        """
+        The audio measurements of Capture Radio Audio, on the audio
+        demodulated from an FM transmission, in Hz of deviation.
+        """
+        path = self.run_dir / measurement["audio_file"]
+        samples, rate = audio_mod.read_wav(path)
+        # save_audio wrote 5 kHz of deviation at 0.8 of full scale
+        result = self._audio_result(samples * 5000 / 0.8, rate, "Hz", path,
+                                    tone_hz, weighting)
+        self._record("audio", **result)
+        return result
+
+    def _samples(self, measurement: dict) -> tuple[np.ndarray, int]:
+        samples, rate = audio_mod.read_wav(self.run_dir
+                                           / measurement.get("file")
+                                           if "file" in measurement
+                                           else self.run_dir
+                                           / measurement["audio_file"])
+        return samples, rate
+
+    @keyword
+    def audio_sinad_should_be_at_least(self, measurement: dict,
+                                       sinad_db: float):
+        """Fail unless an audio measurement's SINAD reaches sinad_db."""
+        ok = measurement["sinad_db"] >= float(sinad_db)
+        self._record("limit", field="sinad_db", value=measurement["sinad_db"],
+                     limit=f">= {float(sinad_db):g} dB",
+                     weighting=measurement["weighting"], passed=ok)
+        if not ok:
+            raise AssertionError(f"SINAD {measurement['sinad_db']:.1f} dB < "
+                                 f"{float(sinad_db):g} dB")
+
+    @keyword
+    def audio_distortion_should_meet_limits(self, measurement: dict,
+                                            direction: str):
+        """THD+N against the radio file's fm <direction>_max_thd_n_percent."""
+        limit = float(self.radio["fm"][f"{direction}_max_thd_n_percent"])
+        value = measurement["thd_n_percent"]
+        ok = value <= limit
+        self._record("limit", field=f"{direction} thd_n_percent", value=value,
+                     limit=f"<= {limit:g}%", passed=ok)
+        if not ok:
+            raise AssertionError(f"{direction} THD+N {value:.1f}% > {limit:g}%")
+
+    @keyword
+    def measure_audio_response(self, measurement: dict,
+                               reference_hz: float = 1000.0) -> list:
+        """
+        Levels of the tone bursts in a recording or a transmission's audio,
+        relative to the reference tone, lowest frequency first.
+        """
+        if "file" in measurement:
+            samples, rate = audio_mod.read_wav(self.run_dir
+                                               / measurement["file"])
+        else:
+            samples, rate = audio_mod.read_wav(self.run_dir
+                                               / measurement["audio_file"])
+        levels = audio_mod.response(audio_mod.tone_segments(samples, rate),
+                                    float(reference_hz))
+        result = [{"tone_hz": s.tone_hz, "level_db": s.level_db}
+                  for s in levels]
+        self._record("response", reference_hz=float(reference_hz),
+                     levels=result)
+        logger.info("<table border=1><tr><th>Hz</th><th>dB</th></tr>"
+                    + "".join(f"<tr><td>{r['tone_hz']:.0f}</td>"
+                              f"<td>{r['level_db']:+.1f}</td></tr>"
+                              for r in result) + "</table>", html=True)
+        return result
+
+    @keyword
+    def audio_response_should_meet_limits(self, levels: list, direction: str,
+                                          reference_hz: float = 1000.0):
+        """
+        Check a response against the radio file's fm
+        <direction>_audio_response: within tolerance_db of a slope in dB per
+        octave through the reference, over band_hz.
+        """
+        spec = self.radio["fm"][f"{direction}_audio_response"]
+        low, high = spec["band_hz"]
+        tol_low, tol_high = spec["tolerance_db"]
+        slope = float(spec["slope_db_per_octave"])
+        failures = []
+        for r in levels:
+            if not low <= r["tone_hz"] <= high:
+                continue
+            error = r["level_db"] - slope * np.log2(r["tone_hz"]
+                                                    / float(reference_hz))
+            ok = tol_low <= error <= tol_high
+            self._record("limit", field=f"{direction} response at "
+                         f"{r['tone_hz']:.0f} Hz", value=float(error),
+                         limit=f"{tol_low:+g}/{tol_high:+g} dB of "
+                               f"{slope:+g} dB/octave", passed=ok)
+            if not ok:
+                failures.append(f"{r['tone_hz']:.0f} Hz {error:+.1f} dB")
+        if failures:
+            raise AssertionError(f"{direction} response off its "
+                                 f"{slope:+g} dB/octave: "
+                                 + ", ".join(failures))
+
+    @keyword
+    def audio_should_have_no_dropouts(self, measurement: dict):
+        """The longest dropout against the radio file's fm rx_max_dropout_s."""
+        limit = float(self.radio["fm"]["rx_max_dropout_s"])
+        gap = measurement["longest_gap_s"]
+        ok = gap <= limit
+        self._record("limit", field="longest_gap_s", value=gap,
+                     limit=f"<= {limit:g} s", passed=ok)
+        if not ok:
+            raise AssertionError(f"{1000 * gap:.0f} ms dropout in the audio")
+
+    @keyword
+    def measure_audio_images(self, measurement: dict, tone_hz: float,
+                             *image_hz) -> dict:
+        """Level of image frequencies relative to the tone, in dB."""
+        samples, rate = self._samples(measurement)
+        levels = audio_mod.images(samples, rate, float(tone_hz),
+                                  [float(f) for f in image_hz])
+        self._record("images", tone_hz=float(tone_hz),
+                     levels_db={str(k): v for k, v in levels.items()})
+        BuiltIn().set_test_message(", ".join(
+            f"{k:.0f} Hz {v:+.1f} dB" for k, v in levels.items()),
+            append=True)
+        return {str(int(k)): v for k, v in levels.items()}
+
+    @keyword
+    def mic_sensitivity(self, measurement: dict, injected_dbfs: float,
+                        target_deviation_hz: float) -> dict:
+        """
+        The injected level that would give target_deviation_hz, scaled from
+        one take at injected_dbfs (below the limiter, the path is linear):
+        in dBFS of the interface, and in mVrms with a calibrated
+        paths.audio_out.
+        """
+        got = float(measurement["tone_deviation_hz"])
+        if got <= 0:
+            raise AssertionError("No tone in the transmission")
+        dbfs = float(injected_dbfs) + 20 * np.log10(float(target_deviation_hz)
+                                                    / got)
+        result = {"target_deviation_hz": float(target_deviation_hz),
+                  "injected_dbfs": float(injected_dbfs),
+                  "measured_deviation_hz": got, "sensitivity_dbfs": dbfs,
+                  "sensitivity_mvrms": self._audio_out_mv(dbfs)}
+        self._record("mic-sensitivity", **result)
+        mv = result["sensitivity_mvrms"]
+        BuiltIn().set_test_message(
+            f"{float(target_deviation_hz):.0f} Hz deviation at {dbfs:.1f} "
+            f"dBFS" + (f" ({mv:.2f} mVrms)" if mv is not None else ""),
+            append=True)
+        return result
+
+    @keyword
+    def spread_should_be_at_most(self, what: str, limit_db: float, *values):
+        """
+        Fail unless repeated readings of one level, in linear units such as
+        Hz of deviation, spread over no more than limit_db.
+        """
+        stats = self.report_repeatability(what, *values)
+        ok = stats["spread_db"] <= float(limit_db)
+        self._record("limit", field=f"{what} spread_db",
+                     value=stats["spread_db"], limit=f"<= {limit_db} dB",
+                     passed=ok)
+        if not ok:
+            raise AssertionError(f"{what} spreads over "
+                                 f"{stats['spread_db']:.2f} dB")
+
+    @keyword
+    def find_rx_sensitivity(self, deviation_hz: float,
+                            target_sinad_db: float = 12.0,
+                            start_dbm: float = -100.0,
+                            stop_dbm: float = -130.0, step_db: float = 2.0,
+                            weighting: str = "psophometric",
+                            seconds: float = 2.0, tone_hz: float = 1000.0
+                            ) -> dict:
+        """
+        Step an FM tone down from start_dbm at the radio's antenna port,
+        recording the speaker at each level, until SINAD falls below the
+        target; the sensitivity is where the SINAD crosses it, interpolated
+        between the levels either side. Needs absolute transmitter levels
+        and the audio interface.
+        """
+        points = []
+        level = float(start_dbm)
+        try:
+            while level >= float(stop_dbm) - 1e-9:
+                self.start_transmitting_fm_tone(deviation_hz, tone_hz,
+                                                level_dbm=level)
+                self.wait_seconds(0.5)
+                a = self.capture_radio_audio(seconds, tone_hz, weighting)
+                points.append((level, a["sinad_db"]))
+                if a["sinad_db"] < float(target_sinad_db):
+                    break
+                level -= float(step_db)
+        finally:
+            self.stop_transmitting()
+        result = {"deviation_hz": float(deviation_hz),
+                  "target_sinad_db": float(target_sinad_db),
+                  "weighting": weighting, "points": points,
+                  "sensitivity_dbm": None}
+        if len(points) >= 2 and points[-1][1] < float(target_sinad_db) \
+                <= points[-2][1]:
+            (l1, s1), (l2, s2) = points[-2], points[-1]
+            result["sensitivity_dbm"] = float(
+                l1 + (float(target_sinad_db) - s1) * (l2 - l1) / (s2 - s1))
+        self._record("rx-sensitivity", **result)
+        if result["sensitivity_dbm"] is None:
+            raise AssertionError(f"SINAD never crossed {target_sinad_db} dB "
+                                 f"between {start_dbm} and {stop_dbm} dBm: "
+                                 f"{points}")
+        BuiltIn().set_test_message(
+            f"{target_sinad_db:g} dB SINAD at "
+            f"{result['sensitivity_dbm']:.1f} dBm", append=True)
+        return result
+
+    def _sim_speaker(self, n: int, rate: int) -> np.ndarray:
+        """
+        The simulated radio's speaker: FM demodulation of what the
+        simulated transmitter plays, de-emphasized, with noise that sets
+        12 dB SINAD at -118 dBm and rises 1 dB per dB below.
+        """
+        state = self._tx_state
+        rng = np.random.default_rng(self._audio_files)
+        if state is None:
+            # Nothing received: the interface loops back what it plays
+            return None
+        path = state["path"]
+        if path not in self._sim_cache:
+            from oat.iq import IqFormat, read_iq
+            from scipy.signal import resample_poly, sosfilt, butter
+            tx = self.bench["transmitter"]
+            iq, r, off = to_analysis_rate(read_iq(path, IqFormat.CS8),
+                                          tx["rate"],
+                                          -tx.get("tune_offset_hz", 0))
+            n_ = np.arange(len(iq))
+            iq = iq * np.exp(-2j * np.pi * off * n_ / r)
+            dev = demodulated_audio(iq, r)
+            g = np.gcd(rate, 48000)
+            dev = resample_poly(dev, rate // g, 48000 // g)
+            # De-emphasis, 6 dB/octave above 300 Hz, unity at 1 kHz
+            deemph = butter(1, 300, fs=rate, output="sos")
+            self._sim_cache[path] = sosfilt(deemph, dev) * (1000 / 300) \
+                * 0.3 / 3000
+        speaker = np.resize(self._sim_cache[path], n)
+        level = state.get("level_dbm")
+        sinad = 40.0 if level is None else min(40.0, 12 + level + 118)
+        rms = np.sqrt(np.mean(speaker ** 2)) or 1e-6
+        noise_rms = rms / np.sqrt(max(10 ** (sinad / 10) - 1, 1e-3))
+        from scipy.signal import butter, sosfilt
+        noise = sosfilt(butter(4, (300, 3000), "bandpass", fs=rate,
+                               output="sos"), rng.normal(size=n))
+        noise *= noise_rms / (np.sqrt(np.mean(noise ** 2)) or 1.0)
+        return speaker + noise
