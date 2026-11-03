@@ -44,6 +44,13 @@ operator:
 #  capture_device: plughw:CARD=AllInOneCable,DEV=0
 #  rate: 48000
 #  ptt: {device: /dev/ttyACM0, line: dtr}
+#  # Mixer controls set (amixer sset) at the start of every run and
+#  # recorded with the results, so desktop sound settings can't change the
+#  # levels between runs. Names from `amixer -c <card> scontrols`; values as
+#  # amixer takes them: a raw step, "40%" or "-6dB".
+#  mixer:
+#    PCM: 102
+#    Mic: 255
 #  # The radio's volume for the tests that record its speaker, set once per
 #  # run (Set Radio Volume Once) and recorded with the results. With
 #  # target_dbfs the operator turns the knob while the run measures the
