@@ -14,6 +14,7 @@ interface can also key the radio, through a serial port's DTR or RTS line.
 """
 
 import os
+import re
 import shutil
 import subprocess
 import time
@@ -334,16 +335,63 @@ class AudioInterface(ABC):
         """Wait for a file played once to end."""
 
 
+def alsa_card(device: str) -> str | None:
+    """The card of an ALSA device name: CARD=Audio, or hw:2 / plughw:2,0."""
+    m = re.search(r"CARD=([^,]+)", device)
+    if m:
+        return m.group(1)
+    m = re.match(r"(?:plug)?hw:(\d+)", device)
+    return m.group(1) if m else None
+
+
+def mixer_readback(text: str) -> str:
+    """The levels in amixer's report of a control, e.g. 'Playback 102 [40%]'."""
+    levels = re.findall(r"(Playback|Capture) (\d+) \[(\d+)%\]", text)
+    seen = []
+    for kind, raw, pct in levels:
+        entry = f"{kind} {raw} [{pct}%]"
+        if entry not in seen:
+            seen.append(entry)
+    return ", ".join(seen)
+
+
 class AlsaAudio(AudioInterface):
     """An ALSA sound device, through aplay and arecord."""
 
     def __init__(self, playback_device: str = "default",
-                 capture_device: str = "default", rate: int = RATE):
+                 capture_device: str = "default", rate: int = RATE,
+                 mixer: dict | None = None):
         self.playback_device = playback_device
         self.capture_device = capture_device
         self.rate = rate
+        self.mixer = dict(mixer or {})
         self._proc: subprocess.Popen | None = None
         self._looping = False
+
+    def apply_mixer(self) -> dict:
+        """
+        Set the interface's mixer controls from the bench file, so a desktop
+        sound server or an earlier session can't leave other levels, and
+        return what each control reads back. Values go to amixer as given:
+        a raw step (102), a percentage ("40%") or dB ("-6dB").
+        """
+        if not self.mixer:
+            return {}
+        card = alsa_card(self.capture_device) or alsa_card(
+            self.playback_device)
+        if card is None:
+            raise ValueError("audio mixer needs a device naming its card, "
+                             "such as plughw:CARD=Audio,DEV=0")
+        applied = {}
+        for control, value in self.mixer.items():
+            proc = subprocess.run(
+                [self._tool("amixer"), "-c", card, "sset", str(control),
+                 str(value)], capture_output=True, text=True)
+            if proc.returncode != 0:
+                raise RuntimeError(f"amixer couldn't set {control!r} on card "
+                                   f"{card}: {proc.stderr.strip()}")
+            applied[str(control)] = mixer_readback(proc.stdout) or str(value)
+        return applied
 
     @staticmethod
     def _tool(name: str) -> str:
@@ -478,7 +526,7 @@ def make_audio(cfg: dict | None) -> AudioInterface | None:
     if kind == "alsa":
         return AlsaAudio(cfg.get("playback_device", "default"),
                          cfg.get("capture_device", "default"),
-                         int(cfg.get("rate", RATE)))
+                         int(cfg.get("rate", RATE)), cfg.get("mixer"))
     if kind == "sim":
         return SimAudio(int(cfg.get("rate", RATE)))
     raise ValueError(f"unknown audio type {kind!r}")

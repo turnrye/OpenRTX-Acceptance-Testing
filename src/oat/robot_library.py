@@ -195,6 +195,9 @@ class OpenRTXAcceptance:
         self.operator = make_operator(self.bench.get("operator", {}))
         self.audio = audio_mod.make_audio(self.bench.get("audio"))
         self.ptt = audio_mod.make_ptt(self.bench.get("audio"))
+        self.audio_mixer = {}
+        if isinstance(self.audio, audio_mod.AlsaAudio):
+            self.audio_mixer = self.audio.apply_mixer()
         if isinstance(self.audio, audio_mod.SimAudio) and isinstance(
                 self.transmitter, SimTransmitter):
             self.audio.source = self._sim_speaker
@@ -224,6 +227,9 @@ class OpenRTXAcceptance:
                 ("Station", self.bench.get("station", "unnamed")),
                 ("Calibration", f"{cal['method']}, measured "
                                 f"{cal['measured']} ({cal['sha256']})"),
+                *((("Audio mixer", "; ".join(
+                    f"{k}: {v}" for k, v in self.audio_mixer.items())),)
+                  if self.audio_mixer else ()),
                 ("Suite commit", suite_commit())):
             BuiltIn().set_suite_metadata(name, value, top=True)
         self.operator.instruct(self._plan_summary())
@@ -374,6 +380,8 @@ class OpenRTXAcceptance:
             "bands": {name: band["frequency_hz"]
                       for name, band in self.radio["bands"].items()},
             "calibration": self.calibration.summary(),
+            **({"audio_mixer": self.audio_mixer}
+               if getattr(self, "audio_mixer", None) else {}),
             "records": self.records,
             "operator": self.operator.exchanges(),
         }
