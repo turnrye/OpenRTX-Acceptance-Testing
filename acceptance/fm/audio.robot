@@ -141,7 +141,8 @@ FM RX 12 dB SINAD Sensitivity
     [Documentation]    FM-RX-1: the level at the antenna port giving 12 dB SINAD
     ...                (psophometric), 1 kHz at the reference deviation, both bandwidths.
     [Tags]    rx    needs:abs-level
-    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, squelch open, volume at the fixed test step
+    Set Radio Volume Once
+    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, squelch open, volume unchanged
     ${narrow}=    Test Deviation    BW_12_5
     ${s12}=    Find RX Sensitivity    ${narrow}
     Remember Result    sensitivity BW_12_5    ${s12}
@@ -152,10 +153,11 @@ FM RX 12 dB SINAD Sensitivity
 
 FM RX Audio Response And Level
     [Documentation]    FM-RX-2: tones from 300 to 3000 Hz at one deviation, recorded from
-    ...                the speaker relative to 1 kHz, and the 1 kHz level at the fixed
-    ...                volume step.
+    ...                the speaker relative to 1 kHz, and the 1 kHz level at the volume
+    ...                Set Radio Volume Once set.
     [Tags]    rx
-    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, volume at the fixed test step
+    Set Radio Volume Once
+    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, volume unchanged
     ${dev}=    Test Deviation    BW_25
     Start Transmitting FM Tones    ${dev}    ${RESPONSE_TONES}
     ${sweep}=    Capture Radio Audio    14
@@ -172,7 +174,8 @@ FM RX Is Not Interrupted By Key Presses
     [Documentation]    FM-RX-3: with voice prompts on and key beeps off, key presses during
     ...                reception must not interrupt the speaker audio.
     [Tags]    rx    manual
-    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, voice prompts on, key beeps off, volume at the fixed test step
+    Set Radio Volume Once
+    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, voice prompts on, key beeps off, volume unchanged
     ${dev}=    Test Deviation    BW_25
     Start Transmitting FM Tone    ${dev}
     Operator Does    When you continue, the speaker is recorded for 8 s: press a few keys (menu, up, down, back) during it, without changing channel
