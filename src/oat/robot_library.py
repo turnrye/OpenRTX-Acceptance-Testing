@@ -141,6 +141,9 @@ class OpenRTXAcceptance:
         self.operator = None
         self.run_dir = None
         self.records = []
+        # How the radio's volume was set for this run, once Set Radio
+        # Volume Once has run
+        self.radio_volume = None
         self._captures = 0
         # A capture from Start Capture, until it's stopped
         self._open_capture = None
@@ -405,6 +408,94 @@ class OpenRTXAcceptance:
         answer = self.operator.ask(question)
         self._record("observation", text=question, answer=answer)
         return answer
+
+    # Radio volume -------------------------------------------------------
+
+    @keyword
+    def set_radio_volume_once(self) -> dict:
+        """
+        Have the operator set the radio's volume for the receive tests that
+        record its speaker, once per run, and record the setting. Later calls
+        return the first setting.
+
+        A volume knob has no steps to name, so with audio.radio_volume
+        target_dbfs in the bench file the volume is set by level: the
+        transmitter sends a 1 kHz FM tone (reference_deviation_hz, default
+        3 kHz, at reference_level_dbm when calibrated), the speaker is
+        measured through the audio interface, and the operator turns the
+        knob until it reads target_dbfs within tolerance_db. Without a
+        target the operator just sets one and says where it is.
+        """
+        if self.radio_volume is not None:
+            return self.radio_volume
+        cfg = (self.bench.get("audio") or {}).get("radio_volume") or {}
+        hint = f" ({cfg['note']})" if cfg.get("note") else ""
+        if cfg.get("target_dbfs") is None:
+            knob = self.operator_reports(
+                "Set the radio volume where it will stay for the rest of "
+                f"this run{hint}. Where is the knob (e.g. 1 o'clock)?")
+            self.radio_volume = {"knob": knob}
+        else:
+            self.radio_volume = self._set_volume_by_level(cfg, hint)
+        summary = f"knob {self.radio_volume['knob'] or 'not given'}"
+        if "level_dbfs" in self.radio_volume:
+            v = self.radio_volume
+            summary = (f"{v['level_dbfs']:.1f} dBFS at the speaker for "
+                       f"{v['reference_deviation_hz']:.0f} Hz deviation "
+                       f"(target {v['target_dbfs']:g} dBFS), {summary}")
+        self._record("radio_volume", **self.radio_volume)
+        BuiltIn().set_suite_metadata("Radio volume", summary, top=True)
+        return self.radio_volume
+
+    def _set_volume_by_level(self, cfg: dict, hint: str) -> dict:
+        """The live-level procedure of Set Radio Volume Once."""
+        interface = self._need_audio()
+        target = float(cfg["target_dbfs"])
+        tolerance = float(cfg.get("tolerance_db", 1.0))
+        deviation = float(cfg.get("reference_deviation_hz", 3000.0))
+        rounds = int(cfg.get("max_rounds", 12))
+        self.operator_does(
+            f"Set the radio to FM, {self._frequency() / 1e6:.4f} MHz, 25 kHz "
+            "bandwidth, no CTCSS, squelch open. Leave the audio cable in: "
+            f"the speaker is measured through it{hint}")
+        self.start_transmitting_fm_tone(
+            deviation, 1000.0, level_dbm=cfg.get("reference_level_dbm"))
+        try:
+            for attempt in range(1, rounds + 1):
+                path = interface.record(self._audio_path("volume"), 1.5)
+                samples, _ = audio_mod.read_wav(path)
+                level = audio_mod.rms_dbfs(samples)
+                clipped = bool(np.max(np.abs(samples)) > 0.99)
+                error = level - target
+                if abs(error) <= tolerance and not clipped:
+                    knob = self.operator.ask(
+                        f"Speaker {level:.1f} dBFS: on target ({target:g} "
+                        f"+-{tolerance:g} dB). Leave the volume there. Where "
+                        "is the knob (e.g. 1 o'clock)?")
+                    accepted = True
+                    break
+                turn = "down" if error > 0 or clipped else "up"
+                why = " and clipping the interface" if clipped else ""
+                answer = self.operator.ask(
+                    f"Speaker {level:.1f} dBFS{why}; the target is "
+                    f"{target:g} +-{tolerance:g} dB. Turn the volume {turn}, "
+                    "then press Enter to measure again (or type accept to "
+                    "keep it as it is)")
+                if answer.lower().startswith("accept"):
+                    knob = self.operator.ask("Where is the volume knob?")
+                    accepted = False
+                    logger.warn(f"Radio volume accepted off target: "
+                                f"{level:.1f} dBFS for {target:g} dBFS")
+                    break
+            else:
+                raise AssertionError(
+                    f"The speaker didn't reach {target:g} dBFS in {rounds} "
+                    f"tries (last {level:.1f} dBFS)")
+        finally:
+            self.stop_transmitting()
+        return {"knob": knob, "level_dbfs": level, "target_dbfs": target,
+                "tolerance_db": tolerance, "reference_deviation_hz": deviation,
+                "on_target": accepted, "clipped": clipped, "tries": attempt}
 
     # Capturing the radio ------------------------------------------------
 

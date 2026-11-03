@@ -44,3 +44,14 @@ operator:
 #  capture_device: plughw:CARD=AllInOneCable,DEV=0
 #  rate: 48000
 #  ptt: {device: /dev/ttyACM0, line: dtr}
+#  # The radio's volume for the tests that record its speaker, set once per
+#  # run (Set Radio Volume Once) and recorded with the results. With
+#  # target_dbfs the operator turns the knob while the run measures the
+#  # speaker playing a 1 kHz FM tone, until it reads the target; without it
+#  # the operator just sets a volume and says where the knob is.
+#  radio_volume:
+#    target_dbfs: -12              # speaker level through the interface
+#    tolerance_db: 1
+#    reference_deviation_hz: 3000  # 1 kHz tone, 60% of 25 kHz deviation
+#    #reference_level_dbm: -60     # with a calibrated transmitter
+#    note: start near 12 o'clock   # shown to the operator

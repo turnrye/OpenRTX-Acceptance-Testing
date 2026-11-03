@@ -191,7 +191,8 @@ FM RX SINAD Is Unchanged After M17
     [Documentation]    MODE-1: receive SINAD at a fixed level before and after a trip
     ...                through M17.
     [Tags]    rx    mode:m17    needs:audio    needs:abs-level
-    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, squelch open, volume at the fixed test step
+    Set Radio Volume Once
+    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, squelch open, volume unchanged
     ${dev}=    Test Deviation    BW_12_5
     Start Transmitting FM Tone    ${dev}    level_dbm=${MODE_LEVEL_DBM}
     ${before}=    Capture Radio Audio    3    1000    psophometric

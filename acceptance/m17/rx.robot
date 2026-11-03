@@ -30,7 +30,8 @@ ${MIN_SINAD_DB}    10
 
 *** Keywords ***
 Set Up M17 Receive
-    Operator Does    Set the radio to M17, ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, volume at the fixed test step
+    Set Radio Volume Once
+    Operator Does    Set the radio to M17, ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, volume unchanged
 
 *** Test Cases ***
 M17 RX Shows The Callsign
