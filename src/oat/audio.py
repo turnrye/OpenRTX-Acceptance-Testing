@@ -346,10 +346,11 @@ def alsa_card(device: str) -> str | None:
 
 def mixer_readback(text: str) -> str:
     """The levels in amixer's report of a control, e.g. 'Playback 102 [40%]'."""
-    levels = re.findall(r"(Playback|Capture) (\d+) \[(\d+)%\]", text)
+    levels = re.findall(
+        r"(Playback|Capture) (\d+) \[(\d+)%\](?:.*?\[(on|off)\])?", text)
     seen = []
-    for kind, raw, pct in levels:
-        entry = f"{kind} {raw} [{pct}%]"
+    for kind, raw, pct, switch in levels:
+        entry = f"{kind} {raw} [{pct}%]" + (f" [{switch}]" if switch else "")
         if entry not in seen:
             seen.append(entry)
     return ", ".join(seen)
@@ -373,7 +374,10 @@ class AlsaAudio(AudioInterface):
         Set the interface's mixer controls from the bench file, so a desktop
         sound server or an earlier session can't leave other levels, and
         return what each control reads back. Values go to amixer as given:
-        a raw step (102), a percentage ("40%") or dB ("-6dB").
+        a raw step (102), a percentage ("40%") or dB ("-6dB"), followed by
+        unmute (or mute) to set the control's switch too: "102 unmute". A
+        desktop sound server that mutes a device it manages leaves the
+        switch off, which silences the interface whatever the level.
         """
         if not self.mixer:
             return {}
@@ -386,7 +390,7 @@ class AlsaAudio(AudioInterface):
         for control, value in self.mixer.items():
             proc = subprocess.run(
                 [self._tool("amixer"), "-c", card, "sset", str(control),
-                 str(value)], capture_output=True, text=True)
+                 *str(value).split()], capture_output=True, text=True)
             if proc.returncode != 0:
                 raise RuntimeError(f"amixer couldn't set {control!r} on card "
                                    f"{card}: {proc.stderr.strip()}")
