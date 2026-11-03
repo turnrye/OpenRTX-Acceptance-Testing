@@ -30,9 +30,11 @@ def test_card_from_device_names():
 
 
 def test_readback_lists_each_level_once():
-    assert mixer_readback(PCM) == "Playback 102 [40%]"
+    assert mixer_readback(PCM) == "Playback 102 [40%] [on]"
     assert mixer_readback("  Mono: Capture 128 [50%] [on]") \
-        == "Capture 128 [50%]"
+        == "Capture 128 [50%] [on]"
+    assert mixer_readback("  Front Left: Playback 255 [100%] [off]") \
+        == "Playback 255 [100%] [off]"
 
 
 @pytest.fixture
@@ -50,11 +52,11 @@ def test_mixer_is_set_on_the_device_card(fake_amixer):
     audio = make_audio({"type": "alsa",
                         "playback_device": "plughw:CARD=Audio,DEV=0",
                         "capture_device": "plughw:CARD=Audio,DEV=0",
-                        "mixer": {"PCM": 102, "Mic": "50%"}})
-    assert audio.apply_mixer() == {"PCM": "Playback 102 [40%]",
-                                   "Mic": "Playback 102 [40%]"}
+                        "mixer": {"PCM": "102 unmute", "Mic": "50%"}})
+    assert audio.apply_mixer() == {"PCM": "Playback 102 [40%] [on]",
+                                   "Mic": "Playback 102 [40%] [on]"}
     assert fake_amixer.read_text().splitlines() == [
-        "-c Audio sset PCM 102", "-c Audio sset Mic 50%"]
+        "-c Audio sset PCM 102 unmute", "-c Audio sset Mic 50%"]
 
 
 def test_no_mixer_section_touches_nothing(fake_amixer):
