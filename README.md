@@ -104,6 +104,9 @@ the C62, for example, the 16 kHz image starts `7dd697c9` and the 48 kHz one `957
 firmware is `-v DSP:stock`. Tags select what runs: `--include tx`, `--include rx`,
 `--include band:2m`, `--exclude mode:m17`, and `--exclude needs:audio` or
 `--exclude needs:abs-level` on a bench without an audio interface or absolute level calibration.
+On a bench of SDRs alone, add `-A bench/sdr-only.args` after the bench's own argument file: it
+excludes `needs:audio` and adds a `Profile` to the suite metadata, so a published run shows that its
+audio tests were left out on purpose.
 
 ### The suites
 
