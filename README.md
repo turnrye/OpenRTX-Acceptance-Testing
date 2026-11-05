@@ -115,6 +115,7 @@ audio tests were left out on purpose.
 | `selftest.robot` | The keywords, on the simulated bench |
 | `selftest-bench.robot` | The bench through its attenuator chain, no radio: the deviation scale at the Bessel null, a known FM deviation and a known M17 stream read back, and their spread over five repeats, which sets the tolerance for comparing firmware states. Needs separate receiver and transmitter. Run it at the start of every evidence session |
 | `fm/bandwidth.robot` | FM deviation, bandwidth, CTCSS and power steps at both bandwidths, adjacent channels, and FM restored after M17 |
+| `audio-levels.robot` | Setting up an audio interface: the clean mic level range, and hum and noise. Not evidence |
 | `fm/audio.robot` | FM audio through the audio interface: mic sensitivity, response, distortion, speech deviation, mic level after cold boots, 12 dB SINAD sensitivity, receive response and dropouts |
 | `m17/tx.robot` | M17 transmit: deviations and ratio, symbol rate, carrier, bandwidth, EVM, decode rate, preamble, long transmissions, power, Codec2 input level and aliasing |
 | `m17/rx.robot` | M17 receive of a generated stream: callsign, Codec2 tone, sensitivity, carrier offset, speaker images |
@@ -178,11 +179,21 @@ firmware, DSP image and date. `--all` shows every number recorded.
 
 A USB sound interface on the radio's accessory connector replaces the acoustic tone and the ear:
 an AIOC, or a CM108 dongle with a resistive pad to the mic pin and a loaded speaker tap. Its
-`audio` section in the bench file names the ALSA devices, and with an AIOC the serial port whose
-DTR line keys the radio (`bench/example.yaml`); without a PTT line the operator keys on request.
+`audio` section in the bench file names the ALSA devices, and the serial port and line that key the
+radio: DTR on an AIOC, RTS on a Digirig Mobile (`bench/example.yaml`). Without a PTT line the
+operator keys on request.
 Keywords inject tones, tone sequences and WAV files, record the speaker, and measure level, SINAD
 and THD+N (optionally psophometrically weighted), response and dropouts. With `paths.audio_out`
 and `paths.audio_in` calibrated, levels read in millivolts.
+
+On a new interface or mixer setting, run `acceptance/audio-levels.robot` first. It steps a tone up
+in level and prints the deviation and THD+N at each step, plus the hum and noise with the mic input
+silent, so you can find the clean range and compare the hum with and without an isolator. Its runs
+aren't evidence, so keep them local.
+
+A desktop sound server can mute or change an interface during a run. Turn its profile off with
+`wpctl status` to find the device's id, then `wpctl set-profile <id> 0`, and set the levels in the
+bench file's `mixer`.
 
 ### M17
 
