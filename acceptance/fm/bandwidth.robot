@@ -54,9 +54,9 @@ FM TX At 25 kHz Stays Within Wide Limits
     ${tx}=    Capture Radio Transmissions
     ...    Play ${tone} at a fixed volume and distance from the mic, key PTT for 5 s, release. Then key PTT, whistle loudly close to the mic for 5 s, release.
     ...    expected=2
+    Remember Result    wide tone    ${tx}[0]
     FM Transmission Should Meet Limits    ${tx}[0]    BW_25
     FM Transmission Should Meet Limits    ${tx}[1]    BW_25
-    Remember Result    wide tone    ${tx}[0]
 
 FM TX At 12.5 kHz Stays Within Narrow Limits
     [Tags]    tx
@@ -64,9 +64,9 @@ FM TX At 12.5 kHz Stays Within Narrow Limits
     ${tx}=    Capture Radio Transmissions
     ...    Play the same tone at the same volume and distance, key PTT for 5 s, release. Then key PTT, whistle loudly close to the mic for 5 s, release.
     ...    expected=2
+    Remember Result    narrow tone    ${tx}[0]
     FM Transmission Should Meet Limits    ${tx}[0]    BW_12_5
     FM Transmission Should Meet Limits    ${tx}[1]    BW_12_5
-    Remember Result    narrow tone    ${tx}[0]
 
 Narrow FM TX Deviates Less Than Wide
     [Tags]    tx
