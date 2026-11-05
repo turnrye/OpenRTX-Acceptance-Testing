@@ -479,9 +479,10 @@ class SimAudio(AudioInterface):
 
 class SerialPtt:
     """
-    Keys the radio through a serial port's modem control line, as an AIOC
-    does (by default PTT follows DTR, with RTS low). Uses the termios ioctls
-    directly, so no serial library is needed.
+    Keys the radio through a serial port's modem control line: DTR on an AIOC
+    by default, RTS on a Digirig Mobile. Linux raises both lines when a port
+    opens, so opening puts the keying line at rest and holds the other low.
+    Uses the termios ioctls directly, so no serial library is needed.
     """
 
     def __init__(self, device: str, line: str = "dtr",
@@ -492,17 +493,31 @@ class SerialPtt:
         bits = {"dtr": termios.TIOCM_DTR, "rts": termios.TIOCM_RTS}
         if line not in bits:
             raise ValueError("ptt line must be dtr or rts")
+        # The port opens at the first key-up, so a wrong one is caught here,
+        # before a run has started, without touching the lines
+        if not os.access(device, os.R_OK | os.W_OK):
+            raise ValueError(f"PTT port {device} is missing or not writable "
+                             "(is the user in the dialout group?)")
         self.device, self.bit, self.active_high = device, bits[line], \
             active_high
+        self.other_bit = bits["rts" if line == "dtr" else "dtr"]
         self._fd: int | None = None
 
-    def _set(self, on: bool) -> None:
+    def _ioctl(self, request: int, bit: int) -> None:
         import struct
+        self._fcntl.ioctl(self._fd, request, struct.pack("I", bit))
+
+    def _set(self, on: bool) -> None:
         if self._fd is None:
-            self._fd = os.open(self.device, os.O_RDWR | os.O_NOCTTY)
-        request = (self._termios.TIOCMBIS if on == self.active_high
-                   else self._termios.TIOCMBIC)
-        self._fcntl.ioctl(self._fd, request, struct.pack("I", self.bit))
+            self._fd = os.open(self.device,
+                               os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+            self._ioctl(self._termios.TIOCMBIC, self.other_bit)
+            self._ioctl(self._request(False), self.bit)
+        self._ioctl(self._request(on), self.bit)
+
+    def _request(self, on: bool) -> int:
+        return (self._termios.TIOCMBIS if on == self.active_high
+                else self._termios.TIOCMBIC)
 
     def key(self) -> None:
         """Key the transmitter."""

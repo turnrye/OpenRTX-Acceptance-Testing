@@ -4,6 +4,9 @@
 
 """Audio test signals and the measurements made on them."""
 
+import struct
+import termios
+
 import numpy as np
 import pytest
 
@@ -109,3 +112,68 @@ def test_audio_config():
     assert audio.make_ptt({"type": "sim"}) is None
     with pytest.raises(ValueError):
         audio.make_audio({"type": "pulse"})
+
+
+class FakeFcntl:
+    """Records modem line changes instead of making them."""
+
+    def __init__(self):
+        self.calls = []
+
+    def ioctl(self, fd, request, data):
+        self.calls.append((request, struct.unpack("I", data)[0]))
+
+
+def serial_ptt(monkeypatch, line, active_high=True):
+    monkeypatch.setattr(audio.os, "access", lambda *a: True)
+    monkeypatch.setattr(audio.os, "open", lambda *a: 7)
+    monkeypatch.setattr(audio.os, "close", lambda fd: None)
+    monkeypatch.setattr(audio.time, "sleep", lambda s: None)
+    ptt = audio.SerialPtt("/dev/fake", line, active_high)
+    ptt._fcntl = FakeFcntl()
+    return ptt, ptt._fcntl.calls
+
+
+def test_serial_ptt_keys_on_rts_with_dtr_held_low(monkeypatch):
+    ptt, calls = serial_ptt(monkeypatch, "rts")
+    ptt.key()
+    assert calls == [(termios.TIOCMBIC, termios.TIOCM_DTR),
+                     (termios.TIOCMBIC, termios.TIOCM_RTS),
+                     (termios.TIOCMBIS, termios.TIOCM_RTS)]
+    calls.clear()
+    ptt.unkey()
+    assert calls == [(termios.TIOCMBIC, termios.TIOCM_RTS)]
+
+
+def test_serial_ptt_keys_on_dtr_with_rts_held_low(monkeypatch):
+    ptt, calls = serial_ptt(monkeypatch, "dtr")
+    ptt.key()
+    assert calls[0] == (termios.TIOCMBIC, termios.TIOCM_RTS)
+    assert calls[-1] == (termios.TIOCMBIS, termios.TIOCM_DTR)
+
+
+def test_serial_ptt_active_low_rests_high(monkeypatch):
+    ptt, calls = serial_ptt(monkeypatch, "rts", active_high=False)
+    ptt.key()
+    assert calls == [(termios.TIOCMBIC, termios.TIOCM_DTR),
+                     (termios.TIOCMBIS, termios.TIOCM_RTS),
+                     (termios.TIOCMBIC, termios.TIOCM_RTS)]
+
+
+def test_serial_ptt_close_releases_before_closing(monkeypatch):
+    ptt, calls = serial_ptt(monkeypatch, "rts")
+    ptt.close()
+    assert calls == []
+    ptt.key()
+    calls.clear()
+    ptt.close()
+    assert calls == [(termios.TIOCMBIC, termios.TIOCM_RTS)]
+
+
+def test_serial_ptt_refuses_a_missing_port_before_the_run(monkeypatch):
+    opened = []
+    monkeypatch.setattr(audio.os, "open", lambda *a: opened.append(a))
+    with pytest.raises(ValueError, match="/dev/nonexistent-ptt"):
+        audio.make_ptt({"ptt": {"device": "/dev/nonexistent-ptt",
+                                "line": "rts"}})
+    assert opened == []
