@@ -34,7 +34,7 @@ jobs:
           -v RADIO:radios/c62.yaml -v BENCH:bench/sim.yaml
           -v CALIBRATION:calibration/sim.yaml -v FIRMWARE:sim
           -v HARDWARE:sim -v DSP:sim acceptance/fm/audio.robot
-          acceptance/m17/rx.robot
+          acceptance/m17/rx.robot acceptance/audio-levels.robot
       - name: Suites resolve their keywords
         run: >-
           uv run robot --dryrun --outputdir runs/dryrun
