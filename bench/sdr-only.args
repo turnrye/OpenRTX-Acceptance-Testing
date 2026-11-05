@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Robot Framework argument file for a bench with SDRs and no audio interface.
+# Add it after the bench's own argument file:
+#
+#   uv run robot -A bench/<name>.local.args -A bench/sdr-only.args ...
+#
+# The profile is suite metadata, so a published run shows that its audio tests
+# were left out on purpose.
+
+--exclude needs:audio
+--metadata Profile:SDR bench, no audio interface
