@@ -40,6 +40,10 @@ operator:
 # /dev/serial/by-id path on a bench with several ports. Without ptt, the
 # operator keys. Leave the section out on a
 # bench without an interface and run with --exclude needs:audio.
+# On macOS, type: coreaudio plays and records through sox, with device names
+# from `sox -V6 -n -t coreaudio x` ("USB Audio Device" for a Digirig) and the
+# port as /dev/cu.usbserial-*; there is no mixer, so set the device's levels
+# in Audio MIDI Setup.
 #audio:
 #  type: alsa
 #  playback_device: plughw:CARD=AllInOneCable,DEV=0
