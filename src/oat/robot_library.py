@@ -251,6 +251,21 @@ class OpenRTXAcceptance:
                                    f"{self._chain_setup(need)}")
         self._chain = need
 
+    def end_test(self, data, result):
+        """
+        Listener: a test that failed between Key Radio and Release Radio, or
+        inside a timed capture, leaves the radio released and the capture
+        stopped, so the next test starts clean.
+        """
+        if self.ptt is not None:
+            try:
+                self.ptt.unkey()
+            except OSError as e:
+                logger.warn(f"Couldn't release PTT on {self.ptt.device}: {e}")
+        if self._open_capture is not None:
+            self._open_capture = None
+            self.receiver.stop()
+
     def _one_instrument(self) -> bool:
         """Whether one SDR both receives and transmits, so the chain stays."""
         rx, tx = self.bench["receiver"], self.bench["transmitter"]
