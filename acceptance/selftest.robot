@@ -148,6 +148,16 @@ The Bench Keys Each Transmission
     Length Should Be    ${tx}    3
     Should Be True    ${tx}[0][tone_deviation_hz] > 0
 
+A Test That Fails Mid-Capture Leaves It Stopped
+    [Documentation]    The next test checks that this one's capture didn't leak.
+    Start Capture
+    Run Keyword And Expect Error    *    Fail    PTT dropped off USB
+
+A Capture Starts After A Failed Test
+    Start Capture
+    ${tx}=    Stop Capture And Measure FM    expected=0
+    Length Should Be    ${tx}    0
+
 Audio Is Injected And Measured
     Inject Audio Tone    1000    -12    duration_s=1
     ${a}=    Capture Radio Audio    2

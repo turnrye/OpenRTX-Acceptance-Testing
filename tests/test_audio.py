@@ -177,3 +177,24 @@ def test_serial_ptt_refuses_a_missing_port_before_the_run(monkeypatch):
         audio.make_ptt({"ptt": {"device": "/dev/nonexistent-ptt",
                                 "line": "rts"}})
     assert opened == []
+
+
+def test_serial_ptt_unkey_leaves_an_unopened_port_alone(monkeypatch):
+    ptt, calls = serial_ptt(monkeypatch, "rts")
+    ptt.unkey()
+    assert calls == [] and ptt._fd is None
+
+
+def test_serial_ptt_reopens_a_port_that_dropped_off_usb(monkeypatch):
+    ptt, calls = serial_ptt(monkeypatch, "rts")
+    ptt.key()
+    gone = ptt._fcntl.ioctl
+    def fail_once(fd, request, data):
+        ptt._fcntl.ioctl = gone
+        raise OSError(6, "Device not configured")
+    ptt._fcntl.ioctl = fail_once
+    calls.clear()
+    ptt.key()
+    assert calls == [(termios.TIOCMBIC, termios.TIOCM_DTR),
+                     (termios.TIOCMBIC, termios.TIOCM_RTS),
+                     (termios.TIOCMBIS, termios.TIOCM_RTS)]
