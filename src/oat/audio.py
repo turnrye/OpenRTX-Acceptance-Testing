@@ -8,8 +8,9 @@ accessory connector: test signals for the mic input, captures of the
 speaker output, and the measurements made on them, which also apply to the
 audio demodulated from a transmission.
 
-The interface is driven through ALSA's aplay and arecord, so no audio
-library is needed; a simulated one stands in for self-tests. An AIOC-style
+The interface is driven through ALSA's aplay and arecord on Linux, or sox's
+coreaudio driver on macOS, so no audio library is needed; a simulated one
+stands in for self-tests. An AIOC-style
 interface can also key the radio, through a serial port's DTR or RTS line.
 """
 
@@ -437,6 +438,53 @@ class AlsaAudio(AudioInterface):
         return Path(path)
 
 
+class CoreAudio(AudioInterface):
+    """
+    A macOS sound device, through sox's coreaudio driver. Devices are named
+    as sox lists them (`sox -V6 -n -t coreaudio x`), such as "USB Audio
+    Device" for a Digirig, or "default". macOS has no amixer: the levels
+    are the device's own, set in Audio MIDI Setup.
+    """
+
+    def __init__(self, playback_device: str = "default",
+                 capture_device: str = "default", rate: int = RATE):
+        self.playback_device = playback_device
+        self.capture_device = capture_device
+        self.rate = rate
+        self._proc: subprocess.Popen | None = None
+
+    @staticmethod
+    def _sox() -> str:
+        path = shutil.which("sox")
+        if path is None:
+            raise RuntimeError("sox not found; install it (brew install sox)")
+        return path
+
+    def play(self, path: Path, repeat: bool = False) -> None:
+        self.stop_playing()
+        cmd = [self._sox(), "-q", str(path), "-t", "coreaudio",
+               self.playback_device] + (["repeat", "-"] if repeat else [])
+        self._proc = subprocess.Popen(cmd, stdout=subprocess.DEVNULL,
+                                      stderr=subprocess.PIPE)
+
+    def wait_playing(self) -> None:
+        if self._proc is not None:
+            self._proc.wait()
+
+    def stop_playing(self) -> None:
+        if self._proc is not None and self._proc.poll() is None:
+            self._proc.terminate()
+            self._proc.wait()
+        self._proc = None
+
+    def record(self, path: Path, seconds: float) -> Path:
+        subprocess.run([self._sox(), "-q", "-t", "coreaudio",
+                        self.capture_device, "-c", "1", "-r", str(self.rate),
+                        "-b", "16", str(path), "trim", "0",
+                        str(float(seconds))], check=True)
+        return Path(path)
+
+
 class SimAudio(AudioInterface):
     """
     A simulated interface and radio. Its speaker plays what `source`
@@ -546,6 +594,13 @@ def make_audio(cfg: dict | None) -> AudioInterface | None:
         return AlsaAudio(cfg.get("playback_device", "default"),
                          cfg.get("capture_device", "default"),
                          int(cfg.get("rate", RATE)), cfg.get("mixer"))
+    if kind == "coreaudio":
+        if cfg.get("mixer"):
+            raise ValueError("audio mixer needs ALSA; on macOS set the levels "
+                             "in Audio MIDI Setup and leave mixer out")
+        return CoreAudio(cfg.get("playback_device", "default"),
+                         cfg.get("capture_device", "default"),
+                         int(cfg.get("rate", RATE)))
     if kind == "sim":
         return SimAudio(int(cfg.get("rate", RATE)))
     raise ValueError(f"unknown audio type {kind!r}")

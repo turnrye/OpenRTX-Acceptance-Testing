@@ -54,7 +54,8 @@ Tests that need them are tagged `needs:abs-level` or `needs:audio`; a bench with
 those tags. `calibration/example.yaml` shows every section.
 
 The SDR backends call `hackrf_transfer` and `rtl_sdr`, so `hackrf` and `librtlsdr` must be installed.
-The audio interface goes through ALSA's `aplay` and `arecord` (`alsa-utils`). For M17 voice,
+The audio interface goes through ALSA's `aplay` and `arecord` (`alsa-utils`), or on macOS through
+`sox` (`type: coreaudio`). For M17 voice,
 Codec2's `c2enc` and `c2dec` (the `codec2` package) encode generated payloads and decode the
 radio's; without them, tests that need voice skip and the rest still run. `m17-demod` from
 m17-cxx-demod, when on the PATH, decodes each M17 capture a second time, independently.
@@ -193,7 +194,8 @@ aren't evidence, so keep them local.
 
 A desktop sound server can mute or change an interface during a run. Turn its profile off with
 `wpctl status` to find the device's id, then `wpctl set-profile <id> 0`, and set the levels in the
-bench file's `mixer`.
+bench file's `mixer`. macOS has no `mixer`: set the interface's input and output levels in Audio MIDI
+Setup, and keep it from being the system's default input or output.
 
 ### M17
 
