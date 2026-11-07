@@ -378,7 +378,10 @@ class OpenRTXAcceptance:
         if self.audio is not None:
             self.audio.stop_playing()
         if self.ptt is not None:
-            self.ptt.close()
+            try:
+                self.ptt.close()
+            except OSError as e:
+                logger.warn(f"Couldn't release PTT on {self.ptt.device}: {e}")
         if self.run_dir is None:
             return
         report = {
