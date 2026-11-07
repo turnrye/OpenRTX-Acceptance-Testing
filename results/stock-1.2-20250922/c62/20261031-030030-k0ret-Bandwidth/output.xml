@@ -1,0 +1,1383 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Rebot 7.5 (Python 3.13.13 on darwin)" generated="2026-10-30T22:56:06.368406" rpa="false" schemaversion="5">
+<suite id="s1" name="Bandwidth" source="acceptance/fm/bandwidth.robot">
+<kw name="Open Bench" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:27:46.977870" level="INFO">Results in runs/stock-c62-0413-retest/bench-Bandwidth</msg>
+<msg time="2026-10-30T22:27:46.984837" level="INFO">Set suite metadata 'Firmware' to value 'stock-1.2-20250922'.</msg>
+<msg time="2026-10-30T22:27:46.984926" level="INFO">Set suite metadata 'Radio' to value 'Retevis C62/C2 (c62)'.</msg>
+<msg time="2026-10-30T22:27:46.984945" level="INFO">Set suite metadata 'Station' to value 'k0ret'.</msg>
+<msg time="2026-10-30T22:27:46.984959" level="INFO">Set suite metadata 'Calibration' to value 'assumed, measured 2026-10-20 (d55ce4aa0a3c)'.</msg>
+<msg time="2026-10-30T22:27:46.984971" level="INFO">Set suite metadata 'Suite commit' to value '69513ad6df'.</msg>
+<arg>${BENCH}</arg>
+<arg>${CALIBRATION}</arg>
+<arg>${RADIO}</arg>
+<arg>${FIRMWARE}</arg>
+<doc>Load the bench, its calibration and the radio file, and prepare the
+instruments. All four are mandatory and differ from tester to tester,
+so suites take them from the command line (-v BENCH:... and so on).
+`firmware` names what the radio runs, such as a git describe.</doc>
+<status status="PASS" start="2026-10-30T22:27:46.975437" elapsed="2.877629"/>
+</kw>
+<test id="s1-t1" name="2m: FM TX At 25 kHz Stays Within Wide Limits" line="39">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:00:38.176877" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-10-30T22:00:38.177123" level="INFO">${FREQUENCY_MHZ} = 146.580</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:00:38.176086" elapsed="0.001107"/>
+</kw>
+<kw name="Create Audio Tone" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:00:38.195036" level="INFO">${tone} = runs/stock-c62-0413/bench-Bandwidth/tone-1000hz.wav</msg>
+<var>${tone}</var>
+<arg>1000</arg>
+<doc>Write a tone WAV for the operator to play into the radio's mic.</doc>
+<status status="PASS" start="2026-10-30T22:00:38.177422" elapsed="0.017670"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, low power, no CTCSS, programming cable out</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:00:38.195320" elapsed="171.946277"/>
+</kw>
+<kw name="Capture Radio Transmissions" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:04:50.855451" level="INFO" html="true">&lt;b&gt;capture01&lt;/b&gt;&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;peak dev Hz&lt;/th&gt;&lt;th&gt;rms dev Hz&lt;/th&gt;&lt;th&gt;tone Hz&lt;/th&gt;&lt;th&gt;OBW 99% Hz&lt;/th&gt;&lt;th&gt;offset Hz&lt;/th&gt;&lt;th&gt;s&lt;/th&gt;&lt;th&gt;audio&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx1&lt;/td&gt;&lt;td&gt;1567&lt;/td&gt;&lt;td&gt;842&lt;/td&gt;&lt;td&gt;1000&lt;/td&gt;&lt;td&gt;4200&lt;/td&gt;&lt;td&gt;74981&lt;/td&gt;&lt;td&gt;7&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture01/tx1.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx2&lt;/td&gt;&lt;td&gt;4768&lt;/td&gt;&lt;td&gt;2892&lt;/td&gt;&lt;td&gt;1590&lt;/td&gt;&lt;td&gt;12800&lt;/td&gt;&lt;td&gt;74982&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture01/tx2.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-10-30T22:04:50.855660" level="INFO">${tx} = [{'start_s': 63.290944, 'duration_s': 6.639372, 'carrier_offset_hz': 74980.8741979689, 'peak_deviation_hz': 1567.0931593825132, 'max_deviation_hz': 1679.2548049929612, 'rms_deviation_hz': 842.16718935...</msg>
+<var>${tx}</var>
+<arg>Play ${tone} at a fixed volume and distance from the mic, key PTT for 5 s, release. Then key PTT, whistle loudly close to the mic for 5 s, release.</arg>
+<arg>expected=2</arg>
+<doc>Record while the operator follows the instruction, then measure each
+FM transmission. Fails unless exactly `expected` are found. Returns
+the measurements, oldest first; each one's audio is saved as a WAV.</doc>
+<status status="PASS" start="2026-10-30T22:03:30.141920" elapsed="80.713757"/>
+</kw>
+<kw name="Fm Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${tx}[0]</arg>
+<arg>BW_25</arg>
+<doc>Check peak deviation and occupied bandwidth against the radio file's
+limits for a channel bandwidth (BW_12_5 or BW_25).</doc>
+<status status="PASS" start="2026-10-30T22:04:50.855906" elapsed="0.000153"/>
+</kw>
+<kw name="Fm Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${tx}[1]</arg>
+<arg>BW_25</arg>
+<doc>Check peak deviation and occupied bandwidth against the radio file's
+limits for a channel bandwidth (BW_12_5 or BW_25).</doc>
+<status status="PASS" start="2026-10-30T22:04:50.856130" elapsed="0.000103"/>
+</kw>
+<kw name="Remember Result" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>wide tone</arg>
+<arg>${tx}[0]</arg>
+<doc>Keep a result for later tests on the same band.</doc>
+<status status="PASS" start="2026-10-30T22:04:50.856289" elapsed="0.000044"/>
+</kw>
+<tag>band:2m</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-10-30T22:00:38.175053" elapsed="252.681351"/>
+</test>
+<test id="s1-t2" name="2m: FM TX At 12.5 kHz Stays Within Narrow Limits" line="50">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:04:50.856825" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-10-30T22:04:50.856907" level="INFO">${FREQUENCY_MHZ} = 146.580</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:04:50.856681" elapsed="0.000240"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, low power, no CTCSS</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:04:50.856964" elapsed="13.990708"/>
+</kw>
+<kw name="Capture Radio Transmissions" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:05:28.029929" level="INFO" html="true">&lt;b&gt;capture02&lt;/b&gt;&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;peak dev Hz&lt;/th&gt;&lt;th&gt;rms dev Hz&lt;/th&gt;&lt;th&gt;tone Hz&lt;/th&gt;&lt;th&gt;OBW 99% Hz&lt;/th&gt;&lt;th&gt;offset Hz&lt;/th&gt;&lt;th&gt;s&lt;/th&gt;&lt;th&gt;audio&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx1&lt;/td&gt;&lt;td&gt;727&lt;/td&gt;&lt;td&gt;418&lt;/td&gt;&lt;td&gt;1000&lt;/td&gt;&lt;td&gt;4000&lt;/td&gt;&lt;td&gt;74979&lt;/td&gt;&lt;td&gt;7&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture02/tx1.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx2&lt;/td&gt;&lt;td&gt;2460&lt;/td&gt;&lt;td&gt;1427&lt;/td&gt;&lt;td&gt;1583&lt;/td&gt;&lt;td&gt;7500&lt;/td&gt;&lt;td&gt;74982&lt;/td&gt;&lt;td&gt;6&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture02/tx2.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-10-30T22:05:28.030126" level="INFO">${tx} = [{'start_s': 3.051216, 'duration_s': 6.897136, 'carrier_offset_hz': 74978.74911962773, 'peak_deviation_hz': 727.0806437696986, 'max_deviation_hz': 759.1511721914547, 'rms_deviation_hz': 417.8069034198...</msg>
+<var>${tx}</var>
+<arg>Play the same tone at the same volume and distance, key PTT for 5 s, release. Then key PTT, whistle loudly close to the mic for 5 s, release.</arg>
+<arg>expected=2</arg>
+<doc>Record while the operator follows the instruction, then measure each
+FM transmission. Fails unless exactly `expected` are found. Returns
+the measurements, oldest first; each one's audio is saved as a WAV.</doc>
+<status status="PASS" start="2026-10-30T22:05:04.847957" elapsed="23.182184"/>
+</kw>
+<kw name="Fm Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${tx}[0]</arg>
+<arg>BW_12_5</arg>
+<doc>Check peak deviation and occupied bandwidth against the radio file's
+limits for a channel bandwidth (BW_12_5 or BW_25).</doc>
+<status status="PASS" start="2026-10-30T22:05:28.030447" elapsed="0.000141"/>
+</kw>
+<kw name="Fm Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${tx}[1]</arg>
+<arg>BW_12_5</arg>
+<doc>Check peak deviation and occupied bandwidth against the radio file's
+limits for a channel bandwidth (BW_12_5 or BW_25).</doc>
+<status status="PASS" start="2026-10-30T22:05:28.030635" elapsed="0.000055"/>
+</kw>
+<kw name="Remember Result" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>narrow tone</arg>
+<arg>${tx}[0]</arg>
+<doc>Keep a result for later tests on the same band.</doc>
+<status status="PASS" start="2026-10-30T22:05:28.030727" elapsed="0.000040"/>
+</kw>
+<tag>band:2m</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-10-30T22:04:50.856532" elapsed="37.174298"/>
+</test>
+<test id="s1-t3" name="2m: Narrow FM TX Deviates Less Than Wide" line="60">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:05:28.031203" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-10-30T22:05:28.031281" level="INFO">${FREQUENCY_MHZ} = 146.580</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:05:28.031068" elapsed="0.000226"/>
+</kw>
+<kw name="Recall Result" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:05:28.031388" level="INFO">${wide} = {'start_s': 63.290944, 'duration_s': 6.639372, 'carrier_offset_hz': 74980.8741979689, 'peak_deviation_hz': 1567.0931593825132, 'max_deviation_hz': 1679.2548049929612, 'rms_deviation_hz': 842.167189358...</msg>
+<var>${wide}</var>
+<arg>wide tone</arg>
+<doc>A result remembered earlier on the current band, or None.</doc>
+<status status="PASS" start="2026-10-30T22:05:28.031341" elapsed="0.000053"/>
+</kw>
+<kw name="Recall Result" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:05:28.031468" level="INFO">${narrow} = {'start_s': 3.051216, 'duration_s': 6.897136, 'carrier_offset_hz': 74978.74911962773, 'peak_deviation_hz': 727.0806437696986, 'max_deviation_hz': 759.1511721914547, 'rms_deviation_hz': 417.80690341981...</msg>
+<var>${narrow}</var>
+<arg>narrow tone</arg>
+<doc>A result remembered earlier on the current band, or None.</doc>
+<status status="PASS" start="2026-10-30T22:05:28.031427" elapsed="0.000047"/>
+</kw>
+<kw name="Skip If" owner="BuiltIn">
+<arg>$wide is None or $narrow is None</arg>
+<arg>Needs the tone takes of both bandwidth tests on this band</arg>
+<doc>Conditionally stops the current test or task and sets its status to SKIP.</doc>
+<status status="PASS" start="2026-10-30T22:05:28.031510" elapsed="0.000258"/>
+</kw>
+<kw name="Ratio Should Be Between" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${narrow}[peak_deviation_hz]</arg>
+<arg>${wide}[peak_deviation_hz]</arg>
+<arg>${RATIO_LOW}</arg>
+<arg>${RATIO_HIGH}</arg>
+<arg>narrow/wide peak deviation</arg>
+<doc>Fail unless numerator / denominator is within [low, high].</doc>
+<status status="PASS" start="2026-10-30T22:05:28.031811" elapsed="0.000071"/>
+</kw>
+<tag>band:2m</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-10-30T22:05:28.030944" elapsed="0.000977"/>
+</test>
+<test id="s1-t4" name="2m: FM RX At 25 kHz Is Clean Up To Full Deviation" line="69">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:05:28.032162" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-10-30T22:05:28.032226" level="INFO">${FREQUENCY_MHZ} = 146.580</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:05:28.032064" elapsed="0.000172"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, volume comfortable</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:05:28.032272" elapsed="137.081669"/>
+</kw>
+<kw name="Start Transmitting Fm Tone" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>3000</arg>
+<doc>Loop an FM tone on the test frequency until stopped.</doc>
+<status status="PASS" start="2026-10-30T22:07:45.114127" elapsed="0.095524"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The radio plays a clean, steady 1 kHz tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:07:45.209970" elapsed="4.276306"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:07:49.486539" elapsed="0.004242"/>
+</kw>
+<kw name="Start Transmitting Fm Tone" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>5000</arg>
+<doc>Loop an FM tone on the test frequency until stopped.</doc>
+<status status="PASS" start="2026-10-30T22:07:49.491002" elapsed="0.110469"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The radio plays the tone louder and still undistorted</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:07:49.601728" elapsed="2.556639"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:07:52.158793" elapsed="0.004284"/>
+</kw>
+<tag>band:2m</tag>
+<tag>manual</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-10-30T22:05:28.031985" elapsed="144.131216"/>
+</test>
+<test id="s1-t5" name="2m: FM RX At 12.5 kHz Is Clean Up To Full Deviation" line="79">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:07:52.164371" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-10-30T22:07:52.164547" level="INFO">${FREQUENCY_MHZ} = 146.580</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:07:52.163916" elapsed="0.000662"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, volume unchanged</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:07:52.164678" elapsed="16.004173"/>
+</kw>
+<kw name="Start Transmitting Fm Tone" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>1500</arg>
+<doc>Loop an FM tone on the test frequency until stopped.</doc>
+<status status="PASS" start="2026-10-30T22:08:08.169124" elapsed="0.109773"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The radio plays a clean, steady 1 kHz tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:08:08.279125" elapsed="2.136418"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:08:10.415925" elapsed="0.004223"/>
+</kw>
+<kw name="Start Transmitting Fm Tone" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>2500</arg>
+<doc>Loop an FM tone on the test frequency until stopped.</doc>
+<status status="PASS" start="2026-10-30T22:08:10.420741" elapsed="0.102826"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The radio plays the tone louder and still undistorted</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:08:10.523788" elapsed="1.591313"/>
+</kw>
+<kw name="Operator Reports" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Compared with 25 kHz at 5 kHz deviation, is this quieter, the same, or louder?</arg>
+<doc>Ask the operator for a value or an observation.</doc>
+<status status="PASS" start="2026-10-30T22:08:12.115484" elapsed="6.285449"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:08:18.401350" elapsed="0.004102"/>
+</kw>
+<tag>band:2m</tag>
+<tag>manual</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-10-30T22:07:52.163519" elapsed="26.242051"/>
+</test>
+<test id="s1-t6" name="2m: CTCSS Deviation Follows The Bandwidth" line="101">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:27:49.855666" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-10-30T22:27:49.855808" level="INFO">${FREQUENCY_MHZ} = 146.580</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:27:49.854751" elapsed="0.001098"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, low power, ${CTCSS_HZ} Hz CTCSS tone on transmit</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:27:49.856050" elapsed="38.061198"/>
+</kw>
+<kw name="Capture Radio Transmissions" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:28:36.107772" level="INFO" html="true">&lt;b&gt;capture01&lt;/b&gt;&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;peak dev Hz&lt;/th&gt;&lt;th&gt;rms dev Hz&lt;/th&gt;&lt;th&gt;tone Hz&lt;/th&gt;&lt;th&gt;OBW 99% Hz&lt;/th&gt;&lt;th&gt;offset Hz&lt;/th&gt;&lt;th&gt;s&lt;/th&gt;&lt;th&gt;audio&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx1&lt;/td&gt;&lt;td&gt;641&lt;/td&gt;&lt;td&gt;445&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;1600&lt;/td&gt;&lt;td&gt;74978&lt;/td&gt;&lt;td&gt;6&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture01/tx1.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-10-30T22:28:36.107980" level="INFO">${wide} = [{'start_s': 1.2987, 'duration_s': 5.59984, 'carrier_offset_hz': 74977.65532687299, 'peak_deviation_hz': 640.9265226616827, 'max_deviation_hz': 757.7549612297942, 'rms_deviation_hz': 445.396076187203,...</msg>
+<var>${wide}</var>
+<arg>Key PTT for 5 s without speaking, release.</arg>
+<doc>Record while the operator follows the instruction, then measure each
+FM transmission. Fails unless exactly `expected` are found. Returns
+the measurements, oldest first; each one's audio is saved as a WAV.</doc>
+<status status="PASS" start="2026-10-30T22:28:27.917798" elapsed="8.190204"/>
+</kw>
+<kw name="Remember Result" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>wide ctcss</arg>
+<arg>${wide}[0]</arg>
+<doc>Keep a result for later tests on the same band.</doc>
+<status status="PASS" start="2026-10-30T22:28:36.108192" elapsed="0.000116"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the bandwidth to 12.5 kHz, CTCSS tone unchanged</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:28:36.108356" elapsed="8.674305"/>
+</kw>
+<kw name="Capture Radio Transmissions" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:28:55.108819" level="INFO" html="true">&lt;b&gt;capture02&lt;/b&gt;&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;peak dev Hz&lt;/th&gt;&lt;th&gt;rms dev Hz&lt;/th&gt;&lt;th&gt;tone Hz&lt;/th&gt;&lt;th&gt;OBW 99% Hz&lt;/th&gt;&lt;th&gt;offset Hz&lt;/th&gt;&lt;th&gt;s&lt;/th&gt;&lt;th&gt;audio&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx1&lt;/td&gt;&lt;td&gt;321&lt;/td&gt;&lt;td&gt;221&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;1000&lt;/td&gt;&lt;td&gt;74976&lt;/td&gt;&lt;td&gt;6&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture02/tx1.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-10-30T22:28:55.109004" level="INFO">${narrow} = [{'start_s': 0.824852, 'duration_s': 6.069476, 'carrier_offset_hz': 74976.11878133603, 'peak_deviation_hz': 321.22138015314175, 'max_deviation_hz': 332.83284160008725, 'rms_deviation_hz': 221.06327654...</msg>
+<var>${narrow}</var>
+<arg>Key PTT for 5 s without speaking, release.</arg>
+<doc>Record while the operator follows the instruction, then measure each
+FM transmission. Fails unless exactly `expected` are found. Returns
+the measurements, oldest first; each one's audio is saved as a WAV.</doc>
+<status status="PASS" start="2026-10-30T22:28:44.782997" elapsed="10.326023"/>
+</kw>
+<kw name="Remember Result" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>narrow ctcss</arg>
+<arg>${narrow}[0]</arg>
+<doc>Keep a result for later tests on the same band.</doc>
+<status status="PASS" start="2026-10-30T22:28:55.109201" elapsed="0.000113"/>
+</kw>
+<kw name="Ratio Should Be Between" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${narrow}[0][ctcss_deviation_hz]</arg>
+<arg>${wide}[0][ctcss_deviation_hz]</arg>
+<arg>${RATIO_LOW}</arg>
+<arg>${RATIO_HIGH}</arg>
+<arg>narrow/wide CTCSS deviation</arg>
+<doc>Fail unless numerator / denominator is within [low, high].</doc>
+<status status="PASS" start="2026-10-30T22:28:55.109360" elapsed="0.000089"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<arg>Turn the CTCSS tone off</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:28:55.109542" elapsed="12.956671"/>
+</kw>
+<tag>band:2m</tag>
+<tag>ctcss</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-10-30T22:27:49.853771" elapsed="78.212675">*HTML* &lt;span class="merge"&gt;Test has been re-executed and results merged.&lt;/span&gt;&lt;hr&gt;&lt;span class="new-status"&gt;New status:&lt;/span&gt; &lt;span class="pass"&gt;PASS&lt;/span&gt;&lt;br&gt;&lt;hr&gt;&lt;span class="old-status"&gt;Old status:&lt;/span&gt; &lt;span class="fail"&gt;FAIL&lt;/span&gt;&lt;br&gt;&lt;span class="old-message"&gt;Old message:&lt;/span&gt; Expected 1 transmission(s), found 0&lt;br&gt;</status>
+</test>
+<test id="s1-t7" name="2m: CTCSS Level Meets Limits" line="113">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:29:08.067597" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-10-30T22:29:08.067778" level="INFO">${FREQUENCY_MHZ} = 146.580</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:29:08.067205" elapsed="0.000603"/>
+</kw>
+<kw name="Recall Result" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:29:08.068019" level="INFO">${wide} = {'start_s': 1.2987, 'duration_s': 5.59984, 'carrier_offset_hz': 74977.65532687299, 'peak_deviation_hz': 640.9265226616827, 'max_deviation_hz': 757.7549612297942, 'rms_deviation_hz': 445.396076187203, ...</msg>
+<var>${wide}</var>
+<arg>wide ctcss</arg>
+<doc>A result remembered earlier on the current band, or None.</doc>
+<status status="PASS" start="2026-10-30T22:29:08.067911" elapsed="0.000124"/>
+</kw>
+<kw name="Recall Result" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:29:08.068503" level="INFO">${narrow} = {'start_s': 0.824852, 'duration_s': 6.069476, 'carrier_offset_hz': 74976.11878133603, 'peak_deviation_hz': 321.22138015314175, 'max_deviation_hz': 332.83284160008725, 'rms_deviation_hz': 221.063276547...</msg>
+<var>${narrow}</var>
+<arg>narrow ctcss</arg>
+<doc>A result remembered earlier on the current band, or None.</doc>
+<status status="PASS" start="2026-10-30T22:29:08.068106" elapsed="0.000412"/>
+</kw>
+<kw name="Skip If" owner="BuiltIn">
+<arg>$wide is None or $narrow is None</arg>
+<arg>Needs both CTCSS takes of the previous test on this band</arg>
+<doc>Conditionally stops the current test or task and sets its status to SKIP.</doc>
+<status status="PASS" start="2026-10-30T22:29:08.068594" elapsed="0.000719"/>
+</kw>
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Fm Transmission Ctcss Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${wide}</arg>
+<arg>BW_25</arg>
+<arg>${CTCSS_HZ}</arg>
+<doc>Check a transmission's CTCSS tone: its frequency against the tone set
+on the radio, and its deviation against the radio file's range for the
+channel bandwidth.</doc>
+<status status="PASS" start="2026-10-30T22:29:08.069704" elapsed="0.000161"/>
+</kw>
+<arg>FM Transmission CTCSS Should Meet Limits</arg>
+<arg>${wide}</arg>
+<arg>BW_25</arg>
+<arg>${CTCSS_HZ}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-10-30T22:29:08.069447" elapsed="0.000451"/>
+</kw>
+<kw name="Fm Transmission Ctcss Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:29:08.070192" level="FAIL">BW_12_5: ctcss_deviation_hz 312.5 Hz outside 350-600 Hz</msg>
+<arg>${narrow}</arg>
+<arg>BW_12_5</arg>
+<arg>${CTCSS_HZ}</arg>
+<doc>Check a transmission's CTCSS tone: its frequency against the tone set
+on the radio, and its deviation against the radio file's range for the
+channel bandwidth.</doc>
+<status status="FAIL" start="2026-10-30T22:29:08.069972" elapsed="0.001217">BW_12_5: ctcss_deviation_hz 312.5 Hz outside 350-600 Hz</status>
+</kw>
+<tag>band:2m</tag>
+<tag>ctcss</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="FAIL" start="2026-10-30T22:29:08.066816" elapsed="0.004520">*HTML* &lt;span class="merge"&gt;Test has been re-executed and results merged.&lt;/span&gt;&lt;hr&gt;&lt;span class="new-status"&gt;New status:&lt;/span&gt; &lt;span class="fail"&gt;FAIL&lt;/span&gt;&lt;br&gt;&lt;span class="new-message"&gt;New message:&lt;/span&gt; BW_12_5: ctcss_deviation_hz 312.5 Hz outside 350-600 Hz&lt;br&gt;&lt;hr&gt;&lt;span class="old-status"&gt;Old status:&lt;/span&gt; &lt;span class="skip"&gt;SKIP&lt;/span&gt;&lt;br&gt;&lt;span class="old-message"&gt;Old message:&lt;/span&gt; Needs both CTCSS takes of the previous test on this band&lt;br&gt;</status>
+</test>
+<test id="s1-t8" name="2m: FM TX Power Rises With Each Setting" line="123">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:11:35.231475" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-10-30T22:11:35.231637" level="INFO">${FREQUENCY_MHZ} = 146.580</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:11:35.231032" elapsed="0.000638"/>
+</kw>
+<kw name="Power Settings" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:11:35.231867" level="INFO">${settings} = ['Low', 'High']</msg>
+<var>${settings}</var>
+<doc>The radio's TX power settings, lowest first: ${POWER_SETTINGS}
+(comma-separated, e.g. for stock firmware: Low,High) or the radio
+file's power_settings. Skips the test when neither lists any.</doc>
+<status status="PASS" start="2026-10-30T22:11:35.231769" elapsed="0.000112"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-10-30T22:11:35.232295" level="INFO">${order} = Low, then High</msg>
+<var>${order}</var>
+<arg>", then ".join($settings)</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-10-30T22:11:35.231983" elapsed="0.000328"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, power ${settings}[0]</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:11:35.232380" elapsed="8.280548"/>
+</kw>
+<kw name="Capture Radio Transmissions" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:13:06.311897" level="INFO" html="true">&lt;b&gt;capture04&lt;/b&gt;&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;peak dev Hz&lt;/th&gt;&lt;th&gt;rms dev Hz&lt;/th&gt;&lt;th&gt;tone Hz&lt;/th&gt;&lt;th&gt;OBW 99% Hz&lt;/th&gt;&lt;th&gt;offset Hz&lt;/th&gt;&lt;th&gt;s&lt;/th&gt;&lt;th&gt;audio&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx1&lt;/td&gt;&lt;td&gt;4275&lt;/td&gt;&lt;td&gt;453&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;13800&lt;/td&gt;&lt;td&gt;74976&lt;/td&gt;&lt;td&gt;4&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture04/tx1.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx2&lt;/td&gt;&lt;td&gt;17&lt;/td&gt;&lt;td&gt;4&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;98500&lt;/td&gt;&lt;td&gt;74974&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture04/tx2.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-10-30T22:13:06.312077" level="INFO">${tx} = [{'start_s': 64.807116, 'duration_s': 4.319688, 'carrier_offset_hz': 74975.68753356698, 'peak_deviation_hz': 4274.514281348159, 'max_deviation_hz': 9532.404546528758, 'rms_deviation_hz': 453.490741060...</msg>
+<var>${tx}</var>
+<arg>For each power setting in turn (${order}): set it, key PTT for 3 s without speaking, release.</arg>
+<arg>expected=${{len($settings)}}</arg>
+<doc>Record while the operator follows the instruction, then measure each
+FM transmission. Fails unless exactly `expected` are found. Returns
+the measurements, oldest first; each one's audio is saved as a WAV.</doc>
+<status status="PASS" start="2026-10-30T22:11:43.513220" elapsed="82.798871"/>
+</kw>
+<kw name="Tx Power Should Rise With Setting" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:13:06.312413" level="INFO" html="true">&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;Setting&lt;/th&gt;&lt;th&gt;Received dBFS&lt;/th&gt;&lt;th&gt;Relative dB&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Low&lt;/td&gt;&lt;td&gt;-7.7&lt;/td&gt;&lt;td&gt;+0.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;High&lt;/td&gt;&lt;td&gt;-2.0&lt;/td&gt;&lt;td&gt;+5.7&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-10-30T22:13:06.312444" level="INFO">Set test message to:
+Received levels: Low +0.0 dB, High +5.7 dB</msg>
+<arg>${settings}</arg>
+<arg>${tx}</arg>
+<doc>Check that each power setting, lowest first, transmits at least the
+radio file's power_min_step_db (default 1 dB) above the one before,
+as received through the bench: relative levels, so no power meter is
+needed. Fails if the receiver clipped, which hides the top settings.</doc>
+<status status="PASS" start="2026-10-30T22:13:06.312285" elapsed="0.000171"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn" type="TEARDOWN">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the power back to ${settings}[0]</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:13:06.312839" elapsed="11.650148"/>
+</kw>
+<arg>$TEST_STATUS != 'SKIP'</arg>
+<arg>Operator Does</arg>
+<arg>Set the power back to ${settings}[0]</arg>
+<doc>Runs the given keyword with the given arguments, if `condition` is true.</doc>
+<status status="PASS" start="2026-10-30T22:13:06.312583" elapsed="11.650482"/>
+</kw>
+<doc>Relative levels through the bench: no power meter needed. For
+stock firmware, name its settings: -v POWER_SETTINGS:Low,High</doc>
+<tag>band:2m</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>power</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-10-30T22:11:35.230623" elapsed="102.732534">Received levels: Low +0.0 dB, High +5.7 dB</status>
+</test>
+<test id="s1-t9" name="2m: FM RX At 12.5 kHz Rejects An Adjacent Channel" line="137">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:13:17.964158" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-10-30T22:13:17.964333" level="INFO">${FREQUENCY_MHZ} = 146.580</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:13:17.963783" elapsed="0.000582"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, volume comfortable</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:13:17.964459" elapsed="10.673756"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:13:28.727639" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>1500</arg>
+<arg>12500</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>2500</arg>
+<arg>interferer=off</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T22:13:28.638336" elapsed="0.089678"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The wanted signal alone: a clean, steady 1 kHz tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:13:28.728180" elapsed="16.543351"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:13:45.271749" elapsed="0.004070"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:13:45.444673" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>1500</arg>
+<arg>12500</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>2500</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T22:13:45.275990" elapsed="0.169055"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The 1 kHz tone continues with no 400 Hz tone from the channel above</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:13:45.445212" elapsed="3.326978"/>
+</kw>
+<kw name="Operator Reports" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Any added noise compared with the wanted signal alone?</arg>
+<doc>Ask the operator for a value or an observation.</doc>
+<status status="PASS" start="2026-10-30T22:13:48.772346" elapsed="5.908971"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:13:54.681449" elapsed="0.004055"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:13:54.846929" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>1500</arg>
+<arg>-12500</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>2500</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T22:13:54.685616" elapsed="0.161679"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>With the interferer on the channel below: still no 400 Hz tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:13:54.847454" elapsed="7.693935"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:14:02.541654" elapsed="0.003668"/>
+</kw>
+<tag>adjacent</tag>
+<tag>band:2m</tag>
+<tag>manual</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-10-30T22:13:17.963437" elapsed="44.581972"/>
+</test>
+<test id="s1-t10" name="2m: FM RX At 25 kHz Rejects An Adjacent Channel" line="151">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:14:02.546394" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-10-30T22:14:02.546570" level="INFO">${FREQUENCY_MHZ} = 146.580</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:14:02.546032" elapsed="0.000571"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, volume comfortable</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:14:02.546701" elapsed="15.849171"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:14:18.512378" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>3000</arg>
+<arg>25000</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>5000</arg>
+<arg>interferer=off</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T22:14:18.396313" elapsed="0.116443"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The wanted signal alone: a clean, steady 1 kHz tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:14:18.512925" elapsed="2.237612"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:14:20.750897" elapsed="0.004281"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:14:20.933058" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>3000</arg>
+<arg>25000</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>5000</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T22:14:20.755382" elapsed="0.178044"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The 1 kHz tone continues with no 400 Hz tone from the channel above</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:14:20.933587" elapsed="2.614211"/>
+</kw>
+<kw name="Operator Reports" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Any added noise compared with the wanted signal alone?</arg>
+<doc>Ask the operator for a value or an observation.</doc>
+<status status="PASS" start="2026-10-30T22:14:23.548150" elapsed="2.507724"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:14:26.056095" elapsed="0.004124"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:14:26.229813" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>3000</arg>
+<arg>12500</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>2500</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T22:14:26.060365" elapsed="0.169785"/>
+</kw>
+<kw name="Operator Reports" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>With a 12.5 kHz neighbour this close, do you hear the 1 kHz tone only, both tones, or mostly 400 Hz?</arg>
+<doc>Ask the operator for a value or an observation.</doc>
+<status status="PASS" start="2026-10-30T22:14:26.230302" elapsed="15.022603"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:14:41.253072" elapsed="0.003936"/>
+</kw>
+<tag>adjacent</tag>
+<tag>band:2m</tag>
+<tag>manual</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-10-30T22:14:02.545686" elapsed="38.711389"/>
+</test>
+<test id="s1-t11" name="70cm: FM TX At 25 kHz Stays Within Wide Limits" line="39">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:14:41.257645" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-10-30T22:14:41.257723" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:14:41.257459" elapsed="0.000277"/>
+</kw>
+<kw name="Create Audio Tone" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:14:41.267088" level="INFO">${tone} = runs/stock-c62-0413/bench-Bandwidth/tone-1000hz.wav</msg>
+<var>${tone}</var>
+<arg>1000</arg>
+<doc>Write a tone WAV for the operator to play into the radio's mic.</doc>
+<status status="PASS" start="2026-10-30T22:14:41.257785" elapsed="0.009325"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, low power, no CTCSS, programming cable out</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:14:41.267216" elapsed="31.261652"/>
+</kw>
+<kw name="Capture Radio Transmissions" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:16:06.716171" level="INFO" html="true">&lt;b&gt;capture05&lt;/b&gt;&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;peak dev Hz&lt;/th&gt;&lt;th&gt;rms dev Hz&lt;/th&gt;&lt;th&gt;tone Hz&lt;/th&gt;&lt;th&gt;OBW 99% Hz&lt;/th&gt;&lt;th&gt;offset Hz&lt;/th&gt;&lt;th&gt;s&lt;/th&gt;&lt;th&gt;audio&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx1&lt;/td&gt;&lt;td&gt;1428&lt;/td&gt;&lt;td&gt;858&lt;/td&gt;&lt;td&gt;1000&lt;/td&gt;&lt;td&gt;4200&lt;/td&gt;&lt;td&gt;74883&lt;/td&gt;&lt;td&gt;8&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture05/tx1.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx2&lt;/td&gt;&lt;td&gt;4539&lt;/td&gt;&lt;td&gt;2944&lt;/td&gt;&lt;td&gt;1826&lt;/td&gt;&lt;td&gt;11200&lt;/td&gt;&lt;td&gt;74884&lt;/td&gt;&lt;td&gt;7&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture05/tx2.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-10-30T22:16:06.716355" level="INFO">.venv/lib/python3.13/site-packages/numpy/_core/fromnumeric.py:3862: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+.venv/lib/python3.13/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)</msg>
+<msg time="2026-10-30T22:16:06.716449" level="INFO">${tx} = [{'start_s': 26.8648, 'duration_s': 8.313276, 'carrier_offset_hz': 74882.78771879066, 'peak_deviation_hz': 1427.9197674572567, 'max_deviation_hz': 1783.5342845197904, 'rms_deviation_hz': 857.755179258...</msg>
+<var>${tx}</var>
+<arg>Play ${tone} at a fixed volume and distance from the mic, key PTT for 5 s, release. Then key PTT, whistle loudly close to the mic for 5 s, release.</arg>
+<arg>expected=2</arg>
+<doc>Record while the operator follows the instruction, then measure each
+FM transmission. Fails unless exactly `expected` are found. Returns
+the measurements, oldest first; each one's audio is saved as a WAV.</doc>
+<status status="PASS" start="2026-10-30T22:15:12.529009" elapsed="54.187454"/>
+</kw>
+<kw name="Fm Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${tx}[0]</arg>
+<arg>BW_25</arg>
+<doc>Check peak deviation and occupied bandwidth against the radio file's
+limits for a channel bandwidth (BW_12_5 or BW_25).</doc>
+<status status="PASS" start="2026-10-30T22:16:06.716615" elapsed="0.000135"/>
+</kw>
+<kw name="Fm Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${tx}[1]</arg>
+<arg>BW_25</arg>
+<doc>Check peak deviation and occupied bandwidth against the radio file's
+limits for a channel bandwidth (BW_12_5 or BW_25).</doc>
+<status status="PASS" start="2026-10-30T22:16:06.716791" elapsed="0.000052"/>
+</kw>
+<kw name="Remember Result" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>wide tone</arg>
+<arg>${tx}[0]</arg>
+<doc>Keep a result for later tests on the same band.</doc>
+<status status="PASS" start="2026-10-30T22:16:06.716879" elapsed="0.000032"/>
+</kw>
+<tag>band:70cm</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-10-30T22:14:41.257267" elapsed="85.459692"/>
+</test>
+<test id="s1-t12" name="70cm: FM TX At 12.5 kHz Stays Within Narrow Limits" line="50">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:16:06.717320" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-10-30T22:16:06.717395" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:16:06.717182" elapsed="0.000225"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, low power, no CTCSS</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:16:06.717446" elapsed="13.230493"/>
+</kw>
+<kw name="Capture Radio Transmissions" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:16:43.150721" level="INFO" html="true">&lt;b&gt;capture06&lt;/b&gt;&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;peak dev Hz&lt;/th&gt;&lt;th&gt;rms dev Hz&lt;/th&gt;&lt;th&gt;tone Hz&lt;/th&gt;&lt;th&gt;OBW 99% Hz&lt;/th&gt;&lt;th&gt;offset Hz&lt;/th&gt;&lt;th&gt;s&lt;/th&gt;&lt;th&gt;audio&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx1&lt;/td&gt;&lt;td&gt;738&lt;/td&gt;&lt;td&gt;409&lt;/td&gt;&lt;td&gt;1000&lt;/td&gt;&lt;td&gt;4000&lt;/td&gt;&lt;td&gt;74878&lt;/td&gt;&lt;td&gt;7&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture06/tx1.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx2&lt;/td&gt;&lt;td&gt;2292&lt;/td&gt;&lt;td&gt;1496&lt;/td&gt;&lt;td&gt;1875&lt;/td&gt;&lt;td&gt;7600&lt;/td&gt;&lt;td&gt;74880&lt;/td&gt;&lt;td&gt;6&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture06/tx2.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-10-30T22:16:43.150903" level="INFO">${tx} = [{'start_s': 2.563008, 'duration_s': 7.434444, 'carrier_offset_hz': 74878.42093114908, 'peak_deviation_hz': 738.3477334293736, 'max_deviation_hz': 758.396275535332, 'rms_deviation_hz': 409.43475898835...</msg>
+<var>${tx}</var>
+<arg>Play the same tone at the same volume and distance, key PTT for 5 s, release. Then key PTT, whistle loudly close to the mic for 5 s, release.</arg>
+<arg>expected=2</arg>
+<doc>Record while the operator follows the instruction, then measure each
+FM transmission. Fails unless exactly `expected` are found. Returns
+the measurements, oldest first; each one's audio is saved as a WAV.</doc>
+<status status="PASS" start="2026-10-30T22:16:19.948111" elapsed="23.202804"/>
+</kw>
+<kw name="Fm Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${tx}[0]</arg>
+<arg>BW_12_5</arg>
+<doc>Check peak deviation and occupied bandwidth against the radio file's
+limits for a channel bandwidth (BW_12_5 or BW_25).</doc>
+<status status="PASS" start="2026-10-30T22:16:43.151089" elapsed="0.000139"/>
+</kw>
+<kw name="Fm Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${tx}[1]</arg>
+<arg>BW_12_5</arg>
+<doc>Check peak deviation and occupied bandwidth against the radio file's
+limits for a channel bandwidth (BW_12_5 or BW_25).</doc>
+<status status="PASS" start="2026-10-30T22:16:43.151274" elapsed="0.000058"/>
+</kw>
+<kw name="Remember Result" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>narrow tone</arg>
+<arg>${tx}[0]</arg>
+<doc>Keep a result for later tests on the same band.</doc>
+<status status="PASS" start="2026-10-30T22:16:43.151372" elapsed="0.000041"/>
+</kw>
+<tag>band:70cm</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-10-30T22:16:06.717052" elapsed="36.434412"/>
+</test>
+<test id="s1-t13" name="70cm: Narrow FM TX Deviates Less Than Wide" line="60">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:16:43.151812" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-10-30T22:16:43.151883" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:16:43.151684" elapsed="0.000211"/>
+</kw>
+<kw name="Recall Result" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:16:43.151981" level="INFO">${wide} = {'start_s': 26.8648, 'duration_s': 8.313276, 'carrier_offset_hz': 74882.78771879066, 'peak_deviation_hz': 1427.9197674572567, 'max_deviation_hz': 1783.5342845197904, 'rms_deviation_hz': 857.7551792585...</msg>
+<var>${wide}</var>
+<arg>wide tone</arg>
+<doc>A result remembered earlier on the current band, or None.</doc>
+<status status="PASS" start="2026-10-30T22:16:43.151939" elapsed="0.000049"/>
+</kw>
+<kw name="Recall Result" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:16:43.152056" level="INFO">${narrow} = {'start_s': 2.563008, 'duration_s': 7.434444, 'carrier_offset_hz': 74878.42093114908, 'peak_deviation_hz': 738.3477334293736, 'max_deviation_hz': 758.396275535332, 'rms_deviation_hz': 409.434758988351...</msg>
+<var>${narrow}</var>
+<arg>narrow tone</arg>
+<doc>A result remembered earlier on the current band, or None.</doc>
+<status status="PASS" start="2026-10-30T22:16:43.152019" elapsed="0.000042"/>
+</kw>
+<kw name="Skip If" owner="BuiltIn">
+<arg>$wide is None or $narrow is None</arg>
+<arg>Needs the tone takes of both bandwidth tests on this band</arg>
+<doc>Conditionally stops the current test or task and sets its status to SKIP.</doc>
+<status status="PASS" start="2026-10-30T22:16:43.152093" elapsed="0.000202"/>
+</kw>
+<kw name="Ratio Should Be Between" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${narrow}[peak_deviation_hz]</arg>
+<arg>${wide}[peak_deviation_hz]</arg>
+<arg>${RATIO_LOW}</arg>
+<arg>${RATIO_HIGH}</arg>
+<arg>narrow/wide peak deviation</arg>
+<doc>Fail unless numerator / denominator is within [low, high].</doc>
+<status status="PASS" start="2026-10-30T22:16:43.152374" elapsed="0.000061"/>
+</kw>
+<tag>band:70cm</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-10-30T22:16:43.151566" elapsed="0.000907"/>
+</test>
+<test id="s1-t14" name="70cm: FM RX At 25 kHz Is Clean Up To Full Deviation" line="69">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:16:43.152722" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-10-30T22:16:43.152789" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:16:43.152624" elapsed="0.000176"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, volume comfortable</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:16:43.152838" elapsed="309.642885"/>
+</kw>
+<kw name="Start Transmitting Fm Tone" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>3000</arg>
+<doc>Loop an FM tone on the test frequency until stopped.</doc>
+<status status="PASS" start="2026-10-30T22:21:52.795973" elapsed="0.104580"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The radio plays a clean, steady 1 kHz tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:21:52.900815" elapsed="3.974313"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:21:56.875520" elapsed="0.004258"/>
+</kw>
+<kw name="Start Transmitting Fm Tone" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>5000</arg>
+<doc>Loop an FM tone on the test frequency until stopped.</doc>
+<status status="PASS" start="2026-10-30T22:21:56.880014" elapsed="0.100701"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The radio plays the tone louder and still undistorted</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:21:56.980941" elapsed="2.089623"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:21:59.071137" elapsed="0.004212"/>
+</kw>
+<tag>band:70cm</tag>
+<tag>manual</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-10-30T22:16:43.152536" elapsed="315.922927"/>
+</test>
+<test id="s1-t15" name="70cm: FM RX At 12.5 kHz Is Clean Up To Full Deviation" line="79">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:21:59.076749" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-10-30T22:21:59.076923" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:21:59.076256" elapsed="0.000707"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, volume unchanged</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:21:59.077074" elapsed="9.047303"/>
+</kw>
+<kw name="Start Transmitting Fm Tone" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>1500</arg>
+<doc>Loop an FM tone on the test frequency until stopped.</doc>
+<status status="PASS" start="2026-10-30T22:22:08.124828" elapsed="0.112321"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The radio plays a clean, steady 1 kHz tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:22:08.237370" elapsed="3.549408"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:22:11.786882" elapsed="0.003928"/>
+</kw>
+<kw name="Start Transmitting Fm Tone" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>2500</arg>
+<doc>Loop an FM tone on the test frequency until stopped.</doc>
+<status status="PASS" start="2026-10-30T22:22:11.790893" elapsed="0.093440"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The radio plays the tone louder and still undistorted</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:22:11.884602" elapsed="2.551489"/>
+</kw>
+<kw name="Operator Reports" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Compared with 25 kHz at 5 kHz deviation, is this quieter, the same, or louder?</arg>
+<doc>Ask the operator for a value or an observation.</doc>
+<status status="PASS" start="2026-10-30T22:22:14.436460" elapsed="3.441961"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:22:17.879058" elapsed="0.004232"/>
+</kw>
+<tag>band:70cm</tag>
+<tag>manual</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-10-30T22:21:59.075805" elapsed="18.807638"/>
+</test>
+<test id="s1-t16" name="70cm: CTCSS Deviation Follows The Bandwidth" line="101">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:22:17.884804" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-10-30T22:22:17.884999" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:22:17.884263" elapsed="0.000779"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, low power, ${CTCSS_HZ} Hz CTCSS tone on transmit</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:22:17.885153" elapsed="37.843651"/>
+</kw>
+<kw name="Capture Radio Transmissions" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:23:06.024624" level="INFO" html="true">&lt;b&gt;capture07&lt;/b&gt;&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;peak dev Hz&lt;/th&gt;&lt;th&gt;rms dev Hz&lt;/th&gt;&lt;th&gt;tone Hz&lt;/th&gt;&lt;th&gt;OBW 99% Hz&lt;/th&gt;&lt;th&gt;offset Hz&lt;/th&gt;&lt;th&gt;s&lt;/th&gt;&lt;th&gt;audio&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx1&lt;/td&gt;&lt;td&gt;643&lt;/td&gt;&lt;td&gt;445&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;1600&lt;/td&gt;&lt;td&gt;74899&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture07/tx1.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-10-30T22:23:06.024799" level="INFO">${wide} = [{'start_s': 1.534184, 'duration_s': 4.773504, 'carrier_offset_hz': 74898.58600179695, 'peak_deviation_hz': 643.0349222102465, 'max_deviation_hz': 844.8141996031096, 'rms_deviation_hz': 445.3159341913...</msg>
+<var>${wide}</var>
+<arg>Key PTT for 5 s without speaking, release.</arg>
+<doc>Record while the operator follows the instruction, then measure each
+FM transmission. Fails unless exactly `expected` are found. Returns
+the measurements, oldest first; each one's audio is saved as a WAV.</doc>
+<status status="PASS" start="2026-10-30T22:22:55.729125" elapsed="10.295687"/>
+</kw>
+<kw name="Remember Result" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>wide ctcss</arg>
+<arg>${wide}[0]</arg>
+<doc>Keep a result for later tests on the same band.</doc>
+<status status="PASS" start="2026-10-30T22:23:06.025063" elapsed="0.000109"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the bandwidth to 12.5 kHz, CTCSS tone unchanged</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:23:06.025211" elapsed="1.079122"/>
+</kw>
+<kw name="Capture Radio Transmissions" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:23:26.382737" level="INFO" html="true">&lt;b&gt;capture08&lt;/b&gt;&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;peak dev Hz&lt;/th&gt;&lt;th&gt;rms dev Hz&lt;/th&gt;&lt;th&gt;tone Hz&lt;/th&gt;&lt;th&gt;OBW 99% Hz&lt;/th&gt;&lt;th&gt;offset Hz&lt;/th&gt;&lt;th&gt;s&lt;/th&gt;&lt;th&gt;audio&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx1&lt;/td&gt;&lt;td&gt;325&lt;/td&gt;&lt;td&gt;221&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;1000&lt;/td&gt;&lt;td&gt;74884&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture08/tx1.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-10-30T22:23:26.382922" level="INFO">${narrow} = [{'start_s': 13.116676, 'duration_s': 4.933404, 'carrier_offset_hz': 74884.36250768579, 'peak_deviation_hz': 325.0430214372788, 'max_deviation_hz': 348.3625610678999, 'rms_deviation_hz': 221.044039833...</msg>
+<var>${narrow}</var>
+<arg>Key PTT for 5 s without speaking, release.</arg>
+<doc>Record while the operator follows the instruction, then measure each
+FM transmission. Fails unless exactly `expected` are found. Returns
+the measurements, oldest first; each one's audio is saved as a WAV.</doc>
+<status status="PASS" start="2026-10-30T22:23:07.104691" elapsed="19.278253"/>
+</kw>
+<kw name="Remember Result" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>narrow ctcss</arg>
+<arg>${narrow}[0]</arg>
+<doc>Keep a result for later tests on the same band.</doc>
+<status status="PASS" start="2026-10-30T22:23:26.383144" elapsed="0.000133"/>
+</kw>
+<kw name="Ratio Should Be Between" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${narrow}[0][ctcss_deviation_hz]</arg>
+<arg>${wide}[0][ctcss_deviation_hz]</arg>
+<arg>${RATIO_LOW}</arg>
+<arg>${RATIO_HIGH}</arg>
+<arg>narrow/wide CTCSS deviation</arg>
+<doc>Fail unless numerator / denominator is within [low, high].</doc>
+<status status="PASS" start="2026-10-30T22:23:26.383321" elapsed="0.000082"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<arg>Turn the CTCSS tone off</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:23:26.383479" elapsed="13.117131"/>
+</kw>
+<tag>band:70cm</tag>
+<tag>ctcss</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-10-30T22:22:17.883807" elapsed="81.617057"/>
+</test>
+<test id="s1-t17" name="70cm: CTCSS Level Meets Limits" line="113">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:23:39.502517" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-10-30T22:23:39.502706" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:23:39.502038" elapsed="0.000707"/>
+</kw>
+<kw name="Recall Result" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:23:39.502996" level="INFO">${wide} = {'start_s': 1.534184, 'duration_s': 4.773504, 'carrier_offset_hz': 74898.58600179695, 'peak_deviation_hz': 643.0349222102465, 'max_deviation_hz': 844.8141996031096, 'rms_deviation_hz': 445.31593419134...</msg>
+<var>${wide}</var>
+<arg>wide ctcss</arg>
+<doc>A result remembered earlier on the current band, or None.</doc>
+<status status="PASS" start="2026-10-30T22:23:39.502868" elapsed="0.000145"/>
+</kw>
+<kw name="Recall Result" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:23:39.503171" level="INFO">${narrow} = {'start_s': 13.116676, 'duration_s': 4.933404, 'carrier_offset_hz': 74884.36250768579, 'peak_deviation_hz': 325.0430214372788, 'max_deviation_hz': 348.3625610678999, 'rms_deviation_hz': 221.0440398333...</msg>
+<var>${narrow}</var>
+<arg>narrow ctcss</arg>
+<doc>A result remembered earlier on the current band, or None.</doc>
+<status status="PASS" start="2026-10-30T22:23:39.503084" elapsed="0.000108"/>
+</kw>
+<kw name="Skip If" owner="BuiltIn">
+<arg>$wide is None or $narrow is None</arg>
+<arg>Needs both CTCSS takes of the previous test on this band</arg>
+<doc>Conditionally stops the current test or task and sets its status to SKIP.</doc>
+<status status="PASS" start="2026-10-30T22:23:39.503335" elapsed="0.000626"/>
+</kw>
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Fm Transmission Ctcss Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${wide}</arg>
+<arg>BW_25</arg>
+<arg>${CTCSS_HZ}</arg>
+<doc>Check a transmission's CTCSS tone: its frequency against the tone set
+on the radio, and its deviation against the radio file's range for the
+channel bandwidth.</doc>
+<status status="PASS" start="2026-10-30T22:23:39.504453" elapsed="0.000194"/>
+</kw>
+<arg>FM Transmission CTCSS Should Meet Limits</arg>
+<arg>${wide}</arg>
+<arg>BW_25</arg>
+<arg>${CTCSS_HZ}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-10-30T22:23:39.504195" elapsed="0.000491"/>
+</kw>
+<kw name="Fm Transmission Ctcss Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:23:39.505017" level="FAIL">BW_12_5: ctcss_deviation_hz 312.6 Hz outside 350-600 Hz</msg>
+<arg>${narrow}</arg>
+<arg>BW_12_5</arg>
+<arg>${CTCSS_HZ}</arg>
+<doc>Check a transmission's CTCSS tone: its frequency against the tone set
+on the radio, and its deviation against the radio file's range for the
+channel bandwidth.</doc>
+<status status="FAIL" start="2026-10-30T22:23:39.504763" elapsed="0.000822">BW_12_5: ctcss_deviation_hz 312.6 Hz outside 350-600 Hz</status>
+</kw>
+<tag>band:70cm</tag>
+<tag>ctcss</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="FAIL" start="2026-10-30T22:23:39.501437" elapsed="0.004319">BW_12_5: ctcss_deviation_hz 312.6 Hz outside 350-600 Hz</status>
+</test>
+<test id="s1-t18" name="70cm: FM TX Power Rises With Each Setting" line="123">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:23:39.506449" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-10-30T22:23:39.506596" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:23:39.506194" elapsed="0.000434"/>
+</kw>
+<kw name="Power Settings" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:23:39.506802" level="INFO">${settings} = ['Low', 'High']</msg>
+<var>${settings}</var>
+<doc>The radio's TX power settings, lowest first: ${POWER_SETTINGS}
+(comma-separated, e.g. for stock firmware: Low,High) or the radio
+file's power_settings. Skips the test when neither lists any.</doc>
+<status status="PASS" start="2026-10-30T22:23:39.506711" elapsed="0.000104"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-10-30T22:23:39.507175" level="INFO">${order} = Low, then High</msg>
+<var>${order}</var>
+<arg>", then ".join($settings)</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-10-30T22:23:39.506899" elapsed="0.000292"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, power ${settings}[0]</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:23:39.507262" elapsed="23.839526"/>
+</kw>
+<kw name="Capture Radio Transmissions" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:24:25.828661" level="INFO" html="true">&lt;b&gt;capture09&lt;/b&gt;&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;peak dev Hz&lt;/th&gt;&lt;th&gt;rms dev Hz&lt;/th&gt;&lt;th&gt;tone Hz&lt;/th&gt;&lt;th&gt;OBW 99% Hz&lt;/th&gt;&lt;th&gt;offset Hz&lt;/th&gt;&lt;th&gt;s&lt;/th&gt;&lt;th&gt;audio&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx1&lt;/td&gt;&lt;td&gt;43&lt;/td&gt;&lt;td&gt;7&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;98900&lt;/td&gt;&lt;td&gt;74890&lt;/td&gt;&lt;td&gt;3&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture09/tx1.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx2&lt;/td&gt;&lt;td&gt;28&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;td&gt;98100&lt;/td&gt;&lt;td&gt;74886&lt;/td&gt;&lt;td&gt;3&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Bandwidth/capture09/tx2.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-10-30T22:24:25.828844" level="INFO">${tx} = [{'start_s': 3.88088, 'duration_s': 3.02194, 'carrier_offset_hz': 74889.82505740938, 'peak_deviation_hz': 42.881782926764295, 'max_deviation_hz': 329.4135033852828, 'rms_deviation_hz': 7.4832031371031...</msg>
+<var>${tx}</var>
+<arg>For each power setting in turn (${order}): set it, key PTT for 3 s without speaking, release.</arg>
+<arg>expected=${{len($settings)}}</arg>
+<doc>Record while the operator follows the instruction, then measure each
+FM transmission. Fails unless exactly `expected` are found. Returns
+the measurements, oldest first; each one's audio is saved as a WAV.</doc>
+<status status="PASS" start="2026-10-30T22:24:03.347039" elapsed="22.481819"/>
+</kw>
+<kw name="Tx Power Should Rise With Setting" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:24:25.829212" level="INFO" html="true">&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;Setting&lt;/th&gt;&lt;th&gt;Received dBFS&lt;/th&gt;&lt;th&gt;Relative dB&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Low&lt;/td&gt;&lt;td&gt;-10.3&lt;/td&gt;&lt;td&gt;+0.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;High&lt;/td&gt;&lt;td&gt;-1.2&lt;/td&gt;&lt;td&gt;+9.0&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-10-30T22:24:25.829245" level="INFO">Set test message to:
+Received levels: Low +0.0 dB, High +9.0 dB</msg>
+<arg>${settings}</arg>
+<arg>${tx}</arg>
+<doc>Check that each power setting, lowest first, transmits at least the
+radio file's power_min_step_db (default 1 dB) above the one before,
+as received through the bench: relative levels, so no power meter is
+needed. Fails if the receiver clipped, which hides the top settings.</doc>
+<status status="PASS" start="2026-10-30T22:24:25.829061" elapsed="0.000197"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn" type="TEARDOWN">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the power back to ${settings}[0]</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:24:25.829589" elapsed="1.708285"/>
+</kw>
+<arg>$TEST_STATUS != 'SKIP'</arg>
+<arg>Operator Does</arg>
+<arg>Set the power back to ${settings}[0]</arg>
+<doc>Runs the given keyword with the given arguments, if `condition` is true.</doc>
+<status status="PASS" start="2026-10-30T22:24:25.829372" elapsed="1.708675"/>
+</kw>
+<doc>Relative levels through the bench: no power meter needed. For
+stock firmware, name its settings: -v POWER_SETTINGS:Low,High</doc>
+<tag>band:70cm</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>power</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-10-30T22:23:39.505919" elapsed="48.032283">Received levels: Low +0.0 dB, High +9.0 dB</status>
+</test>
+<test id="s1-t19" name="70cm: FM RX At 12.5 kHz Rejects An Adjacent Channel" line="137">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:24:27.539284" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-10-30T22:24:27.539434" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:24:27.538978" elapsed="0.000487"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, volume comfortable</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:24:27.539555" elapsed="12.320968"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:24:39.964784" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>1500</arg>
+<arg>12500</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>2500</arg>
+<arg>interferer=off</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T22:24:39.860953" elapsed="0.104238"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The wanted signal alone: a clean, steady 1 kHz tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:24:39.965373" elapsed="20.944619"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:25:00.910341" elapsed="0.004229"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:25:01.087423" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>1500</arg>
+<arg>12500</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>2500</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T22:25:00.914765" elapsed="0.173017"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The 1 kHz tone continues with no 400 Hz tone from the channel above</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:25:01.087939" elapsed="4.217019"/>
+</kw>
+<kw name="Operator Reports" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Any added noise compared with the wanted signal alone?</arg>
+<doc>Ask the operator for a value or an observation.</doc>
+<status status="PASS" start="2026-10-30T22:25:05.305133" elapsed="4.388075"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:25:09.693572" elapsed="0.004198"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:25:09.862557" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>1500</arg>
+<arg>-12500</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>2500</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T22:25:09.697938" elapsed="0.165042"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>With the interferer on the channel below: still no 400 Hz tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:25:09.863174" elapsed="5.267012"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:25:15.130665" elapsed="0.004073"/>
+</kw>
+<tag>adjacent</tag>
+<tag>band:70cm</tag>
+<tag>manual</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-10-30T22:24:27.538681" elapsed="47.596126"/>
+</test>
+<test id="s1-t20" name="70cm: FM RX At 25 kHz Rejects An Adjacent Channel" line="151">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-10-30T22:25:15.135647" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-10-30T22:25:15.135759" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-10-30T22:25:15.135325" elapsed="0.000454"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, volume comfortable</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-10-30T22:25:15.135851" elapsed="10.469527"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:25:25.714154" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>3000</arg>
+<arg>25000</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>5000</arg>
+<arg>interferer=off</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T22:25:25.605635" elapsed="0.108938"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The wanted signal alone: a clean, steady 1 kHz tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:25:25.714734" elapsed="1.969168"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:25:27.684028" elapsed="0.004008"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:25:27.857788" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>3000</arg>
+<arg>25000</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>5000</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T22:25:27.688119" elapsed="0.170069"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The 1 kHz tone continues with no 400 Hz tone from the channel above</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-10-30T22:25:27.858368" elapsed="3.395070"/>
+</kw>
+<kw name="Operator Reports" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Any added noise compared with the wanted signal alone?</arg>
+<doc>Ask the operator for a value or an observation.</doc>
+<status status="PASS" start="2026-10-30T22:25:31.253871" elapsed="2.910797"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:25:34.164844" elapsed="0.004070"/>
+</kw>
+<kw name="Start Transmitting With Interferer" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-10-30T22:25:34.330435" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<arg>3000</arg>
+<arg>12500</arg>
+<arg>${ADJACENT_DB}</arg>
+<arg>2500</arg>
+<doc>Loop the wanted FM tone on the test frequency plus an interferer,
+interferer_db stronger, interferer_offset_hz away, modulated with a
+different tone so the operator can tell which one they hear.</doc>
+<status status="PASS" start="2026-10-30T22:25:34.169087" elapsed="0.161715"/>
+</kw>
+<kw name="Operator Reports" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>With a 12.5 kHz neighbour this close, do you hear the 1 kHz tone only, both tones, or mostly 400 Hz?</arg>
+<doc>Ask the operator for a value or an observation.</doc>
+<status status="PASS" start="2026-10-30T22:25:34.330964" elapsed="3.126048"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-10-30T22:25:37.457553" elapsed="0.004266"/>
+</kw>
+<tag>adjacent</tag>
+<tag>band:70cm</tag>
+<tag>manual</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-10-30T22:25:15.135026" elapsed="22.326912"/>
+</test>
+<kw name="Close Bench" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the instruments and write measurements.json: every capture,
+check and operator answer, with the run's provenance. Absolute paths
+are made relative, so the file can be published as it is.</doc>
+<status status="PASS" start="2026-10-30T22:29:08.071710" elapsed="0.019504"/>
+</kw>
+<doc>FM follows the 12.5/25 kHz channel bandwidth setting, on transmit
+and on receive, on every band the radio has.
+
+Run it with a bench's argument file (bench/example.args), whose
+oat.expand repeats each test on every band in the radio file. Transmit is measured from the SDR capture; receive is
+judged by the operator, until the radio can report its own audio.
+The programming cable stays out throughout: it disconnects the mic
+and the speaker.
+
+To measure stock firmware as a reference, exclude mode:m17.</doc>
+<meta name="Calibration">assumed, measured 2026-10-20 (d55ce4aa0a3c)</meta>
+<meta name="Firmware">stock-1.2-20250922</meta>
+<meta name="Hardware">Retevis C62 2501R0621100413</meta>
+<meta name="Radio">Retevis C62/C2 (c62)</meta>
+<meta name="Station">k0ret</meta>
+<meta name="Suite commit">69513ad6df</meta>
+<status status="FAIL" elapsed="1383.572389"/>
+</suite>
+<statistics>
+<total>
+<stat pass="18" fail="2" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="4" fail="0" skip="0">adjacent</stat>
+<stat pass="9" fail="1" skip="0">band:2m</stat>
+<stat pass="9" fail="1" skip="0">band:70cm</stat>
+<stat pass="2" fail="2" skip="0">ctcss</stat>
+<stat pass="8" fail="0" skip="0">manual</stat>
+<stat pass="18" fail="2" skip="0">mode:fm</stat>
+<stat pass="18" fail="2" skip="0">per-band</stat>
+<stat pass="2" fail="0" skip="0">power</stat>
+<stat pass="8" fail="0" skip="0">rx</stat>
+<stat pass="10" fail="2" skip="0">tx</stat>
+</tag>
+<suite>
+<stat name="Bandwidth" id="s1" pass="18" fail="2" skip="0">Bandwidth</stat>
+</suite>
+</statistics>
+<errors>
+<msg time="2026-10-30T22:13:28.727639" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<msg time="2026-10-30T22:13:45.444673" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<msg time="2026-10-30T22:13:54.846929" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<msg time="2026-10-30T22:14:18.512378" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<msg time="2026-10-30T22:14:20.933058" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<msg time="2026-10-30T22:14:26.229813" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<msg time="2026-10-30T22:24:39.964784" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<msg time="2026-10-30T22:25:01.087423" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<msg time="2026-10-30T22:25:09.862557" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<msg time="2026-10-30T22:25:25.714154" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<msg time="2026-10-30T22:25:27.857788" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+<msg time="2026-10-30T22:25:34.330435" level="WARN">Transmitter gain capped: the wanted signal is 3.8 dB below a plain tone</msg>
+</errors>
+</robot>

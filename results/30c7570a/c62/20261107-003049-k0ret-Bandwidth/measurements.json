@@ -1,0 +1,1497 @@
+{
+  "schema": 1,
+  "suite": "Bandwidth",
+  "started": "2026-11-07T00:30:49+00:00",
+  "station": "k0ret",
+  "radio": "Retevis C62/C2",
+  "radio_file": "c62",
+  "firmware": "v0.4.5-88-g30c7570a",
+  "hardware": "Retevis C62 2501R0621100415",
+  "dsp": "9579b617f048c646465118f6d0b9e1b765b4d7d811ff9c8649c5754fe45a8903",
+  "suite_commit": "4818e0cd0b",
+  "bands": {
+    "2m": 146580000,
+    "70cm": 445975000
+  },
+  "calibration": {
+    "method": "assumed",
+    "measured": "2026-10-20",
+    "expires": "2026-12-31",
+    "sha256": "d55ce4aa0a3c"
+  },
+  "records": [
+    {
+      "test": "2m: CTCSS Deviation Follows The Bandwidth",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Set the radio to FM, 146.580 MHz, 25 kHz bandwidth, low power, 100.0 Hz CTCSS tone on transmit",
+      "answer": ""
+    },
+    {
+      "test": "2m: CTCSS Deviation Follows The Bandwidth",
+      "band": "2m",
+      "kind": "capture",
+      "instruction": "Key PTT for 5 s without speaking, release.",
+      "files": [
+        "capture01.cu8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 0.437168,
+          "duration_s": 4.322128,
+          "carrier_offset_hz": 74918.40759043922,
+          "peak_deviation_hz": 667.1917942897128,
+          "max_deviation_hz": 777.5987458915873,
+          "rms_deviation_hz": 445.5214472652728,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 99.95694404038709,
+          "ctcss_deviation_hz": 629.7865011113043,
+          "occupied_bandwidth_hz": 1600.0,
+          "power_db": -8.113094329833984,
+          "carrier_level_db": -13.001585417337854,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -81.59240956077701,
+          "audio_file": "capture01/tx1.wav"
+        }
+      ]
+    },
+    {
+      "test": "2m: CTCSS Deviation Follows The Bandwidth",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Set the bandwidth to 12.5 kHz, CTCSS tone unchanged",
+      "answer": ""
+    },
+    {
+      "test": "2m: CTCSS Deviation Follows The Bandwidth",
+      "band": "2m",
+      "kind": "capture",
+      "instruction": "Key PTT for 5 s without speaking, release.",
+      "files": [
+        "capture02.cu8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 0.3,
+          "duration_s": 3.745256,
+          "carrier_offset_hz": 74916.79326503676,
+          "peak_deviation_hz": 361.00158597228165,
+          "max_deviation_hz": 3574.3567403377374,
+          "rms_deviation_hz": 222.0958965917153,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 99.95694993420712,
+          "ctcss_deviation_hz": 312.5575069607061,
+          "occupied_bandwidth_hz": 1000.0,
+          "power_db": -8.230690002441406,
+          "carrier_level_db": -10.456923831813963,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -83.20673496324162,
+          "audio_file": "capture02/tx1.wav"
+        }
+      ]
+    },
+    {
+      "test": "2m: CTCSS Deviation Follows The Bandwidth",
+      "band": "2m",
+      "kind": "ratio",
+      "what": "narrow/wide CTCSS deviation",
+      "value": 0.4962912136242608,
+      "low": 0.4,
+      "high": 0.65,
+      "passed": true
+    },
+    {
+      "test": "2m: CTCSS Deviation Follows The Bandwidth",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    },
+    {
+      "test": "2m: CTCSS Level Meets Limits",
+      "band": "2m",
+      "kind": "limit",
+      "field": "ctcss_hz",
+      "value": 99.95694404038709,
+      "limit": "100.0 Hz +-0.5%",
+      "bandwidth": "BW_25",
+      "passed": true
+    },
+    {
+      "test": "2m: CTCSS Level Meets Limits",
+      "band": "2m",
+      "kind": "limit",
+      "field": "ctcss_deviation_hz",
+      "value": 629.7865011113043,
+      "limit": "500-1000 Hz",
+      "bandwidth": "BW_25",
+      "passed": true
+    },
+    {
+      "test": "2m: CTCSS Level Meets Limits",
+      "band": "2m",
+      "kind": "limit",
+      "field": "ctcss_hz",
+      "value": 99.95694993420712,
+      "limit": "100.0 Hz +-0.5%",
+      "bandwidth": "BW_12_5",
+      "passed": true
+    },
+    {
+      "test": "2m: CTCSS Level Meets Limits",
+      "band": "2m",
+      "kind": "limit",
+      "field": "ctcss_deviation_hz",
+      "value": 312.5575069607061,
+      "limit": "350-600 Hz",
+      "bandwidth": "BW_12_5",
+      "passed": false
+    },
+    {
+      "test": "2m: FM Restores CTCSS After M17",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Set the radio to FM, 146.580 MHz, 12.5 kHz bandwidth, low power, 100.0 Hz CTCSS tone on transmit; switch to M17, key PTT once for 2 s, then switch back to FM",
+      "answer": ""
+    },
+    {
+      "test": "2m: FM Restores CTCSS After M17",
+      "band": "2m",
+      "kind": "capture",
+      "instruction": "Key PTT for 5 s without speaking, release.",
+      "files": [
+        "capture03.cu8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 0.858216,
+          "duration_s": 3.993788,
+          "carrier_offset_hz": 74917.58994276174,
+          "peak_deviation_hz": 328.6378168861245,
+          "max_deviation_hz": 357.280259285044,
+          "rms_deviation_hz": 221.0863261977743,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 99.95694967516395,
+          "ctcss_deviation_hz": 312.55035106251086,
+          "occupied_bandwidth_hz": 1000.0,
+          "power_db": -8.12151050567627,
+          "carrier_level_db": -10.445307547455894,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -82.41005723825947,
+          "audio_file": "capture03/tx1.wav"
+        }
+      ]
+    },
+    {
+      "test": "2m: FM Restores CTCSS After M17",
+      "band": "2m",
+      "kind": "limit",
+      "field": "ctcss_hz",
+      "value": 99.95694967516395,
+      "limit": "100.0 Hz +-0.5%",
+      "bandwidth": "BW_12_5",
+      "passed": true
+    },
+    {
+      "test": "2m: FM Restores CTCSS After M17",
+      "band": "2m",
+      "kind": "limit",
+      "field": "ctcss_deviation_hz",
+      "value": 312.55035106251086,
+      "limit": "350-600 Hz",
+      "bandwidth": "BW_12_5",
+      "passed": false
+    },
+    {
+      "test": "2m: FM Restores CTCSS After M17",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    },
+    {
+      "test": "2m: FM TX Power Rises With Each Setting",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Set the radio to FM, 146.580 MHz, 25 kHz bandwidth, no CTCSS, power 1 W",
+      "answer": ""
+    },
+    {
+      "test": "2m: FM TX Power Rises With Each Setting",
+      "band": "2m",
+      "kind": "capture",
+      "instruction": "For each power setting in turn (1 W, then 2.5 W, then 5 W): set it, key PTT for 3 s without speaking, release.",
+      "files": [
+        "capture04.cu8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.7517,
+          "duration_s": 2.088356,
+          "carrier_offset_hz": 74917.74854387167,
+          "peak_deviation_hz": 71.47492844006469,
+          "max_deviation_hz": 278.6485498908522,
+          "rms_deviation_hz": 8.84261072517304,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 78.93904527694869,
+          "ctcss_deviation_hz": 0.028714022965891886,
+          "occupied_bandwidth_hz": 97900.0,
+          "power_db": -8.120086669921875,
+          "carrier_level_db": -0.000358559051386093,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -82.25145612833148,
+          "audio_file": "capture04/tx1.wav"
+        },
+        {
+          "start_s": 8.882368,
+          "duration_s": 3.202604,
+          "carrier_offset_hz": 74916.33374361625,
+          "peak_deviation_hz": 27.260694592344734,
+          "max_deviation_hz": 49.237479185086016,
+          "rms_deviation_hz": 6.030819869968294,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 78.97457955556808,
+          "ctcss_deviation_hz": 0.01733077995250301,
+          "occupied_bandwidth_hz": 96900.0,
+          "power_db": -5.152182102203369,
+          "carrier_level_db": -0.00023489806808260063,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -83.66625638374535,
+          "audio_file": "capture04/tx2.wav"
+        },
+        {
+          "start_s": 15.166216,
+          "duration_s": 3.356028,
+          "carrier_offset_hz": 74915.6476794132,
+          "peak_deviation_hz": 29.7798022828238,
+          "max_deviation_hz": 255.84824773572086,
+          "rms_deviation_hz": 6.255125475436259,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 244.6382712261379,
+          "ctcss_deviation_hz": 0.010107909915334022,
+          "occupied_bandwidth_hz": 95200.0,
+          "power_db": -2.309828042984009,
+          "carrier_level_db": -0.0002385975343162641,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -84.35232058679685,
+          "audio_file": "capture04/tx3.wav"
+        }
+      ]
+    },
+    {
+      "test": "2m: FM TX Power Rises With Each Setting",
+      "band": "2m",
+      "kind": "power",
+      "settings": [
+        "1 W",
+        "2.5 W",
+        "5 W"
+      ],
+      "relative_db": [
+        0.0,
+        2.967904567718506,
+        5.810258626937866
+      ],
+      "received_dbfs": [
+        -8.120086669921875,
+        -5.152182102203369,
+        -2.309828042984009
+      ],
+      "receiver_clipped": 0.0
+    },
+    {
+      "test": "2m: FM TX Power Rises With Each Setting",
+      "band": "2m",
+      "kind": "limit",
+      "field": "power step 1 W -> 2.5 W",
+      "value": 2.967904567718506,
+      "limit": ">= 1.0 dB",
+      "passed": true
+    },
+    {
+      "test": "2m: FM TX Power Rises With Each Setting",
+      "band": "2m",
+      "kind": "limit",
+      "field": "power step 2.5 W -> 5 W",
+      "value": 2.8423540592193604,
+      "limit": ">= 1.0 dB",
+      "passed": true
+    },
+    {
+      "test": "2m: FM TX Power Rises With Each Setting",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Set the power back to 1 W",
+      "answer": ""
+    },
+    {
+      "test": "70cm: CTCSS Deviation Follows The Bandwidth",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the radio to FM, 445.975 MHz, 25 kHz bandwidth, low power, 100.0 Hz CTCSS tone on transmit",
+      "answer": ""
+    },
+    {
+      "test": "70cm: CTCSS Deviation Follows The Bandwidth",
+      "band": "70cm",
+      "kind": "capture",
+      "instruction": "Key PTT for 5 s without speaking, release.",
+      "files": [
+        "capture05.cu8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 0.627032,
+          "duration_s": 3.447212,
+          "carrier_offset_hz": 74711.34363704214,
+          "peak_deviation_hz": 681.6584099050972,
+          "max_deviation_hz": 753.8734508690997,
+          "rms_deviation_hz": 445.59474296794355,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 99.95694786194653,
+          "ctcss_deviation_hz": 629.7745856558741,
+          "occupied_bandwidth_hz": 1600.0,
+          "power_db": -12.402078628540039,
+          "carrier_level_db": -13.026016557167088,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -288.6563629578595,
+          "audio_file": "capture05/tx1.wav"
+        }
+      ]
+    },
+    {
+      "test": "70cm: CTCSS Deviation Follows The Bandwidth",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the bandwidth to 12.5 kHz, CTCSS tone unchanged",
+      "answer": ""
+    },
+    {
+      "test": "70cm: CTCSS Deviation Follows The Bandwidth",
+      "band": "70cm",
+      "kind": "capture",
+      "instruction": "Key PTT for 5 s without speaking, release.",
+      "files": [
+        "capture06.cu8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 0.545268,
+          "duration_s": 3.2627,
+          "carrier_offset_hz": 74709.32933693752,
+          "peak_deviation_hz": 328.5070620547324,
+          "max_deviation_hz": 338.4263270019075,
+          "rms_deviation_hz": 221.11123976169137,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 99.9569474244794,
+          "ctcss_deviation_hz": 312.53973269310757,
+          "occupied_bandwidth_hz": 1000.0,
+          "power_db": -12.43089771270752,
+          "carrier_level_db": -10.47620987481341,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -290.6706630624831,
+          "audio_file": "capture06/tx1.wav"
+        }
+      ]
+    },
+    {
+      "test": "70cm: CTCSS Deviation Follows The Bandwidth",
+      "band": "70cm",
+      "kind": "ratio",
+      "what": "narrow/wide CTCSS deviation",
+      "value": 0.49627238032734416,
+      "low": 0.4,
+      "high": 0.65,
+      "passed": true
+    },
+    {
+      "test": "70cm: CTCSS Deviation Follows The Bandwidth",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    },
+    {
+      "test": "70cm: CTCSS Level Meets Limits",
+      "band": "70cm",
+      "kind": "limit",
+      "field": "ctcss_hz",
+      "value": 99.95694786194653,
+      "limit": "100.0 Hz +-0.5%",
+      "bandwidth": "BW_25",
+      "passed": true
+    },
+    {
+      "test": "70cm: CTCSS Level Meets Limits",
+      "band": "70cm",
+      "kind": "limit",
+      "field": "ctcss_deviation_hz",
+      "value": 629.7745856558741,
+      "limit": "500-1000 Hz",
+      "bandwidth": "BW_25",
+      "passed": true
+    },
+    {
+      "test": "70cm: CTCSS Level Meets Limits",
+      "band": "70cm",
+      "kind": "limit",
+      "field": "ctcss_hz",
+      "value": 99.9569474244794,
+      "limit": "100.0 Hz +-0.5%",
+      "bandwidth": "BW_12_5",
+      "passed": true
+    },
+    {
+      "test": "70cm: CTCSS Level Meets Limits",
+      "band": "70cm",
+      "kind": "limit",
+      "field": "ctcss_deviation_hz",
+      "value": 312.53973269310757,
+      "limit": "350-600 Hz",
+      "bandwidth": "BW_12_5",
+      "passed": false
+    },
+    {
+      "test": "70cm: FM Restores CTCSS After M17",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the radio to FM, 445.975 MHz, 12.5 kHz bandwidth, low power, 100.0 Hz CTCSS tone on transmit; switch to M17, key PTT once for 2 s, then switch back to FM",
+      "answer": ""
+    },
+    {
+      "test": "70cm: FM Restores CTCSS After M17",
+      "band": "70cm",
+      "kind": "capture",
+      "instruction": "Key PTT for 5 s without speaking, release.",
+      "files": [
+        "capture07.cu8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 0.618516,
+          "duration_s": 3.506704,
+          "carrier_offset_hz": 74712.60827922366,
+          "peak_deviation_hz": 327.9654568151536,
+          "max_deviation_hz": 340.9689841981548,
+          "rms_deviation_hz": 221.10913295716995,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 99.95694633383553,
+          "ctcss_deviation_hz": 312.54770582312386,
+          "occupied_bandwidth_hz": 1000.0,
+          "power_db": -12.426711082458496,
+          "carrier_level_db": -10.471228182966883,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -287.3917207763443,
+          "audio_file": "capture07/tx1.wav"
+        }
+      ]
+    },
+    {
+      "test": "70cm: FM Restores CTCSS After M17",
+      "band": "70cm",
+      "kind": "limit",
+      "field": "ctcss_hz",
+      "value": 99.95694633383553,
+      "limit": "100.0 Hz +-0.5%",
+      "bandwidth": "BW_12_5",
+      "passed": true
+    },
+    {
+      "test": "70cm: FM Restores CTCSS After M17",
+      "band": "70cm",
+      "kind": "limit",
+      "field": "ctcss_deviation_hz",
+      "value": 312.54770582312386,
+      "limit": "350-600 Hz",
+      "bandwidth": "BW_12_5",
+      "passed": false
+    },
+    {
+      "test": "70cm: FM Restores CTCSS After M17",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    },
+    {
+      "test": "70cm: FM TX Power Rises With Each Setting",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the radio to FM, 445.975 MHz, 25 kHz bandwidth, no CTCSS, power 1 W",
+      "answer": ""
+    },
+    {
+      "test": "70cm: FM TX Power Rises With Each Setting",
+      "band": "70cm",
+      "kind": "capture",
+      "instruction": "For each power setting in turn (1 W, then 2.5 W, then 5 W): set it, key PTT for 3 s without speaking, release.",
+      "files": [
+        "capture08.cu8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.800476,
+          "duration_s": 1.782916,
+          "carrier_offset_hz": 74712.41657764213,
+          "peak_deviation_hz": 27.82987387945286,
+          "max_deviation_hz": 110.21087705604704,
+          "rms_deviation_hz": 8.3381130416754,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 151.85655267670617,
+          "ctcss_deviation_hz": 0.03380186415835416,
+          "occupied_bandwidth_hz": 98900.0,
+          "power_db": -12.426982879638672,
+          "carrier_level_db": -0.0016485358172702916,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -287.5834223578713,
+          "audio_file": "capture08/tx1.wav"
+        },
+        {
+          "start_s": 6.24806,
+          "duration_s": 1.696492,
+          "carrier_offset_hz": 74709.7776942595,
+          "peak_deviation_hz": 22.5987435765175,
+          "max_deviation_hz": 36.637168052051535,
+          "rms_deviation_hz": 5.962667761992943,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 200.10101810460435,
+          "ctcss_deviation_hz": 0.030181476972040447,
+          "occupied_bandwidth_hz": 98400.0,
+          "power_db": -5.840311527252197,
+          "carrier_level_db": -0.0006401103587274893,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -290.2223057405063,
+          "audio_file": "capture08/tx2.wav"
+        },
+        {
+          "start_s": 10.106672,
+          "duration_s": 1.963728,
+          "carrier_offset_hz": 74708.39031224216,
+          "peak_deviation_hz": 26.55181486524521,
+          "max_deviation_hz": 63.86461713598077,
+          "rms_deviation_hz": 5.27493685471011,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 78.94275531032226,
+          "ctcss_deviation_hz": 0.07315915399766208,
+          "occupied_bandwidth_hz": 97600.0,
+          "power_db": -1.5143532752990723,
+          "carrier_level_db": -0.00024680588734059283,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -291.6096877578384,
+          "audio_file": "capture08/tx3.wav"
+        }
+      ]
+    },
+    {
+      "test": "70cm: FM TX Power Rises With Each Setting",
+      "band": "70cm",
+      "kind": "power",
+      "settings": [
+        "1 W",
+        "2.5 W",
+        "5 W"
+      ],
+      "relative_db": [
+        0.0,
+        6.586671352386475,
+        10.9126296043396
+      ],
+      "received_dbfs": [
+        -12.426982879638672,
+        -5.840311527252197,
+        -1.5143532752990723
+      ],
+      "receiver_clipped": 0.0
+    },
+    {
+      "test": "70cm: FM TX Power Rises With Each Setting",
+      "band": "70cm",
+      "kind": "limit",
+      "field": "power step 1 W -> 2.5 W",
+      "value": 6.586671352386475,
+      "limit": ">= 1.0 dB",
+      "passed": true
+    },
+    {
+      "test": "70cm: FM TX Power Rises With Each Setting",
+      "band": "70cm",
+      "kind": "limit",
+      "field": "power step 2.5 W -> 5 W",
+      "value": 4.325958251953125,
+      "limit": ">= 1.0 dB",
+      "passed": true
+    },
+    {
+      "test": "70cm: FM TX Power Rises With Each Setting",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the power back to 1 W",
+      "answer": ""
+    },
+    {
+      "test": "2m: FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Set the radio to FM, 146.580 MHz, 25 kHz bandwidth, no CTCSS, volume comfortable",
+      "answer": ""
+    },
+    {
+      "test": "2m: FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "band": "2m",
+      "kind": "transmit",
+      "deviation_hz": 3000.0,
+      "tone_hz": 1000.0,
+      "ctcss_hz": 0.0
+    },
+    {
+      "test": "2m: FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "band": "2m",
+      "kind": "assertion",
+      "text": "The radio plays a clean, steady 1 kHz tone",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "2m: FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "band": "2m",
+      "kind": "transmit",
+      "deviation_hz": 5000.0,
+      "tone_hz": 1000.0,
+      "ctcss_hz": 0.0
+    },
+    {
+      "test": "2m: FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "band": "2m",
+      "kind": "assertion",
+      "text": "The radio plays the tone louder and still undistorted",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "2m: FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Set the radio to FM, 146.580 MHz, 12.5 kHz bandwidth, no CTCSS, volume unchanged",
+      "answer": ""
+    },
+    {
+      "test": "2m: FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "band": "2m",
+      "kind": "transmit",
+      "deviation_hz": 1500.0,
+      "tone_hz": 1000.0,
+      "ctcss_hz": 0.0
+    },
+    {
+      "test": "2m: FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "band": "2m",
+      "kind": "assertion",
+      "text": "The radio plays a clean, steady 1 kHz tone",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "2m: FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "band": "2m",
+      "kind": "transmit",
+      "deviation_hz": 2500.0,
+      "tone_hz": 1000.0,
+      "ctcss_hz": 0.0
+    },
+    {
+      "test": "2m: FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "band": "2m",
+      "kind": "assertion",
+      "text": "The radio plays the tone louder and still undistorted",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "2m: FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "band": "2m",
+      "kind": "observation",
+      "text": "Compared with the louder tone at 25 kHz, is this quieter, the same, or louder?",
+      "answer": "same"
+    },
+    {
+      "test": "2m: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Set the radio to FM, 146.580 MHz, 12.5 kHz bandwidth, no CTCSS, volume comfortable",
+      "answer": ""
+    },
+    {
+      "test": "2m: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "transmit",
+      "deviation_hz": 1500.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": 12500.0,
+      "interferer_db": 20.0,
+      "interferer": false,
+      "interferer_deviation_hz": 2500.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 3.8278537031645
+    },
+    {
+      "test": "2m: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "assertion",
+      "text": "The wanted signal alone: a clean, steady 1 kHz tone",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "2m: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "transmit",
+      "deviation_hz": 1500.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": 12500.0,
+      "interferer_db": 20.0,
+      "interferer": true,
+      "interferer_deviation_hz": 2500.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 3.8278537031645
+    },
+    {
+      "test": "2m: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "assertion",
+      "text": "The 1 kHz tone continues with no 400 Hz tone from the channel above",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "2m: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "observation",
+      "text": "Any added noise compared with the wanted signal alone?",
+      "answer": "no"
+    },
+    {
+      "test": "2m: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "transmit",
+      "deviation_hz": 1500.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": -12500.0,
+      "interferer_db": 20.0,
+      "interferer": true,
+      "interferer_deviation_hz": 2500.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 3.8278537031645
+    },
+    {
+      "test": "2m: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "assertion",
+      "text": "With the interferer on the channel below: still no 400 Hz tone",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "2m: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Set the radio to FM, 146.580 MHz, 25 kHz bandwidth, no CTCSS, volume comfortable",
+      "answer": ""
+    },
+    {
+      "test": "2m: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "transmit",
+      "deviation_hz": 3000.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": 25000.0,
+      "interferer_db": 20.0,
+      "interferer": false,
+      "interferer_deviation_hz": 5000.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 3.8278537031645
+    },
+    {
+      "test": "2m: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "assertion",
+      "text": "The wanted signal alone: a clean, steady 1 kHz tone",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "2m: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "transmit",
+      "deviation_hz": 3000.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": 25000.0,
+      "interferer_db": 20.0,
+      "interferer": true,
+      "interferer_deviation_hz": 5000.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 3.8278537031645
+    },
+    {
+      "test": "2m: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "assertion",
+      "text": "The 1 kHz tone continues with no 400 Hz tone from the channel above",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "2m: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "observation",
+      "text": "Any added noise compared with the wanted signal alone?",
+      "answer": "no"
+    },
+    {
+      "test": "2m: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "transmit",
+      "deviation_hz": 3000.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": 12500.0,
+      "interferer_db": 20.0,
+      "interferer": true,
+      "interferer_deviation_hz": 2500.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 3.8278537031645
+    },
+    {
+      "test": "2m: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "2m",
+      "kind": "observation",
+      "text": "With a 12.5 kHz neighbour this close, do you hear the 1 kHz tone only, both tones, or mostly 400 Hz?",
+      "answer": "1 khz"
+    },
+    {
+      "test": "2m: FM RX SINAD Is Unchanged After M17",
+      "band": "2m",
+      "kind": "observation",
+      "text": "Set the radio volume where it will stay for the rest of this run. Where is the knob (e.g. 1 o'clock)?",
+      "answer": "8"
+    },
+    {
+      "test": "2m: FM RX SINAD Is Unchanged After M17",
+      "band": "2m",
+      "kind": "radio_volume",
+      "knob": "8"
+    },
+    {
+      "test": "2m: FM RX SINAD Is Unchanged After M17",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Set the radio to FM, 146.580 MHz, 12.5 kHz bandwidth, no CTCSS, squelch open, volume unchanged",
+      "answer": ""
+    },
+    {
+      "test": "70cm: FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the radio to FM, 445.975 MHz, 25 kHz bandwidth, no CTCSS, volume comfortable",
+      "answer": ""
+    },
+    {
+      "test": "70cm: FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "band": "70cm",
+      "kind": "transmit",
+      "deviation_hz": 3000.0,
+      "tone_hz": 1000.0,
+      "ctcss_hz": 0.0
+    },
+    {
+      "test": "70cm: FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "band": "70cm",
+      "kind": "assertion",
+      "text": "The radio plays a clean, steady 1 kHz tone",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "70cm: FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "band": "70cm",
+      "kind": "transmit",
+      "deviation_hz": 5000.0,
+      "tone_hz": 1000.0,
+      "ctcss_hz": 0.0
+    },
+    {
+      "test": "70cm: FM RX At 25 kHz Is Clean Up To Full Deviation",
+      "band": "70cm",
+      "kind": "assertion",
+      "text": "The radio plays the tone louder and still undistorted",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "70cm: FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the radio to FM, 445.975 MHz, 12.5 kHz bandwidth, no CTCSS, volume unchanged",
+      "answer": ""
+    },
+    {
+      "test": "70cm: FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "band": "70cm",
+      "kind": "transmit",
+      "deviation_hz": 1500.0,
+      "tone_hz": 1000.0,
+      "ctcss_hz": 0.0
+    },
+    {
+      "test": "70cm: FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "band": "70cm",
+      "kind": "assertion",
+      "text": "The radio plays a clean, steady 1 kHz tone",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "70cm: FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "band": "70cm",
+      "kind": "transmit",
+      "deviation_hz": 2500.0,
+      "tone_hz": 1000.0,
+      "ctcss_hz": 0.0
+    },
+    {
+      "test": "70cm: FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "band": "70cm",
+      "kind": "assertion",
+      "text": "The radio plays the tone louder and still undistorted",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "70cm: FM RX At 12.5 kHz Is Clean Up To Full Deviation",
+      "band": "70cm",
+      "kind": "observation",
+      "text": "Compared with the louder tone at 25 kHz, is this quieter, the same, or louder?",
+      "answer": "louder"
+    },
+    {
+      "test": "70cm: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the radio to FM, 445.975 MHz, 12.5 kHz bandwidth, no CTCSS, volume comfortable",
+      "answer": ""
+    },
+    {
+      "test": "70cm: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "transmit",
+      "deviation_hz": 1500.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": 12500.0,
+      "interferer_db": 20.0,
+      "interferer": false,
+      "interferer_deviation_hz": 2500.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 3.8278537031645
+    },
+    {
+      "test": "70cm: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "assertion",
+      "text": "The wanted signal alone: a clean, steady 1 kHz tone",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "70cm: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "transmit",
+      "deviation_hz": 1500.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": 12500.0,
+      "interferer_db": 20.0,
+      "interferer": true,
+      "interferer_deviation_hz": 2500.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 3.8278537031645
+    },
+    {
+      "test": "70cm: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "assertion",
+      "text": "The 1 kHz tone continues with no 400 Hz tone from the channel above",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "70cm: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "observation",
+      "text": "Any added noise compared with the wanted signal alone?",
+      "answer": "no"
+    },
+    {
+      "test": "70cm: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "transmit",
+      "deviation_hz": 1500.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": -12500.0,
+      "interferer_db": 20.0,
+      "interferer": true,
+      "interferer_deviation_hz": 2500.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 3.8278537031645
+    },
+    {
+      "test": "70cm: FM RX At 12.5 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "assertion",
+      "text": "With the interferer on the channel below: still no 400 Hz tone",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "70cm: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the radio to FM, 445.975 MHz, 25 kHz bandwidth, no CTCSS, volume comfortable",
+      "answer": ""
+    },
+    {
+      "test": "70cm: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "transmit",
+      "deviation_hz": 3000.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": 25000.0,
+      "interferer_db": 20.0,
+      "interferer": false,
+      "interferer_deviation_hz": 5000.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 3.8278537031645
+    },
+    {
+      "test": "70cm: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "assertion",
+      "text": "The wanted signal alone: a clean, steady 1 kHz tone",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "70cm: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "transmit",
+      "deviation_hz": 3000.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": 25000.0,
+      "interferer_db": 20.0,
+      "interferer": true,
+      "interferer_deviation_hz": 5000.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 3.8278537031645
+    },
+    {
+      "test": "70cm: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "assertion",
+      "text": "The 1 kHz tone continues with no 400 Hz tone from the channel above",
+      "passed": true,
+      "note": ""
+    },
+    {
+      "test": "70cm: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "observation",
+      "text": "Any added noise compared with the wanted signal alone?",
+      "answer": "no"
+    },
+    {
+      "test": "70cm: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "transmit",
+      "deviation_hz": 3000.0,
+      "tone_hz": 1000.0,
+      "interferer_offset_hz": 12500.0,
+      "interferer_db": 20.0,
+      "interferer": true,
+      "interferer_deviation_hz": 2500.0,
+      "interferer_tone_hz": 400.0,
+      "gain_offset_db": 17.0,
+      "wanted_shortfall_db": 3.8278537031645
+    },
+    {
+      "test": "70cm: FM RX At 25 kHz Rejects An Adjacent Channel",
+      "band": "70cm",
+      "kind": "observation",
+      "text": "With a 12.5 kHz neighbour this close, do you hear the 1 kHz tone only, both tones, or mostly 400 Hz?",
+      "answer": "1khz"
+    },
+    {
+      "test": "70cm: FM RX SINAD Is Unchanged After M17",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the radio to FM, 445.975 MHz, 12.5 kHz bandwidth, no CTCSS, squelch open, volume unchanged",
+      "answer": ""
+    }
+  ],
+  "operator": [
+    {
+      "kind": "instruct",
+      "text": "Plan for Bandwidth:\n  Radio: Retevis C62 2501R0621100415 as Retevis C62/C2 (radios/c62.yaml), firmware v0.4.5-88-g30c7570a, DSP image 9579b617f048c646465118f6d0b9e1b765b4d7d811ff9c8649c5754fe45a8903\n  Bench: k0ret, receiver rtlsdr, transmitter hackrf, calibration assumed of 2026-10-20\n  2m: 146.580 MHz (to receiver 58.4 dB, from transmitter 58.5 dB)\n  70cm: 445.975 MHz (to receiver 58.0 dB, from transmitter 58.3 dB)\n  Modes: fm, m17\n  Transmit tests (first): attenuator chain from the radio to the rtlsdr\n  Receive tests (then; you'll be asked to move it): attenuator chain from the hackrf to the radio\n  Tests (18):\n    - 2m: CTCSS Deviation Follows The Bandwidth\n    - 2m: CTCSS Level Meets Limits\n    - 2m: FM Restores CTCSS After M17\n    - 2m: FM TX Power Rises With Each Setting\n    - 70cm: CTCSS Deviation Follows The Bandwidth\n    - 70cm: CTCSS Level Meets Limits\n    - 70cm: FM Restores CTCSS After M17\n    - 70cm: FM TX Power Rises With Each Setting\n    - 2m: FM RX At 25 kHz Is Clean Up To Full Deviation\n    - 2m: FM RX At 12.5 kHz Is Clean Up To Full Deviation\n    - 2m: FM RX At 12.5 kHz Rejects An Adjacent Channel\n    - 2m: FM RX At 25 kHz Rejects An Adjacent Channel\n    - 2m: FM RX SINAD Is Unchanged After M17\n    - 70cm: FM RX At 25 kHz Is Clean Up To Full Deviation\n    - 70cm: FM RX At 12.5 kHz Is Clean Up To Full Deviation\n    - 70cm: FM RX At 12.5 kHz Rejects An Adjacent Channel\n    - 70cm: FM RX At 25 kHz Rejects An Adjacent Channel\n    - 70cm: FM RX SINAD Is Unchanged After M17\nCheck the setup, then continue to begin.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 146.580 MHz, 25 kHz bandwidth, low power, 100.0 Hz CTCSS tone on transmit",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT for 5 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the bandwidth to 12.5 kHz, CTCSS tone unchanged",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT for 5 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 146.580 MHz, 12.5 kHz bandwidth, low power, 100.0 Hz CTCSS tone on transmit; switch to M17, key PTT once for 2 s, then switch back to FM",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT for 5 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 146.580 MHz, 25 kHz bandwidth, no CTCSS, power 1 W",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "For each power setting in turn (1 W, then 2.5 W, then 5 W): set it, key PTT for 3 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the power back to 1 W",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 445.975 MHz, 25 kHz bandwidth, low power, 100.0 Hz CTCSS tone on transmit",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT for 5 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the bandwidth to 12.5 kHz, CTCSS tone unchanged",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT for 5 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 445.975 MHz, 12.5 kHz bandwidth, low power, 100.0 Hz CTCSS tone on transmit; switch to M17, key PTT once for 2 s, then switch back to FM",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT for 5 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 445.975 MHz, 25 kHz bandwidth, no CTCSS, power 1 W",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "For each power setting in turn (1 W, then 2.5 W, then 5 W): set it, key PTT for 3 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the power back to 1 W",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Move the attenuator chain: from the hackrf to the radio",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 146.580 MHz, 25 kHz bandwidth, no CTCSS, volume comfortable",
+      "answer": ""
+    },
+    {
+      "kind": "confirm",
+      "text": "The radio plays a clean, steady 1 kHz tone",
+      "answer": "yes"
+    },
+    {
+      "kind": "confirm",
+      "text": "The radio plays the tone louder and still undistorted",
+      "answer": "yes"
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 146.580 MHz, 12.5 kHz bandwidth, no CTCSS, volume unchanged",
+      "answer": ""
+    },
+    {
+      "kind": "confirm",
+      "text": "The radio plays a clean, steady 1 kHz tone",
+      "answer": "yes"
+    },
+    {
+      "kind": "confirm",
+      "text": "The radio plays the tone louder and still undistorted",
+      "answer": "yes"
+    },
+    {
+      "kind": "ask",
+      "text": "Compared with the louder tone at 25 kHz, is this quieter, the same, or louder?",
+      "answer": "same"
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 146.580 MHz, 12.5 kHz bandwidth, no CTCSS, volume comfortable",
+      "answer": ""
+    },
+    {
+      "kind": "confirm",
+      "text": "The wanted signal alone: a clean, steady 1 kHz tone",
+      "answer": "yes"
+    },
+    {
+      "kind": "confirm",
+      "text": "The 1 kHz tone continues with no 400 Hz tone from the channel above",
+      "answer": "yes"
+    },
+    {
+      "kind": "ask",
+      "text": "Any added noise compared with the wanted signal alone?",
+      "answer": "no"
+    },
+    {
+      "kind": "confirm",
+      "text": "With the interferer on the channel below: still no 400 Hz tone",
+      "answer": "yes"
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 146.580 MHz, 25 kHz bandwidth, no CTCSS, volume comfortable",
+      "answer": ""
+    },
+    {
+      "kind": "confirm",
+      "text": "The wanted signal alone: a clean, steady 1 kHz tone",
+      "answer": "yes"
+    },
+    {
+      "kind": "confirm",
+      "text": "The 1 kHz tone continues with no 400 Hz tone from the channel above",
+      "answer": "yes"
+    },
+    {
+      "kind": "ask",
+      "text": "Any added noise compared with the wanted signal alone?",
+      "answer": "no"
+    },
+    {
+      "kind": "ask",
+      "text": "With a 12.5 kHz neighbour this close, do you hear the 1 kHz tone only, both tones, or mostly 400 Hz?",
+      "answer": "1 khz"
+    },
+    {
+      "kind": "ask",
+      "text": "Set the radio volume where it will stay for the rest of this run. Where is the knob (e.g. 1 o'clock)?",
+      "answer": "8"
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 146.580 MHz, 12.5 kHz bandwidth, no CTCSS, squelch open, volume unchanged",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 445.975 MHz, 25 kHz bandwidth, no CTCSS, volume comfortable",
+      "answer": ""
+    },
+    {
+      "kind": "confirm",
+      "text": "The radio plays a clean, steady 1 kHz tone",
+      "answer": "no"
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 445.975 MHz, 12.5 kHz bandwidth, no CTCSS, volume unchanged",
+      "answer": ""
+    },
+    {
+      "kind": "confirm",
+      "text": "The radio plays a clean, steady 1 kHz tone",
+      "answer": "yes"
+    },
+    {
+      "kind": "confirm",
+      "text": "The radio plays the tone louder and still undistorted",
+      "answer": "yes"
+    },
+    {
+      "kind": "ask",
+      "text": "Compared with the louder tone at 25 kHz, is this quieter, the same, or louder?",
+      "answer": "louder"
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 445.975 MHz, 12.5 kHz bandwidth, no CTCSS, volume comfortable",
+      "answer": ""
+    },
+    {
+      "kind": "confirm",
+      "text": "The wanted signal alone: a clean, steady 1 kHz tone",
+      "answer": "yes"
+    },
+    {
+      "kind": "confirm",
+      "text": "The 1 kHz tone continues with no 400 Hz tone from the channel above",
+      "answer": "yes"
+    },
+    {
+      "kind": "ask",
+      "text": "Any added noise compared with the wanted signal alone?",
+      "answer": "no"
+    },
+    {
+      "kind": "confirm",
+      "text": "With the interferer on the channel below: still no 400 Hz tone",
+      "answer": "yes"
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 445.975 MHz, 25 kHz bandwidth, no CTCSS, volume comfortable",
+      "answer": ""
+    },
+    {
+      "kind": "confirm",
+      "text": "The wanted signal alone: a clean, steady 1 kHz tone",
+      "answer": "yes"
+    },
+    {
+      "kind": "confirm",
+      "text": "The 1 kHz tone continues with no 400 Hz tone from the channel above",
+      "answer": "yes"
+    },
+    {
+      "kind": "ask",
+      "text": "Any added noise compared with the wanted signal alone?",
+      "answer": "no"
+    },
+    {
+      "kind": "ask",
+      "text": "With a 12.5 kHz neighbour this close, do you hear the 1 kHz tone only, both tones, or mostly 400 Hz?",
+      "answer": "1khz"
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 445.975 MHz, 12.5 kHz bandwidth, no CTCSS, squelch open, volume unchanged",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Plan for Bandwidth:\n  Radio: Retevis C62 2501R0621100415 as Retevis C62/C2 (radios/c62.yaml), firmware v0.4.5-88-g30c7570a, DSP image 9579b617f048c646465118f6d0b9e1b765b4d7d811ff9c8649c5754fe45a8903\n  Bench: k0ret, receiver rtlsdr, transmitter hackrf, calibration assumed of 2026-10-20\n  70cm: 445.975 MHz (to receiver 58.0 dB, from transmitter 58.3 dB)\n  Modes: fm\n  Receive tests (first): attenuator chain from the hackrf to the radio\n  Tests (1):\n    - 70cm: FM RX At 25 kHz Is Clean Up To Full Deviation\nCheck the setup, then continue to begin.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 445.975 MHz, 25 kHz bandwidth, no CTCSS, volume comfortable",
+      "answer": ""
+    },
+    {
+      "kind": "confirm",
+      "text": "The radio plays a clean, steady 1 kHz tone",
+      "answer": "yes"
+    },
+    {
+      "kind": "confirm",
+      "text": "The radio plays the tone louder and still undistorted",
+      "answer": "yes"
+    }
+  ],
+  "reruns": [
+    {
+      "started": "2026-11-07T00:45:30+00:00",
+      "tests": [
+        "70cm: FM RX At 25 kHz Is Clean Up To Full Deviation"
+      ]
+    }
+  ]
+}
