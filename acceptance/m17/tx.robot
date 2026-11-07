@@ -16,6 +16,7 @@ Documentation     M17 on transmit, measured and decoded from the SDR capture
 ...               -v CALLSIGN:<yours>.
 Library           Collections
 Library           oat.robot_library.OpenRTXAcceptance
+Resource          ../keyed.resource
 Suite Setup       Open Bench    ${BENCH}    ${CALIBRATION}    ${RADIO}    ${FIRMWARE}    ${HARDWARE}    dsp=${DSP}
 Suite Teardown    Close Bench
 Test Tags         per-band    mode:m17    tx
@@ -63,7 +64,7 @@ M17 TX Deviation And Ratio Meet The Specification
     [Documentation]    M17-TX-1 and 2: outer and inner deviation (nominally 2400 and
     ...                800 Hz) and their ratio (3).
     Set Up M17
-    ${tx}=    Capture Radio M17 Transmissions    Key PTT for 5 s without speaking, release.
+    ${tx}=    Capture Keyed M17 Transmissions    5
     Remember Result    m17 take    ${tx}[0]
     M17 Transmission Should Meet Limits    ${tx}[0]    deviation,ratio
 
@@ -85,9 +86,7 @@ M17 TX Decodes Every Time
     ...                CRC and names ${CALLSIGN}, stream frames in sequence, an EOT, and
     ...                the right polarity.
     Set Up M17
-    ${tx}=    Capture Radio M17 Transmissions
-    ...    Key PTT ${DECODE_RUNS} times, 2 s each without speaking, with 2 s between.
-    ...    expected=${DECODE_RUNS}
+    ${tx}=    Capture Keyed M17 Transmissions    2    ${DECODE_RUNS}
     M17 Transmissions Should Decode    ${tx}    ${CALLSIGN}
     FOR    ${m}    IN    @{tx}
         M17 Transmission Should Meet Limits    ${m}    polarity
@@ -105,7 +104,7 @@ M17 TX Holds A Long Transmission
     [Documentation]    M17-TX-7: ${LONG_S} s keyed without a reset: one transmission whose
     ...                frames run in sequence to the end.
     Set Up M17
-    ${tx}=    Capture Radio M17 Transmissions    Key PTT for ${{${LONG_S} + 2}} s without speaking, release.
+    ${tx}=    Capture Keyed M17 Transmissions    ${{${LONG_S} + 2}}
     M17 Transmissions Should Decode    ${tx}    ${CALLSIGN}
     Should Be True    ${tx}[0][stream_frames] >= ${LONG_S} / 0.04
     ...    Only ${tx}[0][stream_frames] frames in ${LONG_S} s
@@ -114,12 +113,9 @@ M17 TX Power Rises With Each Setting
     [Documentation]    M17-TX-7: relative levels through the bench, as for FM.
     [Tags]    power
     ${settings}=    Power Settings
-    ${order}=    Evaluate    ", then ".join($settings)
     Set Up M17
     Operator Does    Set the power to ${settings}[0]
-    ${tx}=    Capture Radio M17 Transmissions
-    ...    For each power setting in turn (${order}): set it, key PTT for 3 s without speaking, release.
-    ...    expected=${{len($settings)}}
+    ${tx}=    Capture Keyed Power Steps    ${settings}    M17
     TX Power Should Rise With Setting    ${settings}    ${tx}
     [Teardown]    Run Keyword If    $TEST_STATUS != 'SKIP'
     ...    Operator Does    Set the power back to ${settings}[0]

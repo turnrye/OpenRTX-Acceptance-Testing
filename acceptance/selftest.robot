@@ -6,6 +6,7 @@
 Documentation     The keywords themselves, on the simulated bench: no hardware.
 Library           OperatingSystem
 Library           oat.robot_library.OpenRTXAcceptance
+Resource          keyed.resource
 Suite Setup       Run Keywords
 ...               Open Bench    bench/sim.yaml    calibration/sim.yaml    radios/c62.yaml    sim    simulated radio    dsp=sim
 ...               AND    Use Band    70cm
@@ -137,6 +138,15 @@ M17 Stream Transmits
 DSP Image Is Mandatory For Radios That Have One
     Run Keyword And Expect Error    *Pass -v DSP:...;*
     ...    Open Bench    bench/sim.yaml    calibration/sim.yaml    radios/c62.yaml    sim    simulated radio
+
+The Bench Keys Each Transmission
+    ${keys}=    Bench Keys The Radio
+    Should Be True    ${keys}
+    Inject Audio Tone    1000    -20
+    ${tx}=    Capture Keyed FM Transmissions    2    3
+    Stop Injecting Audio
+    Length Should Be    ${tx}    3
+    Should Be True    ${tx}[0][tone_deviation_hz] > 0
 
 Audio Is Injected And Measured
     Inject Audio Tone    1000    -12    duration_s=1
