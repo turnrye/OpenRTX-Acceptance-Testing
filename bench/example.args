@@ -11,8 +11,11 @@
 #
 # The firmware, its DSP image, the radio unit and the output folder change per run, so they
 # stay on the command line. The radio file appears twice: once for the suite, once for
-# oat.expand, which repeats per-band tests on every band it lists.
+# oat.expand, which repeats per-band tests on every band it lists. The bench file appears
+# twice too: oat.preflight finds its devices before Robot writes anything, so a missing one
+# stops the run without overwriting an earlier run's results in the output folder.
 
+--prerunmodifier oat.preflight.Preflight:bench/example.yaml
 --prerunmodifier oat.expand.Expand:radios/c62.yaml
 --variable RADIO:radios/c62.yaml
 --variable BENCH:bench/example.yaml

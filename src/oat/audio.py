@@ -14,6 +14,7 @@ stands in for self-tests. An AIOC-style
 interface can also key the radio, through a serial port's DTR or RTS line.
 """
 
+import glob
 import os
 import re
 import shutil
@@ -628,10 +629,74 @@ def make_audio(cfg: dict | None) -> AudioInterface | None:
     raise ValueError(f"unknown audio type {kind!r}")
 
 
-def make_ptt(cfg: dict | None) -> SerialPtt | None:
-    """PTT from a bench audio section's 'ptt', or None for the operator."""
+# Where a PTT line's serial port can be: Linux USB serial devices, and the
+# macOS call-out devices other than the built-in ones. macOS names a USB
+# adapter by where it's plugged in, so the name changes with the port.
+SERIAL_PORT_GLOBS = ("/dev/serial/by-id/*", "/dev/ttyUSB*", "/dev/ttyACM*",
+                     "/dev/cu.*")
+BUILT_IN_PORTS = ("Bluetooth", "debug-console")
+# How many answers the operator gets to name a port
+PTT_PORT_ASKS = 3
+# The ports chosen this run, by the bench file's name for them ("" for none),
+# so the operator is asked once
+_chosen_ports: dict[str, str] = {}
+
+
+def serial_ports() -> list[str]:
+    """The serial ports present that a PTT line could be on."""
+    found = []
+    for pattern in SERIAL_PORT_GLOBS:
+        for path in sorted(glob.glob(pattern)):
+            if path not in found and not any(b in path
+                                             for b in BUILT_IN_PORTS):
+                found.append(path)
+    return found
+
+
+def _usable(path: str) -> bool:
+    return bool(path) and os.access(path, os.R_OK | os.W_OK)
+
+
+def choose_ptt_port(device: str | None, operator) -> str:
+    """
+    The serial port that keys the radio: the bench file's device when it's
+    present, otherwise one the operator picks from the ports present (Enter
+    takes the only one), asked once a run. Raises ValueError when no port is
+    present or the answers name none.
+    """
+    if _usable(device):
+        return device
+    key = device or ""
+    if key in _chosen_ports:
+        return _chosen_ports[key]
+    what = (f"PTT port {device} is missing" if device
+            else "The bench file names no PTT port")
+    for _ in range(PTT_PORT_ASKS):
+        ports = serial_ports()
+        if not ports:
+            raise ValueError(f"{what}, and no serial ports are present: plug "
+                             "the audio interface in")
+        only = ports[0] if len(ports) == 1 else ""
+        answer = operator.ask(
+            f"{what}. Serial ports present: {', '.join(ports)}. Which one "
+            "keys the radio?" + (f" (Enter for {only})" if only else ""))
+        answer = answer or only
+        if _usable(answer):
+            _chosen_ports[key] = answer
+            return answer
+    raise ValueError(f"{what}, and no answer named a usable port")
+
+
+def make_ptt(cfg: dict | None, operator=None) -> SerialPtt | None:
+    """
+    PTT from a bench audio section's 'ptt', or None for the operator. With
+    an operator, a missing or unnamed device is chosen by choose_ptt_port.
+    """
     if not cfg or not cfg.get("ptt"):
         return None
     ptt = cfg["ptt"]
-    return SerialPtt(ptt["device"], ptt.get("line", "dtr"),
+    device = ptt.get("device")
+    if operator is not None:
+        device = choose_ptt_port(device, operator)
+    return SerialPtt(device, ptt.get("line", "dtr"),
                      ptt.get("active_high", True))

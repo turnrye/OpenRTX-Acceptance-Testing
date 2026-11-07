@@ -205,7 +205,7 @@ class OpenRTXAcceptance:
             link_loopback(self.receiver, self.transmitter)
         self.operator = make_operator(self.bench.get("operator", {}))
         self.audio = audio_mod.make_audio(self.bench.get("audio"))
-        self.ptt = audio_mod.make_ptt(self.bench.get("audio"))
+        self.ptt = audio_mod.make_ptt(self.bench.get("audio"), self.operator)
         self.audio_mixer = {}
         if isinstance(self.audio, audio_mod.AlsaAudio):
             self.audio_mixer = self.audio.apply_mixer()
