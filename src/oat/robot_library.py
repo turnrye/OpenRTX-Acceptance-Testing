@@ -1411,6 +1411,21 @@ class OpenRTXAcceptance:
             self.audio.stop_playing()
 
     @keyword
+    def bench_keys_the_radio(self) -> bool:
+        """
+        Whether Key Radio keys the radio itself, through the audio
+        interface's PTT line (or the simulated interface), rather than by
+        asking the operator.
+        """
+        return self.ptt is not None or isinstance(self.audio,
+                                                  audio_mod.SimAudio)
+
+    @keyword
+    def bench_has_audio(self) -> bool:
+        """Whether the bench has an audio interface on the radio."""
+        return self.audio is not None
+
+    @keyword
     def key_radio(self):
         """
         Key the radio: through the audio interface's PTT line when the bench

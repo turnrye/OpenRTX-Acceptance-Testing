@@ -182,7 +182,9 @@ A USB sound interface on the radio's accessory connector replaces the acoustic t
 an AIOC, or a CM108 dongle with a resistive pad to the mic pin and a loaded speaker tap. Its
 `audio` section in the bench file names the ALSA devices, and the serial port and line that key the
 radio: DTR on an AIOC, RTS on a Digirig Mobile (`bench/example.yaml`). Without a PTT line the
-operator keys on request.
+operator keys on request. With one, the bench keys every transmission itself
+(`acceptance/keyed.resource`), and `fm/bandwidth.robot` plays its tones into the mic instead of
+asking for a tone and a whistle: the operator only changes the radio's settings.
 Keywords inject tones, tone sequences and WAV files, record the speaker, and measure level, SINAD
 and THD+N (optionally psophometrically weighted), response and dropouts. With `paths.audio_out`
 and `paths.audio_in` calibrated, levels read in millivolts.
