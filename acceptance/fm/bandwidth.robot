@@ -133,13 +133,13 @@ CTCSS Level Meets Limits
 
 FM Restores CTCSS After M17
     [Documentation]    MODE-1: switching to M17 and back must restore the FM setup,
-    ...                CTCSS level included (radio_setOpmode).
+    ...                CTCSS level included (radio_setOpmode). Compares with the
+    ...                level before M17; CTCSS Level Meets Limits checks the limits.
     [Tags]    tx    ctcss    mode:m17
     ${before}=    Recall Result    narrow ctcss
     Skip If    $before is None    Needs the 12.5 kHz CTCSS take of the CTCSS test on this band
     Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, low power, ${CTCSS_HZ} Hz CTCSS tone on transmit; switch to M17, key PTT once for 2 s, then switch back to FM
     ${after}=    Capture Radio Transmissions    Key PTT for 5 s without speaking, release.
-    FM Transmission CTCSS Should Meet Limits    ${after}[0]    BW_12_5    ${CTCSS_HZ}
     Ratio Should Be Between    ${after}[0][ctcss_deviation_hz]    ${before}[ctcss_deviation_hz]
     ...    ${MODE_RATIO_LOW}    ${MODE_RATIO_HIGH}    CTCSS deviation after M17 / before
     [Teardown]    Operator Does    Turn the CTCSS tone off
