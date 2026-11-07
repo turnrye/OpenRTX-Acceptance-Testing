@@ -32,7 +32,8 @@ ${FIRMWARE}       ${EMPTY}
 ${HARDWARE}       ${EMPTY}
 # The DSP image, mandatory for radio files with dsp_image: true
 ${DSP}            ${EMPTY}
-# Narrow over wide peak deviation for the same tone at the mic: the BK4819's
+# Narrow over wide deviation of the same tone at the mic, read from the tone
+# itself so a key-up transient doesn't count: the BK4819's
 # 12.5 kHz mode halves it (0.47-0.60 measured on a C2, 2026-10-30; the spread
 # is the acoustic tone moving between takes)
 ${RATIO_LOW}      0.4
@@ -109,8 +110,8 @@ Narrow FM TX Deviates Less Than Wide
     ${narrow}=    Recall Result    narrow tone
     Skip If    $wide is None or $narrow is None
     ...    Needs the tone takes of both bandwidth tests on this band
-    Ratio Should Be Between    ${narrow}[peak_deviation_hz]    ${wide}[peak_deviation_hz]
-    ...    ${RATIO_LOW}    ${RATIO_HIGH}    narrow/wide peak deviation
+    Ratio Should Be Between    ${narrow}[tone_deviation_hz]    ${wide}[tone_deviation_hz]
+    ...    ${RATIO_LOW}    ${RATIO_HIGH}    narrow/wide tone deviation
 
 FM RX At 25 kHz Is Clean Up To Full Deviation
     [Tags]    rx    manual
@@ -142,8 +143,8 @@ FM Bandwidth Survives An M17 Round Trip
     FM Transmission Should Meet Limits    ${tx}[0]    BW_12_5
     ${narrow}=    Recall Result    narrow tone
     Skip If    $narrow is None    Needs the 12.5 kHz tone take on this band to compare with
-    Ratio Should Be Between    ${tx}[0][peak_deviation_hz]    ${narrow}[peak_deviation_hz]
-    ...    0.8    1.25    deviation after M17 / before
+    Ratio Should Be Between    ${tx}[0][tone_deviation_hz]    ${narrow}[tone_deviation_hz]
+    ...    0.8    1.25    tone deviation after M17 / before
 
 CTCSS Deviation Follows The Bandwidth
     [Tags]    tx    ctcss
