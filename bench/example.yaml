@@ -49,8 +49,9 @@ operator:
 # ALSA device names from `aplay -L` and `arecord -L`. An AIOC or a Digirig
 # Mobile also keys the radio: ptt names its serial port and the line that keys
 # (DTR on an AIOC, RTS on a Digirig); the other line is held low. Prefer a
-# /dev/serial/by-id path on a bench with several ports. Without ptt, the
-# operator keys. Leave the section out on a
+# /dev/serial/by-id path on a bench with several ports. Leave the device out,
+# or let it go missing, and the run asks which port keys the radio before it
+# starts. Without ptt, the operator keys. Leave the section out on a
 # bench without an interface and run with --exclude needs:audio.
 # On macOS, type: coreaudio plays and records through sox, with device names
 # from `sox -V6 -n -t coreaudio x` ("USB Audio Device" for a Digirig) and the
