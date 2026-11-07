@@ -555,13 +555,28 @@ class SerialPtt:
         import struct
         self._fcntl.ioctl(self._fd, request, struct.pack("I", bit))
 
-    def _set(self, on: bool) -> None:
+    def _open(self) -> None:
         if self._fd is None:
             self._fd = os.open(self.device,
                                os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
             self._ioctl(self._termios.TIOCMBIC, self.other_bit)
             self._ioctl(self._request(False), self.bit)
-        self._ioctl(self._request(on), self.bit)
+
+    def _set(self, on: bool) -> None:
+        try:
+            self._open()
+            self._ioctl(self._request(on), self.bit)
+        except OSError:
+            # The interface dropped off USB, as RF on its cable can make it
+            # do, and came back: open it again, once
+            if self._fd is not None:
+                try:
+                    os.close(self._fd)
+                except OSError:
+                    pass
+                self._fd = None
+            self._open()
+            self._ioctl(self._request(on), self.bit)
 
     def _request(self, on: bool) -> int:
         return (self._termios.TIOCMBIS if on == self.active_high
@@ -574,8 +589,9 @@ class SerialPtt:
         time.sleep(0.2)
 
     def unkey(self) -> None:
-        """Release the transmitter."""
-        self._set(False)
+        """Release the transmitter; nothing to do if it was never keyed."""
+        if self._fd is not None:
+            self._set(False)
 
     def close(self) -> None:
         """Release, then close the port."""
