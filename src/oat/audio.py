@@ -596,9 +596,15 @@ class SerialPtt:
     def close(self) -> None:
         """Release, then close the port."""
         if self._fd is not None:
-            self.unkey()
-            os.close(self._fd)
-            self._fd = None
+            try:
+                self.unkey()
+            finally:
+                # A port that dropped off USB released its lines with it
+                try:
+                    os.close(self._fd)
+                except OSError:
+                    pass
+                self._fd = None
 
 
 def make_audio(cfg: dict | None) -> AudioInterface | None:
