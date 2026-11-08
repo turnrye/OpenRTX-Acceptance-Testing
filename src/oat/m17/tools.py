@@ -52,10 +52,14 @@ def to_codec2_rate(audio: np.ndarray, rate: int) -> np.ndarray:
 
 
 def codec2_encode(pcm: np.ndarray) -> bytes:
-    """8 kHz s16 audio as Codec2 3200 frames, through c2enc."""
+    """
+    8 kHz s16 audio as Codec2 3200 frames, through c2enc. The files are
+    named .bin: to a .c2 file c2enc adds a 7-byte header, which then shifts
+    every frame of the stream for a receiver.
+    """
     c2enc = require("c2enc", "codec2")
     with tempfile.TemporaryDirectory() as tmp:
-        raw, out = Path(tmp) / "in.raw", Path(tmp) / "out.c2"
+        raw, out = Path(tmp) / "in.raw", Path(tmp) / "out.bin"
         np.asarray(pcm, dtype="<i2").tofile(raw)
         subprocess.run([c2enc, CODEC2_MODE, str(raw), str(out)], check=True,
                        capture_output=True)
@@ -66,7 +70,7 @@ def codec2_decode(data: bytes) -> np.ndarray:
     """Codec2 3200 frames as 8 kHz s16 audio, through c2dec."""
     c2dec = require("c2dec", "codec2")
     with tempfile.TemporaryDirectory() as tmp:
-        bits, out = Path(tmp) / "in.c2", Path(tmp) / "out.raw"
+        bits, out = Path(tmp) / "in.bin", Path(tmp) / "out.raw"
         bits.write_bytes(data)
         subprocess.run([c2dec, CODEC2_MODE, str(bits), str(out)], check=True,
                        capture_output=True)
