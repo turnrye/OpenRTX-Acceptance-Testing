@@ -5,6 +5,7 @@
 """Generated M17 signals measure as generated."""
 
 import json
+import subprocess
 from pathlib import Path
 
 import numpy as np
@@ -128,6 +129,32 @@ def test_codec2_tone_survives_the_round_trip(tmp_path):
     symbols = codec.stream_symbols(codec.Lsf(), payloads)
     m, = phy.measure_m17_capture(capture((symbols, {})), RATE, 0.0)
     pcm = tools.write_codec2_wav(tmp_path / "voice.wav", m.payload)
+    spec = np.abs(np.fft.rfft(pcm * np.hanning(len(pcm))))
+    freqs = np.fft.rfftfreq(len(pcm), 1 / tools.CODEC2_RATE)
+    assert freqs[np.argmax(spec)] == pytest.approx(1000, abs=30)
+
+
+@pytest.mark.skipif(not tools.available("c2enc"),
+                    reason="codec2 (c2enc) not installed")
+def test_codec2_frames_carry_no_file_header():
+    frames = tools.codec2_encode(np.zeros(tools.CODEC2_RATE, dtype=np.int16))
+    assert len(frames) % tools.CODEC2_FRAME_BYTES == 0
+    assert not frames.startswith(b"\xc0\xde\xc2")
+
+
+@pytest.mark.skipif(not (tools.available("c2enc")
+                         and tools.available(tools.M17_DEMOD)),
+                    reason="codec2 (c2enc) or m17-demod not installed")
+def test_m17_demod_hears_our_codec2_tone():
+    # An independent receiver, so a mistake shared by our encoder and
+    # decoder can't pass
+    payloads = tools.tone_payloads(1000, 2.0, -20)
+    symbols = codec.stream_symbols(codec.Lsf(), payloads)
+    m, = phy.measure_m17_capture(capture((symbols, {})), RATE, 0.0)
+    done = subprocess.run([tools.M17_DEMOD], capture_output=True,
+                          input=phy.baseband_pcm(m.baseband).tobytes())
+    pcm = np.frombuffer(done.stdout, dtype=np.int16).astype(float)
+    pcm = pcm[len(pcm) // 4:]
     spec = np.abs(np.fft.rfft(pcm * np.hanning(len(pcm))))
     freqs = np.fft.rfftfreq(len(pcm), 1 / tools.CODEC2_RATE)
     assert freqs[np.argmax(spec)] == pytest.approx(1000, abs=30)
