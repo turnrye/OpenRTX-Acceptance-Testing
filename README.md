@@ -120,6 +120,7 @@ audio tests were left out on purpose.
 | `fm/audio.robot` | FM audio through the audio interface: mic sensitivity, response, distortion, speech deviation, mic level after cold boots, 12 dB SINAD sensitivity, receive response and dropouts |
 | `m17/tx.robot` | M17 transmit: deviations and ratio, symbol rate, carrier, bandwidth, EVM, decode rate, preamble, long transmissions, power, Codec2 input level and aliasing |
 | `m17/rx.robot` | M17 receive of a generated stream: callsign, Codec2 tone, sensitivity, carrier offset, speaker images |
+| `aprs/rx.robot` | APRS receive (OpenRTX#559): messages to the radio's APRS callsign reach the inbox, matched as an address, stored once, not pushed out by other traffic; full-size frames; deviation and pre-emphasis. The operator reads the inbox |
 
 On `bench/sim.yaml` the simulated radio transmits what the audio interface plays into its mic,
 plays at its speaker what the simulated transmitter sends, and the transmitter loops back into
@@ -145,12 +146,13 @@ for each transmission's audio.
 ### Radios and their capabilities
 
 A radio file (`radios/`) says what the radio has: its `bands`, each with the frequency tests use,
-its `modes`, and the limits tests check. Tests say what they need with tags: `mode:fm`, `mode:m17`,
+its `modes`, and the limits tests check. Tests say what they need with tags: `mode:fm`, `mode:m17`, `mode:aprs`,
 and `per-band` for tests to repeat on every band. `oat.expand`, the pre-run modifier in the argument
 file, fits the suite to the radio: each per-band test is repeated per band, named for it
 (`2m: FM TX At 25 kHz ...`, tagged `band:2m`), and tests needing a mode the radio lacks are left
 out. A band may list its own `modes`, as `radios/c2.yaml` keeps GMRS to FM; per-band tests then
-run only on the bands with their modes. Transmit tests (`tx`) on every band come before receive tests (`rx`), grouped by band within
+run only on the bands with their modes. `radios/mduv3x0.yaml` (MD-UV380/390) runs APRS on 2m and
+`radios/cs7000p.yaml` (CS7000-PLUS, UHF only) on 70cm. Transmit tests (`tx`) on every band come before receive tests (`rx`), grouped by band within
 each.
 
 ### Operator prompts

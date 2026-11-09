@@ -17,6 +17,7 @@ from robot.api.deco import keyword, library
 from robot.libraries.BuiltIn import BuiltIn
 from scipy.io import wavfile
 
+from oat import aprs
 from oat import audio as audio_mod
 from oat.analysis import demodulated_audio, measure_capture, to_analysis_rate
 from oat.calibration import load_calibration
@@ -30,7 +31,7 @@ from oat.m17 import codec as m17_codec
 from oat.m17 import phy as m17_phy
 from oat.m17 import tools as m17_tools
 from oat.m17.phy import measure_m17_capture
-from oat.signals import fm_carriers, fm_tone, silence, tone
+from oat.signals import fm_carriers, fm_modulate, fm_tone, silence, tone
 
 # Length of the looped transmitter signal; whole cycles of 1 kHz and CTCSS
 TX_LOOP_S = 2.0
@@ -1222,6 +1223,55 @@ class OpenRTXAcceptance:
             return m17_tools.tone_payloads(
                 float(parts[1]), frames * 0.04, level)[:frames]
         return m17_tools.wav_payloads(Path(audio))
+
+    @keyword
+    def aprs_message(self, addressee: str, text: str, number: str = "") -> str:
+        """
+        An APRS message's information field, :ADDRESSEE:text{number, for
+        Start Transmitting APRS Packets.
+        """
+        return aprs.message_info(str(addressee), str(text), str(number))
+
+    @keyword
+    def start_transmitting_aprs_packets(self, *info: str,
+                                        source: str = "N9OAT",
+                                        path: str = "WIDE1-1",
+                                        deviation_hz: float = 3000.0,
+                                        twist_db: float = 0.0,
+                                        gap_s: float = 1.5,
+                                        txdelay_ms: float = 300.0,
+                                        level_dbm=None,
+                                        loop: bool = False) -> float:
+        """
+        Send APRS packets on the test frequency, one transmission per
+        information field: TXDELAY of flags, the AX.25 UI frame from
+        `source` via `path` (digipeaters separated by commas, a * marking
+        one that has repeated it, empty for none), then gap_s without
+        carrier. deviation_hz is the louder tone's peak deviation; twist_db
+        raises the space tone over the mark, as a pre-emphasizing
+        transmitter does (aprs.PREEMPHASIS_TWIST_DB, 5.3 dB). Plays once
+        unless loop; returns how long one pass lasts, in seconds, to wait
+        before Stop Transmitting.
+        """
+        tx = self.bench["transmitter"]
+        hops = [p.strip() for p in str(path).split(",") if p.strip()]
+        offset = self._tx_baseband_offset()
+        parts = []
+        for text in info:
+            frame = aprs.ui_frame(str(source), str(text), hops)
+            sound = aprs.packet_audio(frame, tx["rate"], float(twist_db),
+                                      float(txdelay_ms) / 1000)
+            parts += [fm_modulate(sound, tx["rate"], float(deviation_hz),
+                                  offset),
+                      silence(float(gap_s), tx["rate"])]
+        iq = np.concatenate(parts)
+        level = self._play(iq, f"tx-aprs-{str(source).replace('*', '')}",
+                           level_dbm, repeat=bool(loop), mode="aprs")
+        self._record("transmit", mode="aprs", source=str(source), path=hops,
+                     packets=[str(t) for t in info],
+                     deviation_hz=float(deviation_hz),
+                     twist_db=float(twist_db), **level)
+        return len(iq) / tx["rate"]
 
     @keyword
     def stop_transmitting(self):

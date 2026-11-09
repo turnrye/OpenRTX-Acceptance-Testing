@@ -14,8 +14,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
-      - name: Codec2, for the M17 voice tests
-        run: sudo apt-get update && sudo apt-get install -y codec2
+      - name: Codec2 for the M17 voice tests, Dire Wolf to check APRS packets
+        run: sudo apt-get update && sudo apt-get install -y codec2 direwolf
       - run: uv sync
       - run: uv run pytest
       - name: Robot self-test on the simulated bench
@@ -35,6 +35,13 @@ jobs:
           -v CALIBRATION:calibration/sim.yaml -v FIRMWARE:sim
           -v HARDWARE:sim -v DSP:sim acceptance/fm/audio.robot
           acceptance/m17/rx.robot acceptance/audio-levels.robot
+      - name: APRS receive suite on the simulated bench, as an MD-UV3x0
+        run: >-
+          uv run robot --outputdir runs/sim-aprs
+          --prerunmodifier oat.expand.Expand:radios/mduv3x0.yaml
+          -v RADIO:radios/mduv3x0.yaml -v BENCH:bench/sim.yaml
+          -v CALIBRATION:calibration/sim.yaml -v FIRMWARE:sim
+          -v HARDWARE:sim -v DSP:sim acceptance/aprs/rx.robot
       - name: Suites resolve their keywords
         run: >-
           uv run robot --dryrun --outputdir runs/dryrun
