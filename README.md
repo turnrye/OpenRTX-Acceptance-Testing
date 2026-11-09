@@ -121,9 +121,9 @@ audio tests were left out on purpose.
 | `selftest-bench.robot` | The bench through its attenuator chain, no radio: the deviation scale at the Bessel null, a known FM deviation and a known M17 stream read back, and their spread over five repeats, which sets the tolerance for comparing firmware states. Needs separate receiver and transmitter. Run it at the start of every evidence session |
 | `fm/bandwidth.robot` | FM deviation, bandwidth, CTCSS and power steps at both bandwidths, adjacent channels, and FM restored after M17 |
 | `audio-levels.robot` | Setting up an audio interface: the clean mic level range, and hum and noise. Not evidence |
-| `fm/audio.robot` | FM audio through the audio interface: mic sensitivity, response, distortion, speech deviation, mic level after cold boots, 12 dB SINAD sensitivity, receive response and dropouts |
+| `fm/audio.robot` | FM audio through the audio interface: mic sensitivity, response, distortion, speech deviation, mic level after cold boots, 12 dB SINAD sensitivity, receive response and dropouts, receive after the radio idles (`slow`) |
 | `m17/tx.robot` | M17 transmit: deviations and ratio, symbol rate, carrier, bandwidth, EVM, decode rate, preamble, long transmissions, power, Codec2 input level and aliasing |
-| `m17/rx.robot` | M17 receive of a generated stream: callsign, Codec2 tone, sensitivity, carrier offset, speaker images |
+| `m17/rx.robot` | M17 receive of a generated stream: callsign, Codec2 tone, sensitivity, carrier offset, speaker images, receive right after a transmission, key presses during receive |
 | `aprs/rx.robot` | APRS receive (OpenRTX#559): messages to the radio's APRS callsign reach the inbox, matched as an address, stored once, not pushed out by other traffic; full-size frames; deviation and pre-emphasis. The operator reads the inbox; message tags end in the run's tag, so reruns aren't copies |
 | `aprs/performance.robot` | APRS receive performance read from the radio's KISS TNC (needs:tnc): every frame at the bench's level, full-size and escaped frames through the TNC, a sensitivity sweep (90% and 50% points), twist, deviation, short TXDELAY, off-frequency and clock error, back-to-back frames, and a soak (tag `long`). No operator after setup |
 

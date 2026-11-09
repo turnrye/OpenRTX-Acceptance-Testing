@@ -1735,6 +1735,15 @@ class OpenRTXAcceptance:
                                                   audio_mod.SimAudio)
 
     @keyword
+    def bench_transmits_at_calibrated_levels(self) -> bool:
+        """
+        Whether the calibration has a transmitter level table, so level_dbm
+        arguments work; without one the transmitter plays at the bench
+        file's gain, which is enough to compare before and after.
+        """
+        return self.calibration.transmitter_levels is not None
+
+    @keyword
     def bench_has_audio(self) -> bool:
         """Whether the bench has an audio interface on the radio."""
         return self.audio is not None

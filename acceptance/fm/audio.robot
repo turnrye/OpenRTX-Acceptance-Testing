@@ -39,6 +39,10 @@ ${RESPONSE_TONES}    300,500,1000,2000,3000
 ${SPEECH_WAV}     ${EMPTY}
 ${COLD_BOOTS}     5
 ${KEYED_S}        5
+# FM-RX-4: how long the radio idles, and how far the tone's level and SINAD
+# may move across it (about the repeatability of a speaker capture)
+${IDLE_S}         600
+${IDLE_DB}        1.0
 
 *** Keywords ***
 Capture Keyed Transmission
@@ -168,6 +172,31 @@ FM RX Audio Response And Level
     ${tone}=    Capture Radio Audio    3    1000
     Audio Distortion Should Meet Limits    ${tone}    rx
     Set Test Message    1 kHz at ${tone}[level_dbfs] dBFS
+    [Teardown]    Stop Transmitting
+
+FM RX Audio Survives An Idle Radio
+    [Documentation]    FM-RX-4: after ${IDLE_S} s with nothing received (squelch closed,
+    ...                no audio routed), a signal plays as it did before: the same tone
+    ...                level and SINAD, without dropouts.
+    [Tags]    rx    slow
+    Set Radio Volume Once
+    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, squelch at its normal setting (closed with no signal), volume unchanged
+    ${dev}=    Test Deviation    BW_25
+    Start Transmitting FM Tone    ${dev}
+    Wait Seconds    1
+    ${before}=    Capture Radio Audio    3    1000
+    Stop Transmitting
+    Log To Console    \n Idling ${IDLE_S} s: leave the radio alone
+    Wait Seconds    ${IDLE_S}
+    Start Transmitting FM Tone    ${dev}
+    Wait Seconds    1
+    ${after}=    Capture Radio Audio    3    1000
+    Audio Should Have No Dropouts    ${after}
+    ${change}=    Evaluate    20 * math.log10(${after}[tone_amplitude] / ${before}[tone_amplitude])
+    Value Should Be Within    ${change}    0    ${IDLE_DB}    tone level after idling / before (dB)
+    ...    relative=False
+    Value Should Be Within    ${after}[sinad_db]    ${before}[sinad_db]    ${IDLE_DB}
+    ...    SINAD after idling (dB)    relative=False
     [Teardown]    Stop Transmitting
 
 FM RX Is Not Interrupted By Key Presses
