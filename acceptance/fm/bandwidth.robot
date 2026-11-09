@@ -229,18 +229,24 @@ FM RX At 25 kHz Rejects An Adjacent Channel
     [Teardown]    Stop Transmitting
 
 FM RX SINAD Is Unchanged After M17
-    [Documentation]    MODE-1: receive SINAD at a fixed level before and after a trip
-    ...                through M17.
-    [Tags]    rx    mode:m17    needs:audio    needs:abs-level
+    [Documentation]    MODE-1: receive SINAD and tone level at a fixed level before and
+    ...                after a trip through M17: ${MODE_LEVEL_DBM} dBm with a calibrated
+    ...                transmitter, otherwise the bench's transmitter gain.
+    [Tags]    rx    mode:m17    needs:audio
     Set Radio Volume Once
     Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, squelch open, volume unchanged
     ${dev}=    Test Deviation    BW_12_5
-    Start Transmitting FM Tone    ${dev}    level_dbm=${MODE_LEVEL_DBM}
+    ${calibrated}=    Bench Transmits At Calibrated Levels
+    ${level}=    Set Variable If    ${calibrated}    ${MODE_LEVEL_DBM}    ${None}
+    Start Transmitting FM Tone    ${dev}    level_dbm=${level}
     ${before}=    Capture Radio Audio    3    1000    psophometric
     Stop Transmitting
     Operator Does    Switch the radio to M17, then back to FM, everything else unchanged
-    Start Transmitting FM Tone    ${dev}    level_dbm=${MODE_LEVEL_DBM}
+    Start Transmitting FM Tone    ${dev}    level_dbm=${level}
     ${after}=    Capture Radio Audio    3    1000    psophometric
     Value Should Be Within    ${after}[sinad_db]    ${before}[sinad_db]    ${MODE_SINAD_DB}
     ...    SINAD after M17 (dB)    relative=False
+    ${change}=    Evaluate    20 * math.log10(${after}[tone_amplitude] / ${before}[tone_amplitude])
+    Value Should Be Within    ${change}    0    ${MODE_SINAD_DB}    tone level after M17 / before (dB)
+    ...    relative=False
     [Teardown]    Stop Transmitting
