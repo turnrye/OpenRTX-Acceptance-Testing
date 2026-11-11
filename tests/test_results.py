@@ -119,6 +119,8 @@ def test_export_combines_a_run_of_several_suites(tmp_path):
     for name in ("first", "second"):
         shutil.copy(ROOT / "acceptance" / "selftest.robot",
                     suites / f"{name}.robot")
+    # The self-test imports it relative to itself
+    shutil.copy(ROOT / "acceptance" / "keyed.resource", suites)
     out = tmp_path / "run"
     assert robot.run(str(suites), test=RERUN_TEST, outputdir=str(out),
                      console="none", report="NONE", log="NONE") == 0
