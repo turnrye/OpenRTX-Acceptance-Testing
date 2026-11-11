@@ -20,6 +20,11 @@ operator:
   type: scripted
   default: "yes"
 
+# The simulated radio's KISS TNC: it decodes each APRS transmission with
+# Dire Wolf's atest at a noise set by the level (none without atest)
+tnc:
+  type: sim
+
 # A simulated audio interface and radio: the radio's speaker plays what the
 # simulated transmitter sends, with noise that follows its level
 audio:

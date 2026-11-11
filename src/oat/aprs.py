@@ -91,13 +91,8 @@ def _bits_lsb_first(data: bytes) -> list[int]:
     return [(byte >> i) & 1 for byte in data for i in range(8)]
 
 
-def hdlc_bits(frame: bytes, preamble_flags: int = 40,
-              tail_flags: int = 3) -> np.ndarray:
-    """
-    The bits sent for a frame: flags, the frame bit-stuffed (a 0 after five
-    1s in a row), flags. Bytes go least significant bit first.
-    """
-    flag = _bits_lsb_first(bytes([FLAG]))
+def _stuffed(frame: bytes) -> list[int]:
+    """A frame's bits, least significant first, with a 0 after five 1s."""
     stuffed, ones = [], 0
     for bit in _bits_lsb_first(frame):
         stuffed.append(bit)
@@ -105,8 +100,24 @@ def hdlc_bits(frame: bytes, preamble_flags: int = 40,
         if ones == 5:
             stuffed.append(0)
             ones = 0
-    return np.array(flag * preamble_flags + stuffed + flag * tail_flags,
-                    dtype=np.uint8)
+    return stuffed
+
+
+def hdlc_bits(frame: bytes | list[bytes], preamble_flags: int = 40,
+              tail_flags: int = 3, flags_between: int = 1) -> np.ndarray:
+    """
+    The bits sent for one transmission: flags, each frame bit-stuffed (a 0
+    after five 1s in a row) with flags_between flags between frames, then
+    tail flags. Bytes go least significant bit first.
+    """
+    frames = [frame] if isinstance(frame, (bytes, bytearray)) else frame
+    flag = _bits_lsb_first(bytes([FLAG]))
+    bits = flag * preamble_flags
+    for i, f in enumerate(frames):
+        if i:
+            bits += flag * flags_between
+        bits += _stuffed(bytes(f))
+    return np.array(bits + flag * tail_flags, dtype=np.uint8)
 
 
 def nrzi(bits: np.ndarray) -> np.ndarray:
@@ -120,13 +131,15 @@ def nrzi(bits: np.ndarray) -> np.ndarray:
     return tone
 
 
-def afsk(tones: np.ndarray, rate: float, twist_db: float = 0.0) -> np.ndarray:
+def afsk(tones: np.ndarray, rate: float, twist_db: float = 0.0,
+         baud: float = BAUD) -> np.ndarray:
     """
     Bell 202 audio for a sequence of tone states (1 mark, 0 space), with a
-    continuous phase. twist_db raises the space tone over the mark; the
-    louder tone peaks at 1.
+    continuous phase. twist_db raises the space tone over the mark (lowers
+    it when negative); the louder tone peaks at 1. baud other than 1200
+    stands in for a transmitter's clock error.
     """
-    per_bit = rate / BAUD
+    per_bit = rate / float(baud)
     n = int(round(len(tones) * per_bit))
     which = tones[np.minimum((np.arange(n) / per_bit).astype(int),
                              len(tones) - 1)]
@@ -137,8 +150,44 @@ def afsk(tones: np.ndarray, rate: float, twist_db: float = 0.0) -> np.ndarray:
     return amplitude * np.sin(phase)
 
 
-def packet_audio(frame: bytes, rate: float, twist_db: float = 0.0,
-                 txdelay_s: float = 0.3) -> np.ndarray:
-    """One transmission's audio: TXDELAY of flags, the frame, tail flags."""
+def packet_audio(frame: bytes | list[bytes], rate: float,
+                 twist_db: float = 0.0, txdelay_s: float = 0.3,
+                 baud_error_ppm: float = 0.0,
+                 flags_between: int = 1) -> np.ndarray:
+    """
+    One transmission's audio: TXDELAY of flags, the frame (or frames, with
+    flags_between flags between them, as a TNC sends a queue), tail flags.
+    """
     flags = max(1, int(round(txdelay_s * BAUD / 8)))
-    return afsk(nrzi(hdlc_bits(frame, flags)), rate, twist_db)
+    baud = BAUD * (1 + float(baud_error_ppm) * 1e-6)
+    return afsk(nrzi(hdlc_bits(frame, flags, flags_between=flags_between)),
+                rate, twist_db, baud)
+
+
+def tnc2(frame: bytes) -> str:
+    """
+    A frame (without its FCS) as TNC2 text, SOURCE>DEST,PATH:info, the way
+    Dire Wolf and APRS-IS print it: SSIDs only when not 0, a * after the
+    last digipeater that has repeated it, the info field as Latin-1.
+    """
+    addresses, i = [], 0
+    while i + 7 <= len(frame):
+        raw = frame[i:i + 7]
+        call = "".join(chr(b >> 1) for b in raw[:6]).rstrip()
+        ssid = (raw[6] >> 1) & 0x0F
+        addresses.append((call + (f"-{ssid}" if ssid else ""),
+                          bool(raw[6] & 0x80)))
+        i += 7
+        if raw[6] & 1:
+            break
+    else:
+        raise ValueError("no end of the address field")
+    if len(addresses) < 2 or i + 2 > len(frame):
+        raise ValueError("too short for a UI frame")
+    dest, source = addresses[0][0], addresses[1][0]
+    digis = addresses[2:]
+    last = max((n for n, (_, h) in enumerate(digis) if h), default=None)
+    path = [call + ("*" if n == last else "")
+            for n, (call, _) in enumerate(digis)]
+    info = frame[i + 2:].decode("latin-1")
+    return f"{source}>{','.join([dest] + path)}:{info}"

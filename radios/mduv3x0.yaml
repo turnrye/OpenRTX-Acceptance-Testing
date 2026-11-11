@@ -62,6 +62,17 @@ fm:
   # peak limit, the usual reference modulation
   test_deviation_hz: {BW_12_5: 1500, BW_25: 3000}
 
+aprs:
+  # Messages the inbox holds (CONFIG_MESSAGES_MAX_ENTRIES in OpenRTX#559's
+  # hwconfig.h): APRS-RX-4 sends more traffic than this
+  inbox_entries: 32
+  # Acceptance criteria, not from a standard. At the bench's level, with
+  # nominal deviation and no twist, every frame is heard; across the
+  # stress cases (twist within 6 dB, deviation 1.5-4.5 kHz, short TXDELAY,
+  # off-frequency, clock error, back to back) at least this fraction is
+  min_frame_rate: 1.0
+  min_stress_frame_rate: 0.95
+
 m17:
   # The M17 Protocol Specification (part I, v2.0.2, sections "4-level
   # Frequency-shift Keying Modulation" and "Dibit, Symbol, and

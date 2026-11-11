@@ -32,6 +32,15 @@ operator:
   type: console         # console, or file to answer prompts through files
   directory: runs/operator
 
+# The radio's KISS TNC, for the tests tagged needs:tnc: the serial port the
+# radio reports every frame it decodes on, as SLIP-framed KISS (a USB CDC
+# port: /dev/cu.usbmodem* on macOS, /dev/ttyACM* or /dev/serial/by-id on
+# Linux). Every byte read is kept in the run's tnc.log. Leave the section out
+# on a bench without one and run with --exclude needs:tnc.
+#tnc:
+#  type: serial
+#  port: /dev/cu.usbmodem1101
+
 # The USB sound interface on the radio's accessory connector, for the tests
 # tagged needs:audio: test audio into the mic input, the speaker captured.
 # ALSA device names from `aplay -L` and `arecord -L`. An AIOC or a Digirig

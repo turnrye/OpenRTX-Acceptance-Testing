@@ -6,6 +6,7 @@
 
 import datetime
 import json
+import secrets
 import shutil
 import subprocess
 import time
@@ -23,6 +24,7 @@ from oat.analysis import demodulated_audio, measure_capture, to_analysis_rate
 from oat.calibration import load_calibration
 from oat.config import check_receiver_safe, load_yaml
 from oat.iq import IqFormat, clipped_fraction, write_iq
+from oat.kiss import make_tnc
 from oat.sanitize import scrub
 from oat.operator import make_operator
 from oat.sdr import make_receiver, make_transmitter
@@ -48,6 +50,8 @@ RESULTS_SCHEMA = 1
 # level under its lowest gain setting; more costs the 8-bit converter
 # too much of its resolution
 MAX_DIGITAL_BACKOFF_DB = 10.0
+# The simulated radio's input at the bench's gain, for relative levels
+SIM_BENCH_LEVEL_DBM = -80.0
 
 
 def chain_direction(tags) -> str | None:
@@ -151,6 +155,12 @@ class OpenRTXAcceptance:
         # Which way the attenuator chain faces: "tx" from the radio to the
         # receiver, "rx" from the transmitter to the radio
         self._chain = None
+        # The radio's KISS TNC, when the bench has one
+        self.tnc = None
+        # Differs from run to run, for test traffic (Run Tag)
+        self.run_id = secrets.token_hex(2)
+        self._aprs_sends = 0
+        self._aprs_batches = 0
 
     # Bench --------------------------------------------------------------
 
@@ -218,6 +228,10 @@ class OpenRTXAcceptance:
         self.run_dir.mkdir(parents=True)
         self.started = datetime.datetime.now(datetime.timezone.utc)
         logger.info(f"Results in {self.run_dir}")
+        # Listening from the start, so no frame the radio reports is missed;
+        # every byte from the port goes to tnc.log
+        self.tnc = make_tnc(self.bench.get("tnc"), self.run_dir / "tnc.log",
+                            getattr(self.receiver, "clock", None))
         # Shown in Robot's report, and filterable in robotframework-dashboard
         cal = self.calibration.summary()
         for name, value in (
@@ -226,6 +240,8 @@ class OpenRTXAcceptance:
                 ("Hardware", self.hardware),
                 *((("DSP", self.dsp),) if self.dsp else ()),
                 ("Station", self.bench.get("station", "unnamed")),
+                *((("TNC", self.bench["tnc"]["type"]),)
+                  if self.bench.get("tnc") else ()),
                 ("Calibration", f"{cal['method']}, measured "
                                 f"{cal['measured']} ({cal['sha256']})"),
                 *((("Audio mixer", "; ".join(
@@ -365,6 +381,8 @@ class OpenRTXAcceptance:
             self.audio.stop_playing()
         if self.ptt is not None:
             self.ptt.close()
+        if self.tnc is not None:
+            self.tnc.close()
         if self.run_dir is None:
             return
         report = {
@@ -384,6 +402,7 @@ class OpenRTXAcceptance:
             **({"audio_mixer": self.audio_mixer}
                if getattr(self, "audio_mixer", None) else {}),
             "records": self.records,
+            **({"tnc_junk": self.tnc.junk} if self.tnc is not None else {}),
             "operator": self.operator.exchanges(),
         }
         text = scrub(json.dumps(report, indent=2, default=plain))
@@ -1069,23 +1088,35 @@ class OpenRTXAcceptance:
         return (-tx.get("tune_offset_hz", 0) + offset_hz
                 - ppm * 1e-6 * self._frequency())
 
-    def _play(self, iq: np.ndarray, name: str, level_dbm=None,
-              repeat: bool = True, mode: str = "fm") -> dict:
+    def _play(self, iq, name: str, level_dbm=None,
+              repeat: bool = True, mode: str = "fm", level_db=None) -> dict:
         """
-        Write a signal and start the transmitter on it, at the bench's gain
-        or at level_dbm at the radio's antenna port. Returns what to record
+        Write a signal and start the transmitter on it: at the bench's gain,
+        at level_dbm at the radio's antenna port, or level_db relative to
+        the bench's gain (for a bench without a transmitter level table).
+        iq is an array, or a sequence of arrays written one after another so
+        a long signal never sits in memory whole. Returns what to record
         about the level.
         """
         tx = self.bench["transmitter"]
-        gain_offset, record = 0.0, {}
+        gain_offset, backoff, record = 0.0, 0.0, {}
         if level_dbm not in (None, "", "None"):
             gain, backoff = self.transmit_level(level_dbm)
-            iq = iq * np.float32(10 ** (-backoff / 20))
             gain_offset = gain - tx.get("tx_vga_db", 0)
             record = {"level_dbm": float(level_dbm), "tx_gain_db": gain,
                       "digital_backoff_db": backoff}
+        elif level_db not in (None, "", "None"):
+            gain_offset, backoff = self._relative_level(float(level_db))
+            record = {"relative_level_db": float(level_db),
+                      "tx_gain_offset_db": gain_offset,
+                      "digital_backoff_db": backoff}
         path = self.run_dir / f"{name}.cs8"
-        write_iq(path, iq, self.transmitter.fmt)
+        scale = np.float32(10 ** (-backoff / 20))
+        parts = [iq] if isinstance(iq, np.ndarray) else iq
+        path.unlink(missing_ok=True)
+        for part in parts:
+            write_iq(path, part * scale if backoff else part,
+                     self.transmitter.fmt, append=True)
         applied = self.transmitter.start(path, self._frequency()
                                          + tx.get("tune_offset_hz", 0),
                                          tx["rate"], repeat=repeat,
@@ -1096,6 +1127,30 @@ class OpenRTXAcceptance:
         self._tx_state = {"path": path, "level_dbm": record.get("level_dbm"),
                           "mode": mode}
         return record
+
+    def _relative_level(self, level_db: float) -> tuple[float, float]:
+        """
+        The transmitter gain offset and digital back-off for level_db
+        relative to the bench's gain: whole gain steps first, back-off
+        (at most MAX_DIGITAL_BACKOFF_DB) below the bottom of the range.
+        """
+        tx = self.bench["transmitter"]
+        if tx["type"] != "hackrf":
+            # Only the HackRF has a gain range; the simulated one takes any
+            return float(level_db), 0.0
+        vga = float(tx.get("tx_vga_db", 0))
+        top = 47.0 - vga
+        if level_db > top + 1e-9:
+            raise AssertionError(f"{level_db:+.0f} dB is above the "
+                                 f"transmitter's range ({top:+.0f} dB)")
+        offset = float(max(np.ceil(level_db - 1e-9), -vga))
+        backoff = offset - level_db
+        if backoff > MAX_DIGITAL_BACKOFF_DB + 1e-9:
+            raise AssertionError(
+                f"{level_db:+.0f} dB is below the transmitter's range "
+                f"({-vga - MAX_DIGITAL_BACKOFF_DB:+.0f} dB): add "
+                f"attenuation, or raise tx_vga_db")
+        return offset, backoff
 
     @keyword
     def transmit_level(self, level_dbm: float) -> tuple[int, float]:
@@ -1241,37 +1296,228 @@ class OpenRTXAcceptance:
                                         gap_s: float = 1.5,
                                         txdelay_ms: float = 300.0,
                                         level_dbm=None,
+                                        level_db=None,
+                                        offset_hz: float = 0.0,
+                                        baud_error_ppm: float = 0.0,
+                                        per_transmission: int = 1,
                                         loop: bool = False) -> float:
         """
-        Send APRS packets on the test frequency, one transmission per
-        information field: TXDELAY of flags, the AX.25 UI frame from
-        `source` via `path` (digipeaters separated by commas, a * marking
-        one that has repeated it, empty for none), then gap_s without
-        carrier. deviation_hz is the louder tone's peak deviation; twist_db
-        raises the space tone over the mark, as a pre-emphasizing
-        transmitter does (aprs.PREEMPHASIS_TWIST_DB, 5.3 dB). Plays once
+        Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+        UI frames from `source` via `path` (digipeaters separated by commas,
+        a * marking one that has repeated it, empty for none), then gap_s
+        without carrier. Each transmission carries per_transmission frames
+        back to back, one flag apart, as a TNC empties its queue.
+        deviation_hz is the louder tone's peak deviation; twist_db raises
+        the space tone over the mark, as a pre-emphasizing transmitter does
+        (aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+        offset_hz moves the carrier off frequency and baud_error_ppm the bit
+        rate off 1200. The level is level_dbm at the radio, level_db
+        relative to the bench's gain, or the bench's gain. Plays once
         unless loop; returns how long one pass lasts, in seconds, to wait
         before Stop Transmitting.
         """
         tx = self.bench["transmitter"]
         hops = [p.strip() for p in str(path).split(",") if p.strip()]
-        offset = self._tx_baseband_offset()
-        parts = []
-        for text in info:
-            frame = aprs.ui_frame(str(source), str(text), hops)
-            sound = aprs.packet_audio(frame, tx["rate"], float(twist_db),
-                                      float(txdelay_ms) / 1000)
-            parts += [fm_modulate(sound, tx["rate"], float(deviation_hz),
-                                  offset),
-                      silence(float(gap_s), tx["rate"])]
-        iq = np.concatenate(parts)
-        level = self._play(iq, f"tx-aprs-{str(source).replace('*', '')}",
-                           level_dbm, repeat=bool(loop), mode="aprs")
+        offset = self._tx_baseband_offset(float(offset_hz))
+        # KISS carries frames without their FCS
+        frames = [aprs.ui_frame(str(source), str(text), hops)
+                  for text in info]
+        groups = [frames[i:i + int(per_transmission)]
+                  for i in range(0, len(frames), int(per_transmission))]
+        sim_level = (float(level_dbm) if level_dbm not in (None, "", "None")
+                     else SIM_BENCH_LEVEL_DBM + float(level_db or 0.0))
+        samples = 0
+
+        def transmissions():
+            nonlocal samples
+            for group in groups:
+                sound = aprs.packet_audio(group, tx["rate"], float(twist_db),
+                                          float(txdelay_ms) / 1000,
+                                          float(baud_error_ppm))
+                if hasattr(self.tnc, "hear"):
+                    self.tnc.hear(sound, tx["rate"],
+                                  [f[:-2] for f in group],
+                                  float(deviation_hz), sim_level)
+                part = fm_modulate(sound, tx["rate"], float(deviation_hz),
+                                   offset)
+                gap = silence(float(gap_s), tx["rate"])
+                samples += len(part) + len(gap)
+                yield part
+                yield gap
+
+        self._aprs_sends += 1
+        level = self._play(transmissions(), f"tx-aprs-{self._aprs_sends:03d}",
+                           level_dbm, repeat=bool(loop), mode="aprs",
+                           level_db=level_db)
         self._record("transmit", mode="aprs", source=str(source), path=hops,
                      packets=[str(t) for t in info],
                      deviation_hz=float(deviation_hz),
-                     twist_db=float(twist_db), **level)
-        return len(iq) / tx["rate"]
+                     twist_db=float(twist_db), offset_hz=float(offset_hz),
+                     baud_error_ppm=float(baud_error_ppm),
+                     txdelay_ms=float(txdelay_ms),
+                     per_transmission=int(per_transmission), **level)
+        return samples / tx["rate"]
+
+    @keyword
+    def run_tag(self) -> str:
+        """
+        Four hex digits that differ from run to run, to put in test traffic:
+        the radio's de-duplication then can't mistake a rerun's packets for
+        the last run's, nor can the operator.
+        """
+        return self.run_id
+
+    def _need_tnc(self):
+        if self.tnc is None:
+            BuiltIn().skip("No TNC: add a tnc section to the bench file "
+                           "(see bench/example.yaml), or exclude needs:tnc")
+        return self.tnc
+
+    @keyword
+    def send_aprs_test_frames(self, count: int = 20, kind: str = "status",
+                              settle_s: float = 2.0, **options) -> dict:
+        """
+        Send `count` numbered test frames and count what the radio's TNC
+        reported. kind is status (short status reports), full (eight
+        digipeaters and a 256-byte information field: the largest frame),
+        or escapes (a full-size frame full of the bytes KISS must escape,
+        0xC0 and 0xDB). Every frame carries the run tag and its number, so
+        each is accounted for: heard, missing, heard more than once, or
+        corrupt (ours, but different from what was sent). Takes Start
+        Transmitting APRS Packets' options. Returns the counts and the
+        fraction heard.
+        """
+        tnc = self._need_tnc()
+        count = int(count)
+        tag = f"oat{self.run_id}"
+        self._aprs_batches += 1
+        batch = f"{tag}.{self._aprs_batches:03d}"
+        info = []
+        for i in range(count):
+            label = f"{batch}.{i:04d}"
+            if kind == "status":
+                info.append(f">{label}")
+            elif kind == "full":
+                info.append(f">{label} " + "x" * (aprs.MAX_INFO_BYTES
+                                                    - len(label) - 2))
+            elif kind == "escapes":
+                body = "\xc0\xdb" * aprs.MAX_INFO_BYTES
+                info.append((f">{label} " + body)[:aprs.MAX_INFO_BYTES])
+            else:
+                raise ValueError("kind is status, full or escapes")
+        if kind in ("full", "escapes") and "path" not in options:
+            options["path"] = ",".join(f"DIGI{n}*" for n in range(1, 9))
+        options.setdefault("gap_s", 0.5)
+        hops = [p.strip() for p in str(options.get("path", "WIDE1-1"))
+                .split(",") if p.strip()]
+        source = str(options.get("source", "N9OAT"))
+        sent = [aprs.ui_frame(source, text, hops)[:-2] for text in info]
+        start = tnc.now()
+        seconds = self.start_transmitting_aprs_packets(*info, **options)
+        self.wait_seconds(seconds + float(settle_s))
+        self.stop_transmitting()
+        heard = tnc.heard_since(start)
+        wanted = {f: n for n, f in enumerate(sent)}
+        got, duplicates, corrupt = set(), 0, []
+        for h in heard:
+            if h.frame in wanted:
+                if wanted[h.frame] in got:
+                    duplicates += 1
+                got.add(wanted[h.frame])
+            elif batch.encode() in h.frame:
+                corrupt.append(h.frame.hex())
+        result = {
+            "frames": kind, "sent": count, "heard": len(got),
+            "missing": sorted(set(range(count)) - got),
+            "duplicates": duplicates, "corrupt": corrupt,
+            "rate": len(got) / count if count else 0.0,
+            "level_dbm": options.get("level_dbm"),
+            "relative_level_db": options.get("level_db"),
+            "options": {k: str(v) for k, v in options.items()},
+        }
+        self._record("aprs-frames", **result)
+        logger.info(f"{kind}: heard {len(got)} of {count}"
+                    + (f", {duplicates} twice" if duplicates else "")
+                    + (f", {len(corrupt)} corrupt" if corrupt else "")
+                    + f" ({', '.join(f'{k}={v}' for k, v in options.items())})")
+        return result
+
+    @keyword
+    def aprs_frames_should_be_heard(self, result: dict, minimum=None):
+        """
+        Fail unless the radio reported at least `minimum` of the frames (the
+        radio file's aprs.min_frame_rate when not given), and none corrupt
+        or twice.
+        """
+        if minimum in (None, "", "None"):
+            minimum = self.radio.get("aprs", {}).get("min_frame_rate", 1.0)
+        minimum = float(minimum)
+        ok = (result["rate"] >= minimum - 1e-9 and not result["corrupt"]
+              and not result["duplicates"])
+        self._record("limit", field="aprs_frame_rate", value=result["rate"],
+                     limit=f">= {minimum:g}, none corrupt or twice",
+                     passed=ok)
+        BuiltIn().set_test_message(
+            f"{result['frames']}: {result['heard']}/{result['sent']}",
+            append=True)
+        if not ok:
+            raise AssertionError(
+                f"heard {result['heard']} of {result['sent']} "
+                f"({result['rate']:.0%}, need {minimum:.0%}), "
+                f"{len(result['corrupt'])} corrupt, "
+                f"{result['duplicates']} twice; missing {result['missing']}")
+
+    @keyword
+    def find_aprs_sensitivity(self, start: float = 0.0, stop: float = -40.0,
+                              step: float = 2.0, count: int = 20,
+                              absolute=None, **options) -> dict:
+        """
+        Step the level down from `start` to `stop`, sending `count` test
+        frames at each, until fewer than half are heard; the result has the
+        curve and the levels where 90% and 50% of frames were still heard,
+        interpolated. Levels are dBm at the radio with a transmitter level
+        table (or absolute: true), otherwise dB relative to the bench's
+        gain; compare relative results only within one session, on one
+        bench. Takes Send APRS Test Frames' options.
+        """
+        if absolute in (None, "", "None"):
+            absolute = self.calibration.transmitter_levels is not None
+        absolute = str(absolute).lower() in ("true", "1", "yes")
+        key = "level_dbm" if absolute else "level_db"
+        points = []
+        level = float(start)
+        while level >= float(stop) - 1e-9:
+            r = self.send_aprs_test_frames(count, **{key: level}, **options)
+            points.append((level, r["rate"]))
+            if r["rate"] < 0.5:
+                break
+            level -= float(step)
+
+        def crossing(target):
+            for (l1, r1), (l2, r2) in zip(points, points[1:]):
+                if r1 >= target > r2:
+                    return float(l1 + (target - r1) * (l2 - l1) / (r2 - r1))
+            return None
+
+        result = {"unit": "dBm" if absolute else "dB re bench",
+                  "points": points, "count": int(count),
+                  "level_90": crossing(0.9), "level_50": crossing(0.5),
+                  "options": {k: str(v) for k, v in options.items()}}
+        self._record("aprs-sensitivity", **result)
+        rows = "".join(f"<tr><td>{l:+.1f}</td><td>{r:.0%}</td></tr>"
+                       for l, r in points)
+        logger.info(f"<table><tr><th>level ({result['unit']})</th>"
+                    f"<th>heard</th></tr>{rows}</table>", html=True)
+        if result["level_50"] is None:
+            raise AssertionError(f"the frame rate never fell below 50% "
+                                 f"between {start} and {stop}: {points}")
+        BuiltIn().set_test_message(
+            "90% at "
+            + (f"{result['level_90']:+.1f}" if result["level_90"] is not None
+               else "n/a")
+            + f", 50% at {result['level_50']:+.1f} {result['unit']}",
+            append=True)
+        return result
 
     @keyword
     def stop_transmitting(self):
@@ -1838,6 +2084,15 @@ class OpenRTXAcceptance:
                                output="sos"), rng.normal(size=n))
         noise *= noise_rms / (np.sqrt(np.mean(noise ** 2)) or 1.0)
         return speaker + noise
+
+    @keyword
+    def radio_value(self, section: str, name: str):
+        """A value from the radio file, such as aprs inbox_entries."""
+        try:
+            return self.radio[section][name]
+        except KeyError:
+            raise AssertionError(f"{self.radio_file}: no {section}.{name}") \
+                from None
 
     @keyword
     def test_deviation(self, bandwidth: str) -> float:
