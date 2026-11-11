@@ -1,0 +1,2921 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Rebot 7.5 (Python 3.13.13 on darwin)" generated="2026-11-10T22:25:12.332551" rpa="false" schemaversion="5">
+<suite id="s1" name="Rx &amp; Performance">
+<suite id="s1-s1" name="Rx" source="acceptance/aprs/rx.robot">
+<kw name="Open APRS Bench" type="SETUP">
+<kw name="Open Bench" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:47:43.825594" level="INFO">Results in runs/cs7000p-aprs-vga40/bench-Rx_&amp;_Performance.Rx</msg>
+<msg time="2026-11-10T21:47:43.851551" level="INFO">Set suite metadata 'Firmware' to value 'aprs-usb-tnc-fc93d759'.</msg>
+<msg time="2026-11-10T21:47:43.851671" level="INFO">Set suite metadata 'Radio' to value 'Connect Systems CS7000-PLUS (cs7000p)'.</msg>
+<msg time="2026-11-10T21:47:43.851689" level="INFO">Set suite metadata 'Hardware' to value 'CS7000-PLUS 2709D157450086'.</msg>
+<msg time="2026-11-10T21:47:43.851702" level="INFO">Set suite metadata 'DSP' to value 'none'.</msg>
+<msg time="2026-11-10T21:47:43.851715" level="INFO">Set suite metadata 'Station' to value 'k0ret'.</msg>
+<msg time="2026-11-10T21:47:43.851740" level="INFO">Set suite metadata 'TNC' to value 'serial'.</msg>
+<msg time="2026-11-10T21:47:43.851751" level="INFO">Set suite metadata 'Calibration' to value 'assumed, measured 2026-10-20 (d55ce4aa0a3c)'.</msg>
+<msg time="2026-11-10T21:47:43.851763" level="INFO">Set suite metadata 'Suite commit' to value '1d00f71740'.</msg>
+<arg>${BENCH}</arg>
+<arg>${CALIBRATION}</arg>
+<arg>${RADIO}</arg>
+<arg>${FIRMWARE}</arg>
+<arg>${HARDWARE}</arg>
+<arg>dsp=${DSP}</arg>
+<doc>Load the bench, its calibration and the radio file, and prepare the
+instruments. All five are mandatory and differ from tester to tester,
+so suites take them from the command line (-v BENCH:... and so on).
+`firmware` names what the radio runs, such as a git describe;
+`hardware` names the unit, by model and serial number, since units of
+one model measure differently. `dsp` names the DSP image the radio's
+audio processor runs, such as its sha256; it is mandatory for radio
+files with dsp_image: true, whose firmware states can differ in it
+alone.</doc>
+<status status="PASS" start="2026-11-10T21:47:43.820977" elapsed="92.738751"/>
+</kw>
+<kw name="Run Tag" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:49:16.560469" level="INFO">${run} = b364</msg>
+<var>${run}</var>
+<doc>Four hex digits that differ from run to run, to put in test traffic:
+the radio's de-duplication then can't mistake a rerun's packets for
+the last run's, nor can the operator.</doc>
+<status status="PASS" start="2026-11-10T21:49:16.560169" elapsed="0.000329"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<msg time="2026-11-10T21:49:16.561203" level="INFO">${RUN} = b364</msg>
+<arg>${RUN}</arg>
+<arg>${run}</arg>
+<doc>Makes the variable available everywhere within the scope of the current suite.</doc>
+<status status="PASS" start="2026-11-10T21:49:16.560673" elapsed="0.000568"/>
+</kw>
+<status status="PASS" start="2026-11-10T21:47:43.820788" elapsed="92.740529"/>
+</kw>
+<test id="s1-s1-t1" name="70cm: APRS RX Stores A Message For My Callsign" line="68">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T21:49:16.562366" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T21:49:16.562570" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T21:49:16.561999" elapsed="0.000605"/>
+</kw>
+<kw name="Set Up APRS Receive">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with Settings &gt; APRS &gt; Callsign ${APRS_CALLSIGN}, and open the inbox. This run's messages end their tag in ".${RUN}"</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-11-10T21:49:16.563007" elapsed="10.029508"/>
+</kw>
+<status status="PASS" start="2026-11-10T21:49:16.562816" elapsed="10.029795"/>
+</kw>
+<kw name="Aprs Message" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:49:26.592988" level="INFO">${msg} = :N0CALL-7 :oat1.b364 hello from the bench{01</msg>
+<var>${msg}</var>
+<arg>${APRS_CALLSIGN}</arg>
+<arg>oat1.${RUN} hello from the bench</arg>
+<arg>01</arg>
+<doc>An APRS message's information field, :ADDRESSEE:text{number, for
+Start Transmitting APRS Packets.</doc>
+<status status="PASS" start="2026-11-10T21:49:26.592775" elapsed="0.000241"/>
+</kw>
+<kw name="Send APRS Packets">
+<kw name="Start Transmitting Aprs Packets" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:49:26.660450" level="INFO">${seconds} = 2.3266665</msg>
+<var>${seconds}</var>
+<arg>@{info}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+UI frames from `source` via `path` (digipeaters separated by commas,
+a * marking one that has repeated it, empty for none), then gap_s
+without carrier. Each transmission carries per_transmission frames
+back to back, one flag apart, as a TNC empties its queue.
+deviation_hz is the louder tone's peak deviation; twist_db raises
+the space tone over the mark, as a pre-emphasizing transmitter does
+(aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+offset_hz moves the carrier off frequency and baud_error_ppm the bit
+rate off 1200. The level is level_dbm at the radio, level_db
+relative to the bench's gain, or the bench's gain. Plays once
+unless loop; returns how long one pass lasts, in seconds, to wait
+before Stop Transmitting.</doc>
+<status status="PASS" start="2026-11-10T21:49:26.593647" elapsed="0.066858"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${{ ${seconds} + 1 }}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-10T21:49:26.660679" elapsed="3.328645"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:49:29.989662" elapsed="0.000431"/>
+</kw>
+<arg>${msg}</arg>
+<arg>source=${SENDER}</arg>
+<arg>path=${PATH}</arg>
+<arg>deviation_hz=${DEVIATION_HZ}</arg>
+<doc>Send packets with Start Transmitting APRS Packets, wait until
+they're out, then stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:49:26.593175" elapsed="3.397093"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>The inbox shows one new APRS message from ${SENDER}: "oat1.${RUN} hello from the bench"</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-11-10T21:49:29.990561" elapsed="3.935544"/>
+</kw>
+<doc>APRS-RX-1: a message to the radio's APRS callsign arrives in the
+inbox, from the sender, with its text.</doc>
+<tag>band:70cm</tag>
+<tag>mode:aprs</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T21:49:16.561421" elapsed="17.365125"/>
+</test>
+<test id="s1-s1-t2" name="70cm: APRS RX Matches The Addressee As An Address" line="76">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T21:49:33.928772" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T21:49:33.928975" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T21:49:33.928236" elapsed="0.000781"/>
+</kw>
+<kw name="Set Up APRS Receive">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with Settings &gt; APRS &gt; Callsign ${APRS_CALLSIGN}, and open the inbox. This run's messages end their tag in ".${RUN}"</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-11-10T21:49:33.929544" elapsed="3.467355"/>
+</kw>
+<status status="PASS" start="2026-11-10T21:49:33.929319" elapsed="3.468039"/>
+</kw>
+<kw name="Address Variants">
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-11-10T21:49:37.398996" level="INFO">${call} = N0CALL</msg>
+<msg time="2026-11-10T21:49:37.399042" level="INFO">${ssid} = 7</msg>
+<var>${call}</var>
+<var>${ssid}</var>
+<arg>($APRS_CALLSIGN.upper().split('-') + ['0'])[:2]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-11-10T21:49:37.398070" elapsed="0.000990"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-11-10T21:49:37.399556" level="INFO">${same} = n0call-07</msg>
+<var>${same}</var>
+<arg>f"{$call.lower()}-{int($ssid):02d}"</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-11-10T21:49:37.399178" elapsed="0.000398"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-11-10T21:49:37.399965" level="INFO">${other_ssid} = N0CALL-8</msg>
+<var>${other_ssid}</var>
+<arg>f"{$call}-{(int($ssid) + 1) % 16}"</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-11-10T21:49:37.399675" elapsed="0.000309"/>
+</kw>
+<return>
+<value>${same}</value>
+<value>${other_ssid}</value>
+<value>OAT9X</value>
+<status status="PASS" start="2026-11-10T21:49:37.400064" elapsed="0.000096"/>
+</return>
+<msg time="2026-11-10T21:49:37.400301" level="INFO">${same} = n0call-07</msg>
+<msg time="2026-11-10T21:49:37.400335" level="INFO">${other_ssid} = N0CALL-8</msg>
+<msg time="2026-11-10T21:49:37.400357" level="INFO">${other} = OAT9X</msg>
+<var>${same}</var>
+<var>${other_ssid}</var>
+<var>${other}</var>
+<doc>The radio's APRS callsign written differently (lower case, SSID
+padded to two digits), the same callsign with another SSID, and
+another station.</doc>
+<status status="PASS" start="2026-11-10T21:49:37.397701" elapsed="0.002670"/>
+</kw>
+<kw name="Aprs Message" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:49:37.400691" level="INFO">${a} = :n0call-07:oat2.b364 written n0call-07{02</msg>
+<var>${a}</var>
+<arg>${same}</arg>
+<arg>oat2.${RUN} written ${same}</arg>
+<arg>02</arg>
+<doc>An APRS message's information field, :ADDRESSEE:text{number, for
+Start Transmitting APRS Packets.</doc>
+<status status="PASS" start="2026-11-10T21:49:37.400510" elapsed="0.000197"/>
+</kw>
+<kw name="Aprs Message" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:49:37.400911" level="INFO">${b} = :N0CALL-8 :oat2.b364 for N0CALL-8{03</msg>
+<var>${b}</var>
+<arg>${other_ssid}</arg>
+<arg>oat2.${RUN} for ${other_ssid}</arg>
+<arg>03</arg>
+<doc>An APRS message's information field, :ADDRESSEE:text{number, for
+Start Transmitting APRS Packets.</doc>
+<status status="PASS" start="2026-11-10T21:49:37.400799" elapsed="0.000149"/>
+</kw>
+<kw name="Aprs Message" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:49:37.401140" level="INFO">${c} = :OAT9X    :oat2.b364 for OAT9X{04</msg>
+<var>${c}</var>
+<arg>${other}</arg>
+<arg>oat2.${RUN} for ${other}</arg>
+<arg>04</arg>
+<doc>An APRS message's information field, :ADDRESSEE:text{number, for
+Start Transmitting APRS Packets.</doc>
+<status status="PASS" start="2026-11-10T21:49:37.401024" elapsed="0.000132"/>
+</kw>
+<kw name="Send APRS Packets">
+<kw name="Start Transmitting Aprs Packets" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:49:37.548846" level="INFO">${seconds} = 6.8333335</msg>
+<var>${seconds}</var>
+<arg>@{info}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+UI frames from `source` via `path` (digipeaters separated by commas,
+a * marking one that has repeated it, empty for none), then gap_s
+without carrier. Each transmission carries per_transmission frames
+back to back, one flag apart, as a TNC empties its queue.
+deviation_hz is the louder tone's peak deviation; twist_db raises
+the space tone over the mark, as a pre-emphasizing transmitter does
+(aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+offset_hz moves the carrier off frequency and baud_error_ppm the bit
+rate off 1200. The level is level_dbm at the radio, level_db
+relative to the bench's gain, or the bench's gain. Plays once
+unless loop; returns how long one pass lasts, in seconds, to wait
+before Stop Transmitting.</doc>
+<status status="PASS" start="2026-11-10T21:49:37.401635" elapsed="0.147263"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${{ ${seconds} + 1 }}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-10T21:49:37.549052" elapsed="7.835554"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:49:45.384932" elapsed="0.000352"/>
+</kw>
+<arg>${a}</arg>
+<arg>${b}</arg>
+<arg>${c}</arg>
+<arg>source=${SENDER}</arg>
+<arg>path=${PATH}</arg>
+<arg>deviation_hz=${DEVIATION_HZ}</arg>
+<doc>Send packets with Start Transmitting APRS Packets, wait until
+they're out, then stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:49:37.401311" elapsed="7.984085"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Of the "oat2.${RUN}" messages, only "oat2.${RUN} written ${same}" arrived; none for ${other_ssid} or ${other}</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-11-10T21:49:45.385655" elapsed="12.886646"/>
+</kw>
+<doc>APRS-RX-2: the addressee is compared as an AX.25 address, so
+another spelling of the radio's callsign reaches it, and another
+SSID or another station doesn't.</doc>
+<tag>band:70cm</tag>
+<tag>mode:aprs</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T21:49:33.927150" elapsed="24.345480"/>
+</test>
+<test id="s1-s1-t3" name="70cm: APRS RX Stores Copies Of A Message Once" line="88">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T21:49:58.274316" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T21:49:58.274478" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T21:49:58.273874" elapsed="0.000635"/>
+</kw>
+<kw name="Set Up APRS Receive">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with Settings &gt; APRS &gt; Callsign ${APRS_CALLSIGN}, and open the inbox. This run's messages end their tag in ".${RUN}"</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-11-10T21:49:58.274898" elapsed="2.234604"/>
+</kw>
+<status status="PASS" start="2026-11-10T21:49:58.274756" elapsed="2.234915"/>
+</kw>
+<kw name="Aprs Message" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:50:00.510319" level="INFO">${msg} = :N0CALL-7 :oat3.b364 sent four times{05</msg>
+<var>${msg}</var>
+<arg>${APRS_CALLSIGN}</arg>
+<arg>oat3.${RUN} sent four times</arg>
+<arg>05</arg>
+<doc>An APRS message's information field, :ADDRESSEE:text{number, for
+Start Transmitting APRS Packets.</doc>
+<status status="PASS" start="2026-11-10T21:50:00.509939" elapsed="0.000437"/>
+</kw>
+<kw name="Send APRS Packets">
+<kw name="Start Transmitting Aprs Packets" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:50:00.624093" level="INFO">${seconds} = 4.586667</msg>
+<var>${seconds}</var>
+<arg>@{info}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+UI frames from `source` via `path` (digipeaters separated by commas,
+a * marking one that has repeated it, empty for none), then gap_s
+without carrier. Each transmission carries per_transmission frames
+back to back, one flag apart, as a TNC empties its queue.
+deviation_hz is the louder tone's peak deviation; twist_db raises
+the space tone over the mark, as a pre-emphasizing transmitter does
+(aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+offset_hz moves the carrier off frequency and baud_error_ppm the bit
+rate off 1200. The level is level_dbm at the radio, level_db
+relative to the bench's gain, or the bench's gain. Plays once
+unless loop; returns how long one pass lasts, in seconds, to wait
+before Stop Transmitting.</doc>
+<status status="PASS" start="2026-11-10T21:50:00.511197" elapsed="0.112942"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${{ ${seconds} + 1 }}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-10T21:50:00.624355" elapsed="5.589823"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:50:06.214504" elapsed="0.000428"/>
+</kw>
+<arg>${msg}</arg>
+<arg>${msg}</arg>
+<arg>source=${SENDER}</arg>
+<arg>path=${PATH}</arg>
+<arg>deviation_hz=${DEVIATION_HZ}</arg>
+<doc>Send packets with Start Transmitting APRS Packets, wait until
+they're out, then stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:50:00.510647" elapsed="5.704450"/>
+</kw>
+<kw name="Send APRS Packets">
+<kw name="Start Transmitting Aprs Packets" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:50:06.283986" level="INFO">${seconds} = 2.2933335</msg>
+<var>${seconds}</var>
+<arg>@{info}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+UI frames from `source` via `path` (digipeaters separated by commas,
+a * marking one that has repeated it, empty for none), then gap_s
+without carrier. Each transmission carries per_transmission frames
+back to back, one flag apart, as a TNC empties its queue.
+deviation_hz is the louder tone's peak deviation; twist_db raises
+the space tone over the mark, as a pre-emphasizing transmitter does
+(aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+offset_hz moves the carrier off frequency and baud_error_ppm the bit
+rate off 1200. The level is level_dbm at the radio, level_db
+relative to the bench's gain, or the bench's gain. Plays once
+unless loop; returns how long one pass lasts, in seconds, to wait
+before Stop Transmitting.</doc>
+<status status="PASS" start="2026-11-10T21:50:06.216368" elapsed="0.067673"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${{ ${seconds} + 1 }}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-10T21:50:06.284211" elapsed="3.295208"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:50:09.579804" elapsed="0.000460"/>
+</kw>
+<arg>${msg}</arg>
+<arg>source=${SENDER}</arg>
+<arg>path=DIGI1*,WIDE2-1</arg>
+<arg>deviation_hz=${DEVIATION_HZ}</arg>
+<doc>Send packets with Start Transmitting APRS Packets, wait until
+they're out, then stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:50:06.215657" elapsed="3.364768"/>
+</kw>
+<kw name="Send APRS Packets">
+<kw name="Start Transmitting Aprs Packets" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:50:09.657656" level="INFO">${seconds} = 2.2941665</msg>
+<var>${seconds}</var>
+<arg>@{info}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+UI frames from `source` via `path` (digipeaters separated by commas,
+a * marking one that has repeated it, empty for none), then gap_s
+without carrier. Each transmission carries per_transmission frames
+back to back, one flag apart, as a TNC empties its queue.
+deviation_hz is the louder tone's peak deviation; twist_db raises
+the space tone over the mark, as a pre-emphasizing transmitter does
+(aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+offset_hz moves the carrier off frequency and baud_error_ppm the bit
+rate off 1200. The level is level_dbm at the radio, level_db
+relative to the bench's gain, or the bench's gain. Plays once
+unless loop; returns how long one pass lasts, in seconds, to wait
+before Stop Transmitting.</doc>
+<status status="PASS" start="2026-11-10T21:50:09.581530" elapsed="0.076186"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${{ ${seconds} + 1 }}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-10T21:50:09.657910" elapsed="3.297517"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:50:12.955705" elapsed="0.000339"/>
+</kw>
+<arg>${msg}</arg>
+<arg>source=${SENDER}</arg>
+<arg>path=DIGI1*,DIGI2*</arg>
+<arg>deviation_hz=${DEVIATION_HZ}</arg>
+<doc>Send packets with Start Transmitting APRS Packets, wait until
+they're out, then stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:50:09.580982" elapsed="3.375194"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>"oat3.${RUN} sent four times" is in the inbox once</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-11-10T21:50:12.956498" elapsed="2.747850"/>
+</kw>
+<doc>APRS-RX-3: the same message sent, retried and relayed by two
+digipeaters is stored once.</doc>
+<tag>band:70cm</tag>
+<tag>mode:aprs</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T21:49:58.273069" elapsed="17.431602"/>
+</test>
+<test id="s1-s1-t4" name="70cm: APRS RX Keeps Messages Through Position Traffic" line="98">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T21:50:15.706446" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T21:50:15.706643" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T21:50:15.705878" elapsed="0.000802"/>
+</kw>
+<kw name="Set Up APRS Receive">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with Settings &gt; APRS &gt; Callsign ${APRS_CALLSIGN}, and open the inbox. This run's messages end their tag in ".${RUN}"</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-11-10T21:50:15.707172" elapsed="0.928066"/>
+</kw>
+<status status="PASS" start="2026-11-10T21:50:15.706981" elapsed="0.928458"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:50:16.635980" level="INFO">${entries} = 64</msg>
+<var>${entries}</var>
+<arg>aprs</arg>
+<arg>inbox_entries</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T21:50:16.635729" elapsed="0.000280"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-11-10T21:50:16.636869" level="INFO">${traffic} = 72</msg>
+<var>${traffic}</var>
+<arg>int($entries) + 8</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-11-10T21:50:16.636191" elapsed="0.000700"/>
+</kw>
+<kw name="Aprs Message" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:50:16.637164" level="INFO">${msg} = :N0CALL-7 :oat4.b364 still here{06</msg>
+<var>${msg}</var>
+<arg>${APRS_CALLSIGN}</arg>
+<arg>oat4.${RUN} still here</arg>
+<arg>06</arg>
+<doc>An APRS message's information field, :ADDRESSEE:text{number, for
+Start Transmitting APRS Packets.</doc>
+<status status="PASS" start="2026-11-10T21:50:16.637011" elapsed="0.000172"/>
+</kw>
+<kw name="Send APRS Packets">
+<kw name="Start Transmitting Aprs Packets" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:50:16.707978" level="INFO">${seconds} = 2.26</msg>
+<var>${seconds}</var>
+<arg>@{info}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+UI frames from `source` via `path` (digipeaters separated by commas,
+a * marking one that has repeated it, empty for none), then gap_s
+without carrier. Each transmission carries per_transmission frames
+back to back, one flag apart, as a TNC empties its queue.
+deviation_hz is the louder tone's peak deviation; twist_db raises
+the space tone over the mark, as a pre-emphasizing transmitter does
+(aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+offset_hz moves the carrier off frequency and baud_error_ppm the bit
+rate off 1200. The level is level_dbm at the radio, level_db
+relative to the bench's gain, or the bench's gain. Plays once
+unless loop; returns how long one pass lasts, in seconds, to wait
+before Stop Transmitting.</doc>
+<status status="PASS" start="2026-11-10T21:50:16.637908" elapsed="0.070125"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${{ ${seconds} + 1 }}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-10T21:50:16.708240" elapsed="3.263656"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:50:19.972172" elapsed="0.000361"/>
+</kw>
+<arg>${msg}</arg>
+<arg>source=${SENDER}</arg>
+<arg>path=${PATH}</arg>
+<arg>deviation_hz=${DEVIATION_HZ}</arg>
+<doc>Send packets with Start Transmitting APRS Packets, wait until
+they're out, then stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:50:16.637417" elapsed="3.335263"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-11-10T21:50:19.974740" level="INFO">@{traffic} = [ &gt;oat4.b364 status 0 | !3501.01N/09001.01W-oat4.b364 position 1 | &gt;oat4.b364 status 2 | !3503.03N/09003.03W-oat4.b364 position 3 | &gt;oat4.b364 status 4 | !3505.05N/09005.05W-oat4.b364 position 5 | &gt;oa...</msg>
+<var>@{traffic}</var>
+<arg>[f"!35{i % 60:02d}.{i % 100:02d}N/090{i % 60:02d}.{i % 100:02d}W-oat4.{$RUN} position {i}" if i % 2 else f"&gt;oat4.{$RUN} status {i}" for i in range(${traffic})]</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-11-10T21:50:19.973048" elapsed="0.001732"/>
+</kw>
+<kw name="Send APRS Packets">
+<kw name="Start Transmitting Aprs Packets" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:50:22.151165" level="INFO">${seconds} = 74.6475025</msg>
+<var>${seconds}</var>
+<arg>@{info}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+UI frames from `source` via `path` (digipeaters separated by commas,
+a * marking one that has repeated it, empty for none), then gap_s
+without carrier. Each transmission carries per_transmission frames
+back to back, one flag apart, as a TNC empties its queue.
+deviation_hz is the louder tone's peak deviation; twist_db raises
+the space tone over the mark, as a pre-emphasizing transmitter does
+(aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+offset_hz moves the carrier off frequency and baud_error_ppm the bit
+rate off 1200. The level is level_dbm at the radio, level_db
+relative to the bench's gain, or the bench's gain. Plays once
+unless loop; returns how long one pass lasts, in seconds, to wait
+before Stop Transmitting.</doc>
+<status status="PASS" start="2026-11-10T21:50:19.975635" elapsed="2.175584"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${{ ${seconds} + 1 }}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-10T21:50:22.151380" elapsed="75.649779"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:51:37.801512" elapsed="0.000428"/>
+</kw>
+<arg>@{traffic}</arg>
+<arg>source=OAT4X</arg>
+<arg>path=${PATH}</arg>
+<arg>deviation_hz=${DEVIATION_HZ}</arg>
+<arg>gap_s=0.3</arg>
+<doc>Send packets with Start Transmitting APRS Packets, wait until
+they're out, then stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:50:19.975101" elapsed="77.826993"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>"oat4.${RUN} still here" is still in the inbox, and none of the ${traffic} "oat4.${RUN} position" or "oat4.${RUN} status" packets are</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-11-10T21:51:37.802405" elapsed="49.132785"/>
+</kw>
+<doc>APRS-RX-4: positions and status from other stations aren't
+stored, so more of them than the inbox holds (the radio file's
+aprs.inbox_entries) don't push a message out.</doc>
+<tag>band:70cm</tag>
+<tag>mode:aprs</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T21:50:15.705036" elapsed="131.230487"/>
+</test>
+<test id="s1-s1-t5" name="70cm: APRS RX Decodes A Full-Size Frame" line="112">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T21:52:26.937412" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T21:52:26.937605" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T21:52:26.936932" elapsed="0.000714"/>
+</kw>
+<kw name="Set Up APRS Receive">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with Settings &gt; APRS &gt; Callsign ${APRS_CALLSIGN}, and open the inbox. This run's messages end their tag in ".${RUN}"</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-11-10T21:52:26.938080" elapsed="1.316428"/>
+</kw>
+<status status="PASS" start="2026-11-10T21:52:26.937915" elapsed="1.316804"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-11-10T21:52:28.255814" level="INFO">${head} = oat5.b364 full frame </msg>
+<var>${head}</var>
+<arg>oat5.${RUN} full frame${SPACE}</arg>
+<doc>Returns the given values which can then be assigned to a variable.</doc>
+<status status="PASS" start="2026-11-10T21:52:28.255057" elapsed="0.000784"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-11-10T21:52:28.256434" level="INFO">${text} = oat5.b364 full frame xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</msg>
+<var>${text}</var>
+<arg>$head + "x" * (242 - len($head))</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-11-10T21:52:28.255991" elapsed="0.000464"/>
+</kw>
+<kw name="Aprs Message" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:52:28.256726" level="INFO">${msg} = :N0CALL-7 :oat5.b364 full frame xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx...</msg>
+<var>${msg}</var>
+<arg>${APRS_CALLSIGN}</arg>
+<arg>${text}</arg>
+<arg>07</arg>
+<doc>An APRS message's information field, :ADDRESSEE:text{number, for
+Start Transmitting APRS Packets.</doc>
+<status status="PASS" start="2026-11-10T21:52:28.256576" elapsed="0.000167"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-11-10T21:52:28.257133" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${{ len($msg) }}</arg>
+<arg>256</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-10T21:52:28.256857" elapsed="0.000328"/>
+</kw>
+<kw name="Send APRS Packets">
+<kw name="Start Transmitting Aprs Packets" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:52:28.419998" level="INFO">${seconds} = 4.0208335</msg>
+<var>${seconds}</var>
+<arg>@{info}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+UI frames from `source` via `path` (digipeaters separated by commas,
+a * marking one that has repeated it, empty for none), then gap_s
+without carrier. Each transmission carries per_transmission frames
+back to back, one flag apart, as a TNC empties its queue.
+deviation_hz is the louder tone's peak deviation; twist_db raises
+the space tone over the mark, as a pre-emphasizing transmitter does
+(aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+offset_hz moves the carrier off frequency and baud_error_ppm the bit
+rate off 1200. The level is level_dbm at the radio, level_db
+relative to the bench's gain, or the bench's gain. Plays once
+unless loop; returns how long one pass lasts, in seconds, to wait
+before Stop Transmitting.</doc>
+<status status="PASS" start="2026-11-10T21:52:28.257709" elapsed="0.162341"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${{ ${seconds} + 1 }}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-10T21:52:28.420247" elapsed="5.026234"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:52:33.446819" elapsed="0.000429"/>
+</kw>
+<arg>${msg}</arg>
+<arg>source=${SENDER}</arg>
+<arg>path=DIGI1*,DIGI2*,DIGI3*,DIGI4*,DIGI5*,DIGI6*,DIGI7*,DIGI8*</arg>
+<arg>deviation_hz=${DEVIATION_HZ}</arg>
+<doc>Send packets with Start Transmitting APRS Packets, wait until
+they're out, then stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:52:28.257356" elapsed="5.190042"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>A message starting "oat5.${RUN} full frame xxx" arrived (cut short or not)</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-11-10T21:52:33.447695" elapsed="6.157709"/>
+</kw>
+<doc>APRS-RX-5: a frame of the full AX.25 size (330 bytes: eight
+digipeaters and a 256-byte information field) decodes. Its message
+text is longer than APRS allows (67), so the inbox may cut it short.</doc>
+<tag>band:70cm</tag>
+<tag>mode:aprs</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T21:52:26.935877" elapsed="12.669711"/>
+</test>
+<test id="s1-s1-t6" name="70cm: APRS RX Across Deviation And Pre-emphasis" line="125">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T21:52:39.606780" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T21:52:39.606959" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T21:52:39.606413" elapsed="0.000576"/>
+</kw>
+<kw name="Set Up APRS Receive">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with Settings &gt; APRS &gt; Callsign ${APRS_CALLSIGN}, and open the inbox. This run's messages end their tag in ".${RUN}"</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-11-10T21:52:39.607368" elapsed="0.884210"/>
+</kw>
+<status status="PASS" start="2026-11-10T21:52:39.607190" elapsed="0.884602"/>
+</kw>
+<kw name="Create List" owner="BuiltIn">
+<msg time="2026-11-10T21:52:40.492826" level="INFO">${expected} = []</msg>
+<var>${expected}</var>
+<doc>Creates and returns a list containing the given items.</doc>
+<status status="PASS" start="2026-11-10T21:52:40.492130" elapsed="0.000754"/>
+</kw>
+<for flavor="IN">
+<iter>
+<for flavor="IN">
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-11-10T21:52:40.493814" level="INFO">${text} = oat6.b364 1500 flat</msg>
+<var>${text}</var>
+<arg>oat6.${RUN} ${dev} ${label}</arg>
+<doc>Returns the given values which can then be assigned to a variable.</doc>
+<status status="PASS" start="2026-11-10T21:52:40.493564" elapsed="0.000270"/>
+</kw>
+<kw name="Aprs Message" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:52:40.494050" level="INFO">${msg} = :N0CALL-7 :oat6.b364 1500 flat</msg>
+<var>${msg}</var>
+<arg>${APRS_CALLSIGN}</arg>
+<arg>${text}</arg>
+<doc>An APRS message's information field, :ADDRESSEE:text{number, for
+Start Transmitting APRS Packets.</doc>
+<status status="PASS" start="2026-11-10T21:52:40.493923" elapsed="0.000143"/>
+</kw>
+<kw name="Send APRS Packets">
+<kw name="Start Transmitting Aprs Packets" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:52:40.564782" level="INFO">${seconds} = 2.2333335</msg>
+<var>${seconds}</var>
+<arg>@{info}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+UI frames from `source` via `path` (digipeaters separated by commas,
+a * marking one that has repeated it, empty for none), then gap_s
+without carrier. Each transmission carries per_transmission frames
+back to back, one flag apart, as a TNC empties its queue.
+deviation_hz is the louder tone's peak deviation; twist_db raises
+the space tone over the mark, as a pre-emphasizing transmitter does
+(aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+offset_hz moves the carrier off frequency and baud_error_ppm the bit
+rate off 1200. The level is level_dbm at the radio, level_db
+relative to the bench's gain, or the bench's gain. Plays once
+unless loop; returns how long one pass lasts, in seconds, to wait
+before Stop Transmitting.</doc>
+<status status="PASS" start="2026-11-10T21:52:40.494565" elapsed="0.070275"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${{ ${seconds} + 1 }}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-10T21:52:40.565008" elapsed="3.238008"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:52:43.803283" elapsed="0.000348"/>
+</kw>
+<arg>${msg}</arg>
+<arg>source=${SENDER}</arg>
+<arg>path=${PATH}</arg>
+<arg>deviation_hz=${dev}</arg>
+<arg>twist_db=${twist}</arg>
+<doc>Send packets with Start Transmitting APRS Packets, wait until
+they're out, then stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:52:40.494202" elapsed="3.309556"/>
+</kw>
+<kw name="Append To List" owner="Collections">
+<arg>${expected}</arg>
+<arg>${text}</arg>
+<doc>Adds `values` to the end of `list`.</doc>
+<status status="PASS" start="2026-11-10T21:52:43.803906" elapsed="0.000399"/>
+</kw>
+<var name="${twist}">0</var>
+<var name="${label}">flat</var>
+<status status="PASS" start="2026-11-10T21:52:40.493468" elapsed="3.310874"/>
+</iter>
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-11-10T21:52:43.805168" level="INFO">${text} = oat6.b364 1500 emph</msg>
+<var>${text}</var>
+<arg>oat6.${RUN} ${dev} ${label}</arg>
+<doc>Returns the given values which can then be assigned to a variable.</doc>
+<status status="PASS" start="2026-11-10T21:52:43.804703" elapsed="0.000489"/>
+</kw>
+<kw name="Aprs Message" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:52:43.805389" level="INFO">${msg} = :N0CALL-7 :oat6.b364 1500 emph</msg>
+<var>${msg}</var>
+<arg>${APRS_CALLSIGN}</arg>
+<arg>${text}</arg>
+<doc>An APRS message's information field, :ADDRESSEE:text{number, for
+Start Transmitting APRS Packets.</doc>
+<status status="PASS" start="2026-11-10T21:52:43.805264" elapsed="0.000140"/>
+</kw>
+<kw name="Send APRS Packets">
+<kw name="Start Transmitting Aprs Packets" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:52:43.875140" level="INFO">${seconds} = 2.2333335</msg>
+<var>${seconds}</var>
+<arg>@{info}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+UI frames from `source` via `path` (digipeaters separated by commas,
+a * marking one that has repeated it, empty for none), then gap_s
+without carrier. Each transmission carries per_transmission frames
+back to back, one flag apart, as a TNC empties its queue.
+deviation_hz is the louder tone's peak deviation; twist_db raises
+the space tone over the mark, as a pre-emphasizing transmitter does
+(aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+offset_hz moves the carrier off frequency and baud_error_ppm the bit
+rate off 1200. The level is level_dbm at the radio, level_db
+relative to the bench's gain, or the bench's gain. Plays once
+unless loop; returns how long one pass lasts, in seconds, to wait
+before Stop Transmitting.</doc>
+<status status="PASS" start="2026-11-10T21:52:43.806100" elapsed="0.069097"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${{ ${seconds} + 1 }}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-10T21:52:43.875386" elapsed="3.234381"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:52:47.110309" elapsed="0.000384"/>
+</kw>
+<arg>${msg}</arg>
+<arg>source=${SENDER}</arg>
+<arg>path=${PATH}</arg>
+<arg>deviation_hz=${dev}</arg>
+<arg>twist_db=${twist}</arg>
+<doc>Send packets with Start Transmitting APRS Packets, wait until
+they're out, then stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:52:43.805590" elapsed="3.305252"/>
+</kw>
+<kw name="Append To List" owner="Collections">
+<arg>${expected}</arg>
+<arg>${text}</arg>
+<doc>Adds `values` to the end of `list`.</doc>
+<status status="PASS" start="2026-11-10T21:52:47.111021" elapsed="0.000268"/>
+</kw>
+<var name="${twist}">5.3</var>
+<var name="${label}">emph</var>
+<status status="PASS" start="2026-11-10T21:52:43.804600" elapsed="3.306726"/>
+</iter>
+<var>${twist}</var>
+<var>${label}</var>
+<value>0</value>
+<value>flat</value>
+<value>5.3</value>
+<value>emph</value>
+<status status="PASS" start="2026-11-10T21:52:40.493382" elapsed="6.618008"/>
+</for>
+<var name="${dev}">1500</var>
+<status status="PASS" start="2026-11-10T21:52:40.493342" elapsed="6.618133"/>
+</iter>
+<iter>
+<for flavor="IN">
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-11-10T21:52:47.112447" level="INFO">${text} = oat6.b364 3000 flat</msg>
+<var>${text}</var>
+<arg>oat6.${RUN} ${dev} ${label}</arg>
+<doc>Returns the given values which can then be assigned to a variable.</doc>
+<status status="PASS" start="2026-11-10T21:52:47.111982" elapsed="0.000490"/>
+</kw>
+<kw name="Aprs Message" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:52:47.112705" level="INFO">${msg} = :N0CALL-7 :oat6.b364 3000 flat</msg>
+<var>${msg}</var>
+<arg>${APRS_CALLSIGN}</arg>
+<arg>${text}</arg>
+<doc>An APRS message's information field, :ADDRESSEE:text{number, for
+Start Transmitting APRS Packets.</doc>
+<status status="PASS" start="2026-11-10T21:52:47.112562" elapsed="0.000162"/>
+</kw>
+<kw name="Send APRS Packets">
+<kw name="Start Transmitting Aprs Packets" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:52:47.183039" level="INFO">${seconds} = 2.2341665</msg>
+<var>${seconds}</var>
+<arg>@{info}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+UI frames from `source` via `path` (digipeaters separated by commas,
+a * marking one that has repeated it, empty for none), then gap_s
+without carrier. Each transmission carries per_transmission frames
+back to back, one flag apart, as a TNC empties its queue.
+deviation_hz is the louder tone's peak deviation; twist_db raises
+the space tone over the mark, as a pre-emphasizing transmitter does
+(aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+offset_hz moves the carrier off frequency and baud_error_ppm the bit
+rate off 1200. The level is level_dbm at the radio, level_db
+relative to the bench's gain, or the bench's gain. Plays once
+unless loop; returns how long one pass lasts, in seconds, to wait
+before Stop Transmitting.</doc>
+<status status="PASS" start="2026-11-10T21:52:47.113372" elapsed="0.069729"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${{ ${seconds} + 1 }}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-10T21:52:47.183279" elapsed="3.237392"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:52:50.420972" elapsed="0.000385"/>
+</kw>
+<arg>${msg}</arg>
+<arg>source=${SENDER}</arg>
+<arg>path=${PATH}</arg>
+<arg>deviation_hz=${dev}</arg>
+<arg>twist_db=${twist}</arg>
+<doc>Send packets with Start Transmitting APRS Packets, wait until
+they're out, then stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:52:47.112910" elapsed="3.308564"/>
+</kw>
+<kw name="Append To List" owner="Collections">
+<arg>${expected}</arg>
+<arg>${text}</arg>
+<doc>Adds `values` to the end of `list`.</doc>
+<status status="PASS" start="2026-11-10T21:52:50.421601" elapsed="0.000280"/>
+</kw>
+<var name="${twist}">0</var>
+<var name="${label}">flat</var>
+<status status="PASS" start="2026-11-10T21:52:47.111884" elapsed="3.310046"/>
+</iter>
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-11-10T21:52:50.423103" level="INFO">${text} = oat6.b364 3000 emph</msg>
+<var>${text}</var>
+<arg>oat6.${RUN} ${dev} ${label}</arg>
+<doc>Returns the given values which can then be assigned to a variable.</doc>
+<status status="PASS" start="2026-11-10T21:52:50.422386" elapsed="0.000758"/>
+</kw>
+<kw name="Aprs Message" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:52:50.423481" level="INFO">${msg} = :N0CALL-7 :oat6.b364 3000 emph</msg>
+<var>${msg}</var>
+<arg>${APRS_CALLSIGN}</arg>
+<arg>${text}</arg>
+<doc>An APRS message's information field, :ADDRESSEE:text{number, for
+Start Transmitting APRS Packets.</doc>
+<status status="PASS" start="2026-11-10T21:52:50.423278" elapsed="0.000246"/>
+</kw>
+<kw name="Send APRS Packets">
+<kw name="Start Transmitting Aprs Packets" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:52:50.498192" level="INFO">${seconds} = 2.2333335</msg>
+<var>${seconds}</var>
+<arg>@{info}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+UI frames from `source` via `path` (digipeaters separated by commas,
+a * marking one that has repeated it, empty for none), then gap_s
+without carrier. Each transmission carries per_transmission frames
+back to back, one flag apart, as a TNC empties its queue.
+deviation_hz is the louder tone's peak deviation; twist_db raises
+the space tone over the mark, as a pre-emphasizing transmitter does
+(aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+offset_hz moves the carrier off frequency and baud_error_ppm the bit
+rate off 1200. The level is level_dbm at the radio, level_db
+relative to the bench's gain, or the bench's gain. Plays once
+unless loop; returns how long one pass lasts, in seconds, to wait
+before Stop Transmitting.</doc>
+<status status="PASS" start="2026-11-10T21:52:50.424169" elapsed="0.074085"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${{ ${seconds} + 1 }}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-10T21:52:50.498454" elapsed="3.235294"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:52:53.734081" elapsed="0.000408"/>
+</kw>
+<arg>${msg}</arg>
+<arg>source=${SENDER}</arg>
+<arg>path=${PATH}</arg>
+<arg>deviation_hz=${dev}</arg>
+<arg>twist_db=${twist}</arg>
+<doc>Send packets with Start Transmitting APRS Packets, wait until
+they're out, then stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:52:50.423729" elapsed="3.310911"/>
+</kw>
+<kw name="Append To List" owner="Collections">
+<arg>${expected}</arg>
+<arg>${text}</arg>
+<doc>Adds `values` to the end of `list`.</doc>
+<status status="PASS" start="2026-11-10T21:52:53.734845" elapsed="0.000409"/>
+</kw>
+<var name="${twist}">5.3</var>
+<var name="${label}">emph</var>
+<status status="PASS" start="2026-11-10T21:52:50.422234" elapsed="3.313075"/>
+</iter>
+<var>${twist}</var>
+<var>${label}</var>
+<value>0</value>
+<value>flat</value>
+<value>5.3</value>
+<value>emph</value>
+<status status="PASS" start="2026-11-10T21:52:47.111756" elapsed="6.623633"/>
+</for>
+<var name="${dev}">3000</var>
+<status status="PASS" start="2026-11-10T21:52:47.111712" elapsed="6.623766"/>
+</iter>
+<iter>
+<for flavor="IN">
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-11-10T21:52:53.736462" level="INFO">${text} = oat6.b364 4500 flat</msg>
+<var>${text}</var>
+<arg>oat6.${RUN} ${dev} ${label}</arg>
+<doc>Returns the given values which can then be assigned to a variable.</doc>
+<status status="PASS" start="2026-11-10T21:52:53.736068" elapsed="0.000414"/>
+</kw>
+<kw name="Aprs Message" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:52:53.736776" level="INFO">${msg} = :N0CALL-7 :oat6.b364 4500 flat</msg>
+<var>${msg}</var>
+<arg>${APRS_CALLSIGN}</arg>
+<arg>${text}</arg>
+<doc>An APRS message's information field, :ADDRESSEE:text{number, for
+Start Transmitting APRS Packets.</doc>
+<status status="PASS" start="2026-11-10T21:52:53.736662" elapsed="0.000129"/>
+</kw>
+<kw name="Send APRS Packets">
+<kw name="Start Transmitting Aprs Packets" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:52:53.810882" level="INFO">${seconds} = 2.2333335</msg>
+<var>${seconds}</var>
+<arg>@{info}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+UI frames from `source` via `path` (digipeaters separated by commas,
+a * marking one that has repeated it, empty for none), then gap_s
+without carrier. Each transmission carries per_transmission frames
+back to back, one flag apart, as a TNC empties its queue.
+deviation_hz is the louder tone's peak deviation; twist_db raises
+the space tone over the mark, as a pre-emphasizing transmitter does
+(aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+offset_hz moves the carrier off frequency and baud_error_ppm the bit
+rate off 1200. The level is level_dbm at the radio, level_db
+relative to the bench's gain, or the bench's gain. Plays once
+unless loop; returns how long one pass lasts, in seconds, to wait
+before Stop Transmitting.</doc>
+<status status="PASS" start="2026-11-10T21:52:53.742181" elapsed="0.068758"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${{ ${seconds} + 1 }}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-10T21:52:53.811159" elapsed="3.235167"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:52:57.046513" elapsed="0.000203"/>
+</kw>
+<arg>${msg}</arg>
+<arg>source=${SENDER}</arg>
+<arg>path=${PATH}</arg>
+<arg>deviation_hz=${dev}</arg>
+<arg>twist_db=${twist}</arg>
+<doc>Send packets with Start Transmitting APRS Packets, wait until
+they're out, then stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:52:53.741579" elapsed="3.305220"/>
+</kw>
+<kw name="Append To List" owner="Collections">
+<arg>${expected}</arg>
+<arg>${text}</arg>
+<doc>Adds `values` to the end of `list`.</doc>
+<status status="PASS" start="2026-11-10T21:52:57.046903" elapsed="0.000187"/>
+</kw>
+<var name="${twist}">0</var>
+<var name="${label}">flat</var>
+<status status="PASS" start="2026-11-10T21:52:53.735972" elapsed="3.311147"/>
+</iter>
+<iter>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2026-11-10T21:52:57.047695" level="INFO">${text} = oat6.b364 4500 emph</msg>
+<var>${text}</var>
+<arg>oat6.${RUN} ${dev} ${label}</arg>
+<doc>Returns the given values which can then be assigned to a variable.</doc>
+<status status="PASS" start="2026-11-10T21:52:57.047349" elapsed="0.000368"/>
+</kw>
+<kw name="Aprs Message" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:52:57.047899" level="INFO">${msg} = :N0CALL-7 :oat6.b364 4500 emph</msg>
+<var>${msg}</var>
+<arg>${APRS_CALLSIGN}</arg>
+<arg>${text}</arg>
+<doc>An APRS message's information field, :ADDRESSEE:text{number, for
+Start Transmitting APRS Packets.</doc>
+<status status="PASS" start="2026-11-10T21:52:57.047790" elapsed="0.000122"/>
+</kw>
+<kw name="Send APRS Packets">
+<kw name="Start Transmitting Aprs Packets" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:52:57.113947" level="INFO">${seconds} = 2.2341665</msg>
+<var>${seconds}</var>
+<arg>@{info}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send APRS packets on the test frequency: TXDELAY of flags, the AX.25
+UI frames from `source` via `path` (digipeaters separated by commas,
+a * marking one that has repeated it, empty for none), then gap_s
+without carrier. Each transmission carries per_transmission frames
+back to back, one flag apart, as a TNC empties its queue.
+deviation_hz is the louder tone's peak deviation; twist_db raises
+the space tone over the mark, as a pre-emphasizing transmitter does
+(aprs.PREEMPHASIS_TWIST_DB, 5.3 dB), or lowers it when negative.
+offset_hz moves the carrier off frequency and baud_error_ppm the bit
+rate off 1200. The level is level_dbm at the radio, level_db
+relative to the bench's gain, or the bench's gain. Plays once
+unless loop; returns how long one pass lasts, in seconds, to wait
+before Stop Transmitting.</doc>
+<status status="PASS" start="2026-11-10T21:52:57.048391" elapsed="0.065609"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${{ ${seconds} + 1 }}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-10T21:52:57.114168" elapsed="3.239326"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:53:00.353868" elapsed="0.000441"/>
+</kw>
+<arg>${msg}</arg>
+<arg>source=${SENDER}</arg>
+<arg>path=${PATH}</arg>
+<arg>deviation_hz=${dev}</arg>
+<arg>twist_db=${twist}</arg>
+<doc>Send packets with Start Transmitting APRS Packets, wait until
+they're out, then stop the transmitter.</doc>
+<status status="PASS" start="2026-11-10T21:52:57.048044" elapsed="3.306438"/>
+</kw>
+<kw name="Append To List" owner="Collections">
+<arg>${expected}</arg>
+<arg>${text}</arg>
+<doc>Adds `values` to the end of `list`.</doc>
+<status status="PASS" start="2026-11-10T21:53:00.354702" elapsed="0.000440"/>
+</kw>
+<var name="${twist}">5.3</var>
+<var name="${label}">emph</var>
+<status status="PASS" start="2026-11-10T21:52:57.047259" elapsed="3.307940"/>
+</iter>
+<var>${twist}</var>
+<var>${label}</var>
+<value>0</value>
+<value>flat</value>
+<value>5.3</value>
+<value>emph</value>
+<status status="PASS" start="2026-11-10T21:52:53.735841" elapsed="6.619472"/>
+</for>
+<var name="${dev}">4500</var>
+<status status="PASS" start="2026-11-10T21:52:53.735791" elapsed="6.619600"/>
+</iter>
+<var>${dev}</var>
+<value>@{DEVIATIONS_HZ}</value>
+<status status="PASS" start="2026-11-10T21:52:40.493066" elapsed="19.862378"/>
+</for>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-11-10T21:53:00.356797" level="INFO">${list} = oat6.b364 1500 flat, oat6.b364 1500 emph, oat6.b364 3000 flat, oat6.b364 3000 emph, oat6.b364 4500 flat, oat6.b364 4500 emph</msg>
+<var>${list}</var>
+<arg>", ".join($expected)</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-11-10T21:53:00.355782" elapsed="0.001066"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>All ${{ len($expected) }} "oat6.${RUN}" messages arrived: ${list}</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-11-10T21:53:00.356994" elapsed="2.198177"/>
+</kw>
+<doc>APRS-RX-6: messages at ['1500', '3000', '4500'] Hz deviation, each flat
+and with a pre-emphasizing transmitter's 5.3 dB twist, all arrive:
+a strong signal mustn't overflow the demodulator, a weak one or a
+tilted one mustn't be lost.</doc>
+<tag>band:70cm</tag>
+<tag>mode:aprs</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T21:52:39.605831" elapsed="22.949723"/>
+</test>
+<kw name="Close Bench" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the instruments and write measurements.json: every capture,
+check and operator answer, with the run's provenance. Absolute paths
+are made relative, so the file can be published as it is.</doc>
+<status status="PASS" start="2026-11-10T21:53:02.556511" elapsed="0.213818"/>
+</kw>
+<doc>APRS on receive (OpenRTX#559): the transmitter sends APRS packets
+(oat.aprs: AX.25 UI frames as 1200 baud Bell 202 AFSK on FM, checked
+against Dire Wolf) and messages addressed to the radio's APRS
+callsign must land in its inbox, once each, and nothing else.
+
+Until the radio can report its inbox over a data link, the operator
+reads it: every message carries a short tag ("oat1.7f2a",
+"oat2.7f2a"...) to look for, whose second half differs from run to run
+(Run Tag). A rerun's messages are new messages, then: the radio
+mustn't treat them as copies of the last run's, nor the operator
+mistake the last run's for them. No audio interface is needed. The
+radio file decides where APRS runs (mode:aprs on a band).</doc>
+<status status="PASS" start="2026-11-10T21:47:43.433696" elapsed="319.336791"/>
+</suite>
+<suite id="s1-s2" name="Performance" source="acceptance/aprs/performance.robot">
+<kw name="Open Bench" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T21:53:02.781822" level="INFO">Results in runs/cs7000p-aprs-vga40/bench-Rx_&amp;_Performance.Performance</msg>
+<msg time="2026-11-10T21:53:02.810551" level="INFO">Set suite metadata 'Firmware' to value 'aprs-usb-tnc-fc93d759'.</msg>
+<msg time="2026-11-10T21:53:02.810696" level="INFO">Set suite metadata 'Radio' to value 'Connect Systems CS7000-PLUS (cs7000p)'.</msg>
+<msg time="2026-11-10T21:53:02.810718" level="INFO">Set suite metadata 'Hardware' to value 'CS7000-PLUS 2709D157450086'.</msg>
+<msg time="2026-11-10T21:53:02.810733" level="INFO">Set suite metadata 'DSP' to value 'none'.</msg>
+<msg time="2026-11-10T21:53:02.810747" level="INFO">Set suite metadata 'Station' to value 'k0ret'.</msg>
+<msg time="2026-11-10T21:53:02.810759" level="INFO">Set suite metadata 'TNC' to value 'serial'.</msg>
+<msg time="2026-11-10T21:53:02.810772" level="INFO">Set suite metadata 'Calibration' to value 'assumed, measured 2026-10-20 (d55ce4aa0a3c)'.</msg>
+<msg time="2026-11-10T21:53:02.810788" level="INFO">Set suite metadata 'Suite commit' to value '1d00f71740'.</msg>
+<arg>${BENCH}</arg>
+<arg>${CALIBRATION}</arg>
+<arg>${RADIO}</arg>
+<arg>${FIRMWARE}</arg>
+<arg>${HARDWARE}</arg>
+<arg>dsp=${DSP}</arg>
+<doc>Load the bench, its calibration and the radio file, and prepare the
+instruments. All five are mandatory and differ from tester to tester,
+so suites take them from the command line (-v BENCH:... and so on).
+`firmware` names what the radio runs, such as a git describe;
+`hardware` names the unit, by model and serial number, since units of
+one model measure differently. `dsp` names the DSP image the radio's
+audio processor runs, such as its sha256; it is mandatory for radio
+files with dsp_image: true, whose firmware states can differ in it
+alone.</doc>
+<status status="PASS" start="2026-11-10T21:53:02.773969" elapsed="1.523017"/>
+</kw>
+<test id="s1-s2-t1" name="70cm: APRS Perf Every Frame Heard At The Bench Level" line="64">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T21:53:04.299362" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T21:53:04.299592" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T21:53:04.298609" elapsed="0.001041"/>
+</kw>
+<kw name="Set Up APRS TNC">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with its USB port connected to the bench's TNC port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-11-10T21:53:04.300908" elapsed="3.563616"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="PASS" start="2026-11-10T21:53:07.864794" elapsed="0.000583"/>
+</kw>
+<status status="PASS" start="2026-11-10T21:53:04.300513" elapsed="3.564926"/>
+</branch>
+<status status="PASS" start="2026-11-10T21:53:04.300463" elapsed="3.565025"/>
+</if>
+<doc>Once per band: the radio in APRS mode on the band's frequency
+and its TNC port connected.</doc>
+<status status="PASS" start="2026-11-10T21:53:04.300114" elapsed="3.565443"/>
+</kw>
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:54:06.181685" level="INFO">status: heard 50 of 50 (gap_s=0.5)</msg>
+<msg time="2026-11-10T21:54:06.182025" level="INFO">${r} = {'frames': 'status', 'sent': 50, 'heard': 50, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'gap_s': '0.5'}}</msg>
+<var>${r}</var>
+<arg>${FRAMES}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T21:53:07.865747" elapsed="58.316308"/>
+</kw>
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:54:06.182799" level="INFO">Set test message to:
+status: 50/50</msg>
+<arg>${r}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T21:54:06.182496" elapsed="0.000341"/>
+</kw>
+<doc>APRS-PERF-1: at the bench's level, nominal deviation and no
+twist, the radio reports every frame (aprs.min_frame_rate),
+exactly as sent, once.</doc>
+<tag>band:70cm</tag>
+<tag>mode:aprs</tag>
+<tag>needs:tnc</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T21:53:04.297373" elapsed="61.885590">status: 50/50</status>
+</test>
+<test id="s1-s2-t2" name="70cm: APRS Perf Full-Size Frames Survive The TNC" line="72">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T21:54:06.184178" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T21:54:06.184376" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T21:54:06.183806" elapsed="0.000602"/>
+</kw>
+<kw name="Set Up APRS TNC">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with its USB port connected to the bench's TNC port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-10T21:54:06.185085" elapsed="0.000016"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-10T21:54:06.185194" elapsed="0.000013"/>
+</kw>
+<status status="NOT RUN" start="2026-11-10T21:54:06.184862" elapsed="0.000366"/>
+</branch>
+<status status="PASS" start="2026-11-10T21:54:06.184842" elapsed="0.000407"/>
+</if>
+<doc>Once per band: the radio in APRS mode on the band's frequency
+and its TNC port connected.</doc>
+<status status="PASS" start="2026-11-10T21:54:06.184669" elapsed="0.000618"/>
+</kw>
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:54:39.537767" level="INFO">full: heard 10 of 10 (path=DIGI1*,DIGI2*,DIGI3*,DIGI4*,DIGI5*,DIGI6*,DIGI7*,DIGI8*, gap_s=0.5)</msg>
+<msg time="2026-11-10T21:54:39.538454" level="INFO">${full} = {'frames': 'full', 'sent': 10, 'heard': 10, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'path': 'DIGI1*,DIGI2*,DIGI3*,DIGI4*,D...</msg>
+<var>${full}</var>
+<arg>10</arg>
+<arg>kind=full</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T21:54:06.185370" elapsed="33.353124"/>
+</kw>
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:54:39.540943" level="INFO">Set test message to:
+full: 10/10</msg>
+<arg>${full}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T21:54:39.540652" elapsed="0.000355"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${full}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T21:54:39.539679" elapsed="0.001392"/>
+</kw>
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:55:12.913517" level="INFO">escapes: heard 10 of 10 (path=DIGI1*,DIGI2*,DIGI3*,DIGI4*,DIGI5*,DIGI6*,DIGI7*,DIGI8*, gap_s=0.5)</msg>
+<msg time="2026-11-10T21:55:12.914031" level="INFO">${esc} = {'frames': 'escapes', 'sent': 10, 'heard': 10, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'path': 'DIGI1*,DIGI2*,DIGI3*,DIGI4...</msg>
+<var>${esc}</var>
+<arg>10</arg>
+<arg>kind=escapes</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T21:54:39.541248" elapsed="33.372826"/>
+</kw>
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:55:12.915193" level="INFO">Set test message to:
+full: 10/10 escapes: 10/10</msg>
+<arg>${esc}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T21:55:12.914742" elapsed="0.000515"/>
+</kw>
+<doc>APRS-PERF-2: the largest frame (eight digipeaters, 256-byte
+information field), and one full of the bytes KISS escapes (0xC0,
+0xDB), come out of the TNC exactly as sent: the decoder's size
+limit, and the SLIP encoder's escapes across its chunks.</doc>
+<tag>band:70cm</tag>
+<tag>mode:aprs</tag>
+<tag>needs:tnc</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T21:54:06.183188" elapsed="66.732482">full: 10/10 escapes: 10/10</status>
+</test>
+<test id="s1-s2-t3" name="70cm: APRS Perf Sensitivity" line="83">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T21:55:12.917232" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T21:55:12.917417" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T21:55:12.916797" elapsed="0.000663"/>
+</kw>
+<kw name="Set Up APRS TNC">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with its USB port connected to the bench's TNC port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-10T21:55:12.918358" elapsed="0.000015"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-10T21:55:12.918465" elapsed="0.000012"/>
+</kw>
+<status status="NOT RUN" start="2026-11-10T21:55:12.918075" elapsed="0.000426"/>
+</branch>
+<status status="PASS" start="2026-11-10T21:55:12.918047" elapsed="0.000481"/>
+</if>
+<doc>Once per band: the radio in APRS mode on the band's frequency
+and its TNC port connected.</doc>
+<status status="PASS" start="2026-11-10T21:55:12.917845" elapsed="0.001060"/>
+</kw>
+<kw name="Find Aprs Sensitivity" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:55:37.511999" level="INFO">status: heard 20 of 20 (level_db=0.0, gap_s=0.5)</msg>
+<msg time="2026-11-10T21:56:02.096187" level="INFO">status: heard 20 of 20 (level_db=-2.0, gap_s=0.5)</msg>
+<msg time="2026-11-10T21:56:26.694409" level="INFO">status: heard 20 of 20 (level_db=-4.0, gap_s=0.5)</msg>
+<msg time="2026-11-10T21:56:51.287269" level="INFO">status: heard 18 of 20 (level_db=-6.0, gap_s=0.5)</msg>
+<msg time="2026-11-10T21:57:15.907444" level="INFO">status: heard 12 of 20 (level_db=-8.0, gap_s=0.5)</msg>
+<msg time="2026-11-10T21:57:40.503034" level="INFO">status: heard 4 of 20 (level_db=-10.0, gap_s=0.5)</msg>
+<msg time="2026-11-10T21:57:40.503544" level="INFO" html="true">&lt;table&gt;&lt;tr&gt;&lt;th&gt;level (dB re bench)&lt;/th&gt;&lt;th&gt;heard&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;+0.0&lt;/td&gt;&lt;td&gt;100%&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-2.0&lt;/td&gt;&lt;td&gt;100%&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-4.0&lt;/td&gt;&lt;td&gt;100%&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-6.0&lt;/td&gt;&lt;td&gt;90%&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-8.0&lt;/td&gt;&lt;td&gt;60%&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-10.0&lt;/td&gt;&lt;td&gt;20%&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-11-10T21:57:40.503642" level="INFO">Set test message to:
+90% at -6.0, 50% at -8.5 dB re bench</msg>
+<arg>${SWEEP_START}</arg>
+<arg>${SWEEP_STOP}</arg>
+<arg>${SWEEP_STEP}</arg>
+<arg>${STRESS_FRAMES}</arg>
+<arg>absolute=${ABSOLUTE_LEVELS}</arg>
+<doc>Step the level down from `start` to `stop`, sending `count` test
+frames at each, until fewer than half are heard; the result has the
+curve and the levels where 90% and 50% of frames were still heard,
+interpolated. Levels are dBm at the radio with a transmitter level
+table (or absolute: true), otherwise dB relative to the bench's
+gain; compare relative results only within one session, on one
+bench. Takes Send APRS Test Frames' options.</doc>
+<status status="PASS" start="2026-11-10T21:55:12.919064" elapsed="147.584810"/>
+</kw>
+<doc>APRS-PERF-3: the frame rate as the level falls, and the levels
+where 90% and 50% of frames are still heard. Recorded for
+comparison; no limit yet.</doc>
+<tag>band:70cm</tag>
+<tag>mode:aprs</tag>
+<tag>needs:tnc</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T21:55:12.916102" elapsed="147.588309">90% at -6.0, 50% at -8.5 dB re bench</status>
+</test>
+<test id="s1-s2-t4" name="70cm: APRS Perf Twist" line="91">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T21:57:40.507522" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T21:57:40.507808" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T21:57:40.506672" elapsed="0.001180"/>
+</kw>
+<kw name="Set Up APRS TNC">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with its USB port connected to the bench's TNC port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-10T21:57:40.509016" elapsed="0.000017"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-10T21:57:40.509344" elapsed="0.000038"/>
+</kw>
+<status status="NOT RUN" start="2026-11-10T21:57:40.508677" elapsed="0.000761"/>
+</branch>
+<status status="PASS" start="2026-11-10T21:57:40.508633" elapsed="0.000868"/>
+</if>
+<doc>Once per band: the radio in APRS mode on the band's frequency
+and its TNC port connected.</doc>
+<status status="PASS" start="2026-11-10T21:57:40.508411" elapsed="0.001183"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:58:05.094850" level="INFO">status: heard 20 of 20 (twist_db=-9, gap_s=0.5)</msg>
+<msg time="2026-11-10T21:58:05.095451" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'twist_db': '-9', 'gap_s': '0.5'}}</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T21:57:40.511011" elapsed="24.584473"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:58:05.096323" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T21:58:05.095963" elapsed="0.000390"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="NOT RUN" start="2026-11-10T21:58:05.096668" elapsed="0.000017"/>
+</kw>
+<status status="NOT RUN" start="2026-11-10T21:58:05.096474" elapsed="0.000245"/>
+</branch>
+<status status="PASS" start="2026-11-10T21:58:05.096439" elapsed="0.000313"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T21:58:05.096805" elapsed="0.000120"/>
+</return>
+<arg>${{ abs(${twist}) &lt;= 6 }}</arg>
+<arg>twist_db=${twist}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T21:57:40.510282" elapsed="24.586797"/>
+</kw>
+<var name="${twist}">-9</var>
+<status status="PASS" start="2026-11-10T21:57:40.510009" elapsed="24.587111"/>
+</iter>
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:58:29.685164" level="INFO">status: heard 20 of 20 (twist_db=-6, gap_s=0.5)</msg>
+<msg time="2026-11-10T21:58:29.685813" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'twist_db': '-6', 'gap_s': '0.5'}}</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T21:58:05.098204" elapsed="24.587655"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:58:29.686839" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T21:58:29.686424" elapsed="0.000439"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:58:29.689865" level="INFO">Set test message to:
+status: 20/20</msg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T21:58:29.687873" elapsed="0.002070"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T21:58:29.687229" elapsed="0.002790"/>
+</kw>
+<status status="PASS" start="2026-11-10T21:58:29.687006" elapsed="0.003040"/>
+</branch>
+<status status="PASS" start="2026-11-10T21:58:29.686962" elapsed="0.003123"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T21:58:29.690138" elapsed="0.000090"/>
+</return>
+<arg>${{ abs(${twist}) &lt;= 6 }}</arg>
+<arg>twist_db=${twist}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T21:58:05.097565" elapsed="24.592763"/>
+</kw>
+<var name="${twist}">-6</var>
+<status status="PASS" start="2026-11-10T21:58:05.097279" elapsed="24.593082"/>
+</iter>
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:58:54.273337" level="INFO">status: heard 20 of 20 (twist_db=-3, gap_s=0.5)</msg>
+<msg time="2026-11-10T21:58:54.274053" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'twist_db': '-3', 'gap_s': '0.5'}}</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T21:58:29.691551" elapsed="24.582556"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:58:54.275234" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T21:58:54.274750" elapsed="0.000513"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:58:54.276256" level="INFO">Set test message to:
+status: 20/20 status: 20/20</msg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T21:58:54.276064" elapsed="0.000225"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T21:58:54.275574" elapsed="0.000833"/>
+</kw>
+<status status="PASS" start="2026-11-10T21:58:54.275396" elapsed="0.001034"/>
+</branch>
+<status status="PASS" start="2026-11-10T21:58:54.275358" elapsed="0.001102"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T21:58:54.276500" elapsed="0.000075"/>
+</return>
+<arg>${{ abs(${twist}) &lt;= 6 }}</arg>
+<arg>twist_db=${twist}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T21:58:29.690786" elapsed="24.585884"/>
+</kw>
+<var name="${twist}">-3</var>
+<status status="PASS" start="2026-11-10T21:58:29.690525" elapsed="24.586178"/>
+</iter>
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:59:18.856718" level="INFO">status: heard 20 of 20 (twist_db=3, gap_s=0.5)</msg>
+<msg time="2026-11-10T21:59:18.857385" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'twist_db': '3', 'gap_s': '0.5'}}</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T21:58:54.277496" elapsed="24.579944"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:59:18.858565" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T21:59:18.858051" elapsed="0.000552"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:59:18.860036" level="INFO">Set test message to:
+status: 20/20 status: 20/20 status: 20/20</msg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T21:59:18.859721" elapsed="0.000378"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T21:59:18.859042" elapsed="0.001130"/>
+</kw>
+<status status="PASS" start="2026-11-10T21:59:18.858793" elapsed="0.001423"/>
+</branch>
+<status status="PASS" start="2026-11-10T21:59:18.858734" elapsed="0.001518"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T21:59:18.860309" elapsed="0.000099"/>
+</return>
+<arg>${{ abs(${twist}) &lt;= 6 }}</arg>
+<arg>twist_db=${twist}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T21:58:54.277044" elapsed="24.583526"/>
+</kw>
+<var name="${twist}">3</var>
+<status status="PASS" start="2026-11-10T21:58:54.276844" elapsed="24.583787"/>
+</iter>
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:59:43.461395" level="INFO">status: heard 20 of 20 (twist_db=6, gap_s=0.5)</msg>
+<msg time="2026-11-10T21:59:43.462017" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'twist_db': '6', 'gap_s': '0.5'}}</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T21:59:18.861960" elapsed="24.600105"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:59:43.463117" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T21:59:43.462639" elapsed="0.000509"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T21:59:43.464541" level="INFO">Set test message to:
+status: 20/20 status: 20/20 status: 20/20 status: 20/20</msg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T21:59:43.464227" elapsed="0.000371"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T21:59:43.463543" elapsed="0.001116"/>
+</kw>
+<status status="PASS" start="2026-11-10T21:59:43.463312" elapsed="0.001393"/>
+</branch>
+<status status="PASS" start="2026-11-10T21:59:43.463267" elapsed="0.001475"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T21:59:43.464800" elapsed="0.000100"/>
+</return>
+<arg>${{ abs(${twist}) &lt;= 6 }}</arg>
+<arg>twist_db=${twist}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T21:59:18.861146" elapsed="24.603906"/>
+</kw>
+<var name="${twist}">6</var>
+<status status="PASS" start="2026-11-10T21:59:18.860838" elapsed="24.604273"/>
+</iter>
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:00:08.052187" level="INFO">status: heard 20 of 20 (twist_db=9, gap_s=0.5)</msg>
+<msg time="2026-11-10T22:00:08.052794" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'twist_db': '9', 'gap_s': '0.5'}}</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T21:59:43.466418" elapsed="24.586427"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:00:08.053991" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T22:00:08.053592" elapsed="0.000423"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="NOT RUN" start="2026-11-10T22:00:08.054323" elapsed="0.000017"/>
+</kw>
+<status status="NOT RUN" start="2026-11-10T22:00:08.054145" elapsed="0.000224"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:00:08.054111" elapsed="0.000284"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T22:00:08.054441" elapsed="0.000083"/>
+</return>
+<arg>${{ abs(${twist}) &lt;= 6 }}</arg>
+<arg>twist_db=${twist}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T21:59:43.465616" elapsed="24.589035"/>
+</kw>
+<var name="${twist}">9</var>
+<status status="PASS" start="2026-11-10T21:59:43.465308" elapsed="24.589392"/>
+</iter>
+<var>${twist}</var>
+<value>-9</value>
+<value>-6</value>
+<value>-3</value>
+<value>3</value>
+<value>6</value>
+<value>9</value>
+<status status="PASS" start="2026-11-10T21:57:40.509750" elapsed="147.544999"/>
+</for>
+<doc>APRS-PERF-4: the space tone from 9 dB below the mark to 9 dB
+above it, as transmitters with and without pre-emphasis reach
+receivers with and without de-emphasis. Within 6 dB is held to the
+stress limit; 9 dB is recorded.</doc>
+<tag>band:70cm</tag>
+<tag>mode:aprs</tag>
+<tag>needs:tnc</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T21:57:40.505162" elapsed="147.549906">status: 20/20 status: 20/20 status: 20/20 status: 20/20</status>
+</test>
+<test id="s1-s2-t5" name="70cm: APRS Perf Deviation" line="101">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T22:00:08.056438" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T22:00:08.056632" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T22:00:08.055997" elapsed="0.000687"/>
+</kw>
+<kw name="Set Up APRS TNC">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with its USB port connected to the bench's TNC port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-10T22:00:08.057542" elapsed="0.000013"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-10T22:00:08.057641" elapsed="0.000009"/>
+</kw>
+<status status="NOT RUN" start="2026-11-10T22:00:08.057261" elapsed="0.000406"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:00:08.057243" elapsed="0.000441"/>
+</if>
+<doc>Once per band: the radio in APRS mode on the band's frequency
+and its TNC port connected.</doc>
+<status status="PASS" start="2026-11-10T22:00:08.057061" elapsed="0.000653"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:00:32.644924" level="INFO">status: heard 20 of 20 (deviation_hz=1000, gap_s=0.5)</msg>
+<msg time="2026-11-10T22:00:32.645270" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'deviation_hz': '1000', 'gap_s': '0....</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T22:00:08.058306" elapsed="24.586999"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:00:32.646226" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T22:00:32.645924" elapsed="0.000328"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="NOT RUN" start="2026-11-10T22:00:32.646494" elapsed="0.000016"/>
+</kw>
+<status status="NOT RUN" start="2026-11-10T22:00:32.646346" elapsed="0.000194"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:00:32.646320" elapsed="0.000241"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T22:00:32.646592" elapsed="0.000051"/>
+</return>
+<arg>${{ 1500 &lt;= ${dev} &lt;= 4500 }}</arg>
+<arg>deviation_hz=${dev}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T22:00:08.058012" elapsed="24.588732"/>
+</kw>
+<var name="${dev}">1000</var>
+<status status="PASS" start="2026-11-10T22:00:08.057899" elapsed="24.588888"/>
+</iter>
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:00:57.236820" level="INFO">status: heard 20 of 20 (deviation_hz=1500, gap_s=0.5)</msg>
+<msg time="2026-11-10T22:00:57.237181" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'deviation_hz': '1500', 'gap_s': '0....</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T22:00:32.647844" elapsed="24.589375"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:00:57.237866" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T22:00:57.237589" elapsed="0.000300"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:00:57.238959" level="INFO">Set test message to:
+status: 20/20</msg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T22:00:57.238496" elapsed="0.000502"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T22:00:57.238136" elapsed="0.000904"/>
+</kw>
+<status status="PASS" start="2026-11-10T22:00:57.237988" elapsed="0.001075"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:00:57.237960" elapsed="0.001130"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T22:00:57.239123" elapsed="0.000059"/>
+</return>
+<arg>${{ 1500 &lt;= ${dev} &lt;= 4500 }}</arg>
+<arg>deviation_hz=${dev}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T22:00:32.647313" elapsed="24.591953"/>
+</kw>
+<var name="${dev}">1500</var>
+<status status="PASS" start="2026-11-10T22:00:32.646979" elapsed="24.592321"/>
+</iter>
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:01:21.836229" level="INFO">status: heard 20 of 20 (deviation_hz=4500, gap_s=0.5)</msg>
+<msg time="2026-11-10T22:01:21.836996" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'deviation_hz': '4500', 'gap_s': '0....</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T22:00:57.240221" elapsed="24.596818"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:01:21.838006" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T22:01:21.837669" elapsed="0.000356"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:01:21.839240" level="INFO">Set test message to:
+status: 20/20 status: 20/20</msg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T22:01:21.838796" elapsed="0.000504"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T22:01:21.838301" elapsed="0.001050"/>
+</kw>
+<status status="PASS" start="2026-11-10T22:01:21.838153" elapsed="0.001227"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:01:21.838119" elapsed="0.001300"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T22:01:21.839457" elapsed="0.000081"/>
+</return>
+<arg>${{ 1500 &lt;= ${dev} &lt;= 4500 }}</arg>
+<arg>deviation_hz=${dev}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T22:00:57.239652" elapsed="24.599981"/>
+</kw>
+<var name="${dev}">4500</var>
+<status status="PASS" start="2026-11-10T22:00:57.239408" elapsed="24.600264"/>
+</iter>
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:01:46.411762" level="INFO">status: heard 20 of 20 (deviation_hz=5000, gap_s=0.5)</msg>
+<msg time="2026-11-10T22:01:46.412278" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'deviation_hz': '5000', 'gap_s': '0....</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T22:01:21.840544" elapsed="24.571784"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:01:46.413175" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T22:01:46.412809" elapsed="0.000394"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="NOT RUN" start="2026-11-10T22:01:46.413542" elapsed="0.000021"/>
+</kw>
+<status status="NOT RUN" start="2026-11-10T22:01:46.413345" elapsed="0.000259"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:01:46.413304" elapsed="0.000327"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T22:01:46.413674" elapsed="0.000078"/>
+</return>
+<arg>${{ 1500 &lt;= ${dev} &lt;= 4500 }}</arg>
+<arg>deviation_hz=${dev}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T22:01:21.840017" elapsed="24.573861"/>
+</kw>
+<var name="${dev}">5000</var>
+<status status="PASS" start="2026-11-10T22:01:21.839808" elapsed="24.574116"/>
+</iter>
+<var>${dev}</var>
+<value>1000</value>
+<value>1500</value>
+<value>4500</value>
+<value>5000</value>
+<status status="PASS" start="2026-11-10T22:00:08.057792" elapsed="98.356171"/>
+</for>
+<doc>APRS-PERF-5: deviation from 1 to 5 kHz: a weak transmitter, the
+usual 3 kHz, and one driving the demodulator hard. 1.5 to 4.5 kHz
+is held to the stress limit.</doc>
+<tag>band:70cm</tag>
+<tag>mode:aprs</tag>
+<tag>needs:tnc</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T22:00:08.055310" elapsed="98.358938">status: 20/20 status: 20/20</status>
+</test>
+<test id="s1-s2-t6" name="70cm: APRS Perf Short TXDELAY" line="110">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T22:01:46.415864" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T22:01:46.416136" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T22:01:46.415240" elapsed="0.000952"/>
+</kw>
+<kw name="Set Up APRS TNC">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with its USB port connected to the bench's TNC port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-10T22:01:46.420445" elapsed="0.000043"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-10T22:01:46.420624" elapsed="0.000013"/>
+</kw>
+<status status="NOT RUN" start="2026-11-10T22:01:46.416933" elapsed="0.003725"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:01:46.416906" elapsed="0.003774"/>
+</if>
+<doc>Once per band: the radio in APRS mode on the band's frequency
+and its TNC port connected.</doc>
+<status status="PASS" start="2026-11-10T22:01:46.416659" elapsed="0.004072"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:02:07.797177" level="INFO">status: heard 20 of 20 (txdelay_ms=150, gap_s=0.5)</msg>
+<msg time="2026-11-10T22:02:07.797916" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'txdelay_ms': '150', 'gap_s': '0.5'}...</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T22:01:46.421517" elapsed="21.376461"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:02:07.799174" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T22:02:07.798682" elapsed="0.000522"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:02:07.800633" level="INFO">Set test message to:
+status: 20/20</msg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T22:02:07.800362" elapsed="0.000322"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T22:02:07.799617" elapsed="0.001118"/>
+</kw>
+<status status="PASS" start="2026-11-10T22:02:07.799394" elapsed="0.001371"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:02:07.799343" elapsed="0.001461"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T22:02:07.800850" elapsed="0.000091"/>
+</return>
+<arg>${{ ${ms} &gt;= 100 }}</arg>
+<arg>txdelay_ms=${ms}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T22:01:46.421107" elapsed="21.379950"/>
+</kw>
+<var name="${ms}">150</var>
+<status status="PASS" start="2026-11-10T22:01:46.420970" elapsed="21.380130"/>
+</iter>
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:02:28.212068" level="INFO">status: heard 20 of 20 (txdelay_ms=100, gap_s=0.5)</msg>
+<msg time="2026-11-10T22:02:28.212416" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'txdelay_ms': '100', 'gap_s': '0.5'}...</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T22:02:07.802314" elapsed="20.410134"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:02:28.213236" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T22:02:28.212916" elapsed="0.000348"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:02:28.214992" level="INFO">Set test message to:
+status: 20/20 status: 20/20</msg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T22:02:28.214658" elapsed="0.000398"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T22:02:28.213524" elapsed="0.001591"/>
+</kw>
+<status status="PASS" start="2026-11-10T22:02:28.213370" elapsed="0.001778"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:02:28.213339" elapsed="0.001841"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T22:02:28.215220" elapsed="0.000066"/>
+</return>
+<arg>${{ ${ms} &gt;= 100 }}</arg>
+<arg>txdelay_ms=${ms}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T22:02:07.801656" elapsed="20.413713"/>
+</kw>
+<var name="${ms}">100</var>
+<status status="PASS" start="2026-11-10T22:02:07.801380" elapsed="20.414013"/>
+</iter>
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:02:47.639525" level="INFO">status: heard 20 of 20 (txdelay_ms=50, gap_s=0.5)</msg>
+<msg time="2026-11-10T22:02:47.640063" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'txdelay_ms': '50', 'gap_s': '0.5'}}</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T22:02:28.216108" elapsed="19.424006"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:02:47.641637" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T22:02:47.641107" elapsed="0.000576"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="NOT RUN" start="2026-11-10T22:02:47.642120" elapsed="0.000030"/>
+</kw>
+<status status="NOT RUN" start="2026-11-10T22:02:47.641860" elapsed="0.000341"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:02:47.641807" elapsed="0.000428"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T22:02:47.642290" elapsed="0.000092"/>
+</return>
+<arg>${{ ${ms} &gt;= 100 }}</arg>
+<arg>txdelay_ms=${ms}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T22:02:28.215678" elapsed="19.426867"/>
+</kw>
+<var name="${ms}">50</var>
+<status status="PASS" start="2026-11-10T22:02:28.215499" elapsed="19.427119"/>
+</iter>
+<var>${ms}</var>
+<value>150</value>
+<value>100</value>
+<value>50</value>
+<status status="PASS" start="2026-11-10T22:01:46.420828" elapsed="61.221853"/>
+</for>
+<doc>APRS-PERF-6: less preamble before the frame, so the receiver
+must acquire quickly. 100 ms and more is held to the stress limit.</doc>
+<tag>band:70cm</tag>
+<tag>mode:aprs</tag>
+<tag>needs:tnc</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T22:01:46.414564" elapsed="61.228501">status: 20/20 status: 20/20</status>
+</test>
+<test id="s1-s2-t7" name="70cm: APRS Perf Off Frequency And Clock Error" line="118">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T22:02:47.645311" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T22:02:47.645607" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T22:02:47.644697" elapsed="0.000964"/>
+</kw>
+<kw name="Set Up APRS TNC">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with its USB port connected to the bench's TNC port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-10T22:02:47.646613" elapsed="0.000022"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-10T22:02:47.646780" elapsed="0.000019"/>
+</kw>
+<status status="NOT RUN" start="2026-11-10T22:02:47.646290" elapsed="0.000547"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:02:47.646267" elapsed="0.000596"/>
+</if>
+<doc>Once per band: the radio in APRS mode on the band's frequency
+and its TNC port connected.</doc>
+<status status="PASS" start="2026-11-10T22:02:47.646027" elapsed="0.000887"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:03:12.219174" level="INFO">status: heard 20 of 20 (offset_hz=-1500, gap_s=0.5)</msg>
+<msg time="2026-11-10T22:03:12.220056" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'offset_hz': '-1500', 'gap_s': '0.5'...</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T22:02:47.647662" elapsed="24.572486"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:03:12.221587" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T22:03:12.220963" elapsed="0.000672"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:03:12.223218" level="INFO">Set test message to:
+status: 20/20</msg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T22:03:12.222891" elapsed="0.000388"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T22:03:12.222153" elapsed="0.001185"/>
+</kw>
+<status status="PASS" start="2026-11-10T22:03:12.221845" elapsed="0.001518"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:03:12.221785" elapsed="0.001616"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T22:03:12.223443" elapsed="0.000087"/>
+</return>
+<arg>${True}</arg>
+<arg>offset_hz=${hz}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T22:02:47.647308" elapsed="24.576356"/>
+</kw>
+<var name="${hz}">-1500</var>
+<status status="PASS" start="2026-11-10T22:02:47.647135" elapsed="24.576572"/>
+</iter>
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:03:36.776633" level="INFO">status: heard 20 of 20 (offset_hz=1500, gap_s=0.5)</msg>
+<msg time="2026-11-10T22:03:36.776816" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'offset_hz': '1500', 'gap_s': '0.5'}...</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T22:03:12.224744" elapsed="24.552088"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:03:36.777166" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T22:03:36.777038" elapsed="0.000136"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:03:36.777775" level="INFO">Set test message to:
+status: 20/20 status: 20/20</msg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T22:03:36.777691" elapsed="0.000099"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T22:03:36.777494" elapsed="0.000311"/>
+</kw>
+<status status="PASS" start="2026-11-10T22:03:36.777431" elapsed="0.000382"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:03:36.777419" elapsed="0.000403"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T22:03:36.777835" elapsed="0.000025"/>
+</return>
+<arg>${True}</arg>
+<arg>offset_hz=${hz}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T22:03:12.224155" elapsed="24.553740"/>
+</kw>
+<var name="${hz}">1500</var>
+<status status="PASS" start="2026-11-10T22:03:12.223872" elapsed="24.554038"/>
+</iter>
+<var>${hz}</var>
+<value>-1500</value>
+<value>1500</value>
+<status status="PASS" start="2026-11-10T22:02:47.646998" elapsed="49.130924"/>
+</for>
+<for flavor="IN">
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:04:01.394661" level="INFO">status: heard 20 of 20 (baud_error_ppm=-5000, gap_s=0.5)</msg>
+<msg time="2026-11-10T22:04:01.395538" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'baud_error_ppm': '-5000', 'gap_s': ...</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T22:03:36.778264" elapsed="24.617431"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:04:01.397115" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T22:04:01.396520" elapsed="0.000645"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:04:01.398910" level="INFO">Set test message to:
+status: 20/20 status: 20/20 status: 20/20</msg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T22:04:01.398529" elapsed="0.000461"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T22:04:01.397669" elapsed="0.001392"/>
+</kw>
+<status status="PASS" start="2026-11-10T22:04:01.397369" elapsed="0.001737"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:04:01.397312" elapsed="0.001837"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T22:04:01.399209" elapsed="0.000111"/>
+</return>
+<arg>${True}</arg>
+<arg>baud_error_ppm=${ppm}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T22:03:36.778110" elapsed="24.621369"/>
+</kw>
+<var name="${ppm}">-5000</var>
+<status status="PASS" start="2026-11-10T22:03:36.778034" elapsed="24.621502"/>
+</iter>
+<iter>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:04:25.918310" level="INFO">status: heard 20 of 20 (baud_error_ppm=5000, gap_s=0.5)</msg>
+<msg time="2026-11-10T22:04:25.919089" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'baud_error_ppm': '5000', 'gap_s': '...</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T22:04:01.400794" elapsed="24.518368"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:04:25.920424" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T22:04:25.919901" elapsed="0.000556"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:04:25.921979" level="INFO">Set test message to:
+status: 20/20 status: 20/20 status: 20/20 status: 20/20</msg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T22:04:25.921679" elapsed="0.000356"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T22:04:25.920924" elapsed="0.001171"/>
+</kw>
+<status status="PASS" start="2026-11-10T22:04:25.920656" elapsed="0.001481"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:04:25.920602" elapsed="0.001566"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T22:04:25.922213" elapsed="0.000073"/>
+</return>
+<arg>${True}</arg>
+<arg>baud_error_ppm=${ppm}</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T22:04:01.400132" elapsed="24.522274"/>
+</kw>
+<var name="${ppm}">5000</var>
+<status status="PASS" start="2026-11-10T22:04:01.399759" elapsed="24.522701"/>
+</iter>
+<var>${ppm}</var>
+<value>-5000</value>
+<value>5000</value>
+<status status="PASS" start="2026-11-10T22:03:36.777981" elapsed="49.144517"/>
+</for>
+<doc>APRS-PERF-7: the carrier 1.5 kHz either side, and the bit rate
+0.5% either side of 1200 baud.</doc>
+<tag>band:70cm</tag>
+<tag>mode:aprs</tag>
+<tag>needs:tnc</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T22:02:47.643485" elapsed="98.279265">status: 20/20 status: 20/20 status: 20/20 status: 20/20</status>
+</test>
+<test id="s1-s2-t8" name="70cm: APRS Perf Back To Back" line="129">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T22:04:25.924622" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T22:04:25.924993" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T22:04:25.924016" elapsed="0.001032"/>
+</kw>
+<kw name="Set Up APRS TNC">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with its USB port connected to the bench's TNC port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-10T22:04:25.926092" elapsed="0.000024"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-10T22:04:25.926267" elapsed="0.000021"/>
+</kw>
+<status status="NOT RUN" start="2026-11-10T22:04:25.925714" elapsed="0.000609"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:04:25.925690" elapsed="0.000663"/>
+</if>
+<doc>Once per band: the radio in APRS mode on the band's frequency
+and its TNC port connected.</doc>
+<status status="PASS" start="2026-11-10T22:04:25.925435" elapsed="0.000976"/>
+</kw>
+<kw name="Stress Case">
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:04:35.666807" level="INFO">status: heard 20 of 20 (per_transmission=10, gap_s=0.5)</msg>
+<msg time="2026-11-10T22:04:35.667553" level="INFO">${r} = {'frames': 'status', 'sent': 20, 'heard': 20, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'per_transmission': '10', 'gap_s': '...</msg>
+<var>${r}</var>
+<arg>${STRESS_FRAMES}</arg>
+<arg>&amp;{options}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T22:04:25.927121" elapsed="9.740502"/>
+</kw>
+<kw name="Radio Value" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:04:35.668872" level="INFO">${min} = 0.95</msg>
+<var>${min}</var>
+<arg>aprs</arg>
+<arg>min_stress_frame_rate</arg>
+<doc>A value from the radio file, such as aprs inbox_entries.</doc>
+<status status="PASS" start="2026-11-10T22:04:35.668376" elapsed="0.000528"/>
+</kw>
+<if>
+<branch type="IF" condition="${enforce}">
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:04:35.670468" level="INFO">Set test message to:
+status: 20/20</msg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T22:04:35.670128" elapsed="0.000408"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${r}</arg>
+<arg>${min}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T22:04:35.669355" elapsed="0.001245"/>
+</kw>
+<status status="PASS" start="2026-11-10T22:04:35.669083" elapsed="0.001562"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:04:35.669031" elapsed="0.001662"/>
+</if>
+<return>
+<value>${r}</value>
+<status status="PASS" start="2026-11-10T22:04:35.670745" elapsed="0.000099"/>
+</return>
+<arg>${True}</arg>
+<arg>per_transmission=10</arg>
+<doc>Send STRESS_FRAMES test frames with these options; if `enforce`,
+fail (at the end of the test) below the stress limit.</doc>
+<status status="PASS" start="2026-11-10T22:04:25.926678" elapsed="9.744317"/>
+</kw>
+<doc>APRS-PERF-8: ten frames per transmission, one flag apart, as a
+digipeater or a TNC emptying its queue sends them.</doc>
+<tag>band:70cm</tag>
+<tag>mode:aprs</tag>
+<tag>needs:tnc</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T22:04:25.923181" elapsed="9.748160">status: 20/20</status>
+</test>
+<test id="s1-s2-t9" name="70cm: APRS Perf Soak" line="135">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-10T22:04:35.673558" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-10T22:04:35.673921" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-10T22:04:35.672853" elapsed="0.001139"/>
+</kw>
+<kw name="Set Up APRS TNC">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to APRS on ${FREQUENCY_MHZ} MHz (25 kHz FM), with its USB port connected to the bench's TNC port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-10T22:04:35.675167" elapsed="0.000027"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-10T22:04:35.675345" elapsed="0.000020"/>
+</kw>
+<status status="NOT RUN" start="2026-11-10T22:04:35.674764" elapsed="0.000644"/>
+</branch>
+<status status="PASS" start="2026-11-10T22:04:35.674732" elapsed="0.000711"/>
+</if>
+<doc>Once per band: the radio in APRS mode on the band's frequency
+and its TNC port connected.</doc>
+<status status="PASS" start="2026-11-10T22:04:35.674456" elapsed="0.001051"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2026-11-10T22:04:35.676248" level="INFO">${short} = 400</msg>
+<var>${short}</var>
+<arg>int(${SOAK_FRAMES}) * 4 // 5</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2026-11-10T22:04:35.675711" elapsed="0.000573"/>
+</kw>
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:12:08.334533" level="INFO">status: heard 400 of 400 (gap_s=0.5)</msg>
+<msg time="2026-11-10T22:12:08.334948" level="INFO">${a} = {'frames': 'status', 'sent': 400, 'heard': 400, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'gap_s': '0.5'}}</msg>
+<var>${a}</var>
+<arg>${short}</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T22:04:35.676471" elapsed="452.658506"/>
+</kw>
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:12:08.336696" level="INFO">Set test message to:
+status: 400/400</msg>
+<arg>${a}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T22:12:08.336381" elapsed="0.003406"/>
+</kw>
+<arg>APRS Frames Should Be Heard</arg>
+<arg>${a}</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-10T22:12:08.335537" elapsed="0.004352"/>
+</kw>
+<kw name="Send Aprs Test Frames" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:17:23.079470" level="INFO">full: heard 100 of 100 (path=DIGI1*,DIGI2*,DIGI3*,DIGI4*,DIGI5*,DIGI6*,DIGI7*,DIGI8*, gap_s=0.5)</msg>
+<msg time="2026-11-10T22:17:23.079986" level="INFO">${b} = {'frames': 'full', 'sent': 100, 'heard': 100, 'missing': [], 'duplicates': 0, 'corrupt': [], 'rate': 1.0, 'level_dbm': None, 'relative_level_db': None, 'options': {'path': 'DIGI1*,DIGI2*,DIGI3*,DIGI4*...</msg>
+<var>${b}</var>
+<arg>${{ int(${SOAK_FRAMES}) - ${short} }}</arg>
+<arg>kind=full</arg>
+<doc>Send `count` numbered test frames and count what the radio's TNC
+reported. kind is status (short status reports), full (eight
+digipeaters and a 256-byte information field: the largest frame),
+or escapes (a full-size frame full of the bytes KISS must escape,
+0xC0 and 0xDB). Every frame carries the run tag and its number, so
+each is accounted for: heard, missing, heard more than once, or
+corrupt (ours, but different from what was sent). Takes Start
+Transmitting APRS Packets' options. Returns the counts and the
+fraction heard.</doc>
+<status status="PASS" start="2026-11-10T22:12:08.340152" elapsed="314.739888"/>
+</kw>
+<kw name="Aprs Frames Should Be Heard" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-10T22:17:23.080926" level="INFO">Set test message to:
+status: 400/400 full: 100/100</msg>
+<arg>${b}</arg>
+<doc>Fail unless the radio reported at least `minimum` of the frames (the
+radio file's aprs.min_frame_rate when not given), and none corrupt
+or twice.</doc>
+<status status="PASS" start="2026-11-10T22:17:23.080535" elapsed="0.000448"/>
+</kw>
+<doc>APRS-PERF-9: SOAK_FRAMES frames, short and full-size, at the
+bench's level: none lost or corrupted over a long run.</doc>
+<tag>band:70cm</tag>
+<tag>long</tag>
+<tag>mode:aprs</tag>
+<tag>needs:tnc</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-10T22:04:35.671897" elapsed="767.409255">status: 400/400 full: 100/100</status>
+</test>
+<kw name="Close Bench" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the instruments and write measurements.json: every capture,
+check and operator answer, with the run's provenance. Absolute paths
+are made relative, so the file can be published as it is.</doc>
+<status status="PASS" start="2026-11-10T22:17:23.081731" elapsed="0.209310"/>
+</kw>
+<doc>APRS receive performance, read from the radio's KISS TNC: the
+transmitter sends numbered test frames and the radio reports every
+frame it decodes on its serial port (the bench's tnc section), so
+each one is accounted for without an operator. Frames carry the run
+tag, so reruns and other traffic don't count.
+
+The radio's ordinary APRS receive is what's measured: the TNC only
+copies out what the demodulator and frame decoder hand to the inbox.
+Levels are relative to the bench's gain unless ABSOLUTE_LEVELS is
+true and the calibration has a transmitter level table; relative
+results compare firmware only within one session on one bench.
+Limits are the radio file's aprs section. Tag "long" marks the soak.</doc>
+<status status="PASS" start="2026-11-10T21:53:02.771509" elapsed="1460.519633"/>
+</suite>
+<meta name="Calibration">assumed, measured 2026-10-20 (d55ce4aa0a3c)</meta>
+<meta name="DSP">none</meta>
+<meta name="Firmware">aprs-usb-tnc-fc93d759</meta>
+<meta name="Hardware">CS7000-PLUS 2709D157450086</meta>
+<meta name="Radio">Connect Systems CS7000-PLUS (cs7000p)</meta>
+<meta name="Station">k0ret</meta>
+<meta name="Suite commit">1d00f71740</meta>
+<meta name="TNC">serial</meta>
+<status status="PASS" start="2026-11-10T21:47:43.424966" elapsed="1779.867042"/>
+</suite>
+<statistics>
+<total>
+<stat pass="15" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="15" fail="0" skip="0">band:70cm</stat>
+<stat pass="1" fail="0" skip="0">long</stat>
+<stat pass="15" fail="0" skip="0">mode:aprs</stat>
+<stat pass="9" fail="0" skip="0">needs:tnc</stat>
+<stat pass="15" fail="0" skip="0">per-band</stat>
+<stat pass="15" fail="0" skip="0">rx</stat>
+</tag>
+<suite>
+<stat name="Rx &amp; Performance" id="s1" pass="15" fail="0" skip="0">Rx &amp; Performance</stat>
+<stat name="Rx" id="s1-s1" pass="6" fail="0" skip="0">Rx &amp; Performance.Rx</stat>
+<stat name="Performance" id="s1-s2" pass="9" fail="0" skip="0">Rx &amp; Performance.Performance</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
