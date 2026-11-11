@@ -29,8 +29,28 @@ run=${1:?$usage}
 results=${2:-results}
 outputs=("$run/output.xml")
 merge=()
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+n=0
 for r in ${reruns[@]+"${reruns[@]}"}; do
-    outputs+=("$r/output.xml")
+    n=$((n + 1))
+    # A rerun of tests from only some of a run's suites is named after them;
+    # rebot --merge takes it under the run's top suite name
+    root=$(uv run python -c 'import sys; from pathlib import Path
+from oat.results import rerun_root
+print(rerun_root(Path(sys.argv[1]), Path(sys.argv[2])) or "")' "$run" "$r")
+    if [ -n "$root" ]; then
+        rc=0
+        uv run rebot --name "$root" --output "$tmp/rerun$n.xml" --log NONE \
+            --report NONE "$r/output.xml" >/dev/null || rc=$?
+        if [ "$rc" -gt 250 ]; then
+            echo "rebot failed ($rc)" >&2
+            exit 1
+        fi
+        outputs+=("$tmp/rerun$n.xml")
+    else
+        outputs+=("$r/output.xml")
+    fi
     merge=(--merge)
 done
 

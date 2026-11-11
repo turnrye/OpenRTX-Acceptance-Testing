@@ -53,6 +53,32 @@ def run_measurements(run: Path) -> dict:
     return combined
 
 
+def suite_parts(measurements: dict) -> set[str]:
+    """
+    The suites a run's measurements cover, without its top suite: a run of
+    several suites lists them, a run of one names it.
+    """
+    names = measurements.get("suites", [measurements["suite"]])
+    return {n.split(".", 1)[-1] for n in names}
+
+
+def rerun_root(run: Path, rerun: Path) -> str | None:
+    """
+    The run's top suite name, when a rerun has to take it for rebot --merge.
+    A rerun of tests from only some of a run's suites gets its top suite
+    named after the suites left (Audio, not Bandwidth & Audio); each of them
+    must be one of the run's. None when the names already match or the
+    suites aren't the run's.
+    """
+    ran = ExecutionResult(str(Path(run) / "output.xml")).suite
+    again = ExecutionResult(str(Path(rerun) / "output.xml")).suite
+    if again.name == ran.name or not again.suites:
+        return None
+    if {s.name for s in again.suites} <= {s.name for s in ran.suites}:
+        return ran.name
+    return None
+
+
 def merge_reruns(run: Path, reruns: list[Path]) -> dict:
     """
     A run's measurements with each rerun's tests in place of the run's own:
@@ -65,7 +91,11 @@ def merge_reruns(run: Path, reruns: list[Path]) -> dict:
     for i, rerun in enumerate(reruns, 1):
         again = run_measurements(rerun)
         result = ExecutionResult(str(Path(rerun) / "output.xml"))
-        differ = [k for k in SAME_RUN if again.get(k) != merged.get(k)]
+        differ = [k for k in SAME_RUN
+                  if k != "suite" and again.get(k) != merged.get(k)]
+        # A rerun of some of the run's suites is named after them
+        if not suite_parts(again) <= suite_parts(merged):
+            differ.append("suite")
         differ += [k for k in SAME_METADATA
                    if result.suite.metadata.get(k) != meta.get(k)]
         if differ:
