@@ -15,7 +15,7 @@ from pathlib import Path
 import numpy as np
 from robot.api import logger
 from robot.api.deco import keyword, library
-from robot.libraries.BuiltIn import BuiltIn
+from robot.libraries.BuiltIn import BuiltIn, RobotNotRunningError
 from scipy.io import wavfile
 
 from oat import aprs
@@ -61,6 +61,12 @@ def chain_direction(tags) -> str | None:
     if "rx" in tags:
         return "rx"
     return None
+
+
+# Which way the attenuator chain faces, per run: "tx" from the radio to the
+# receiver, "rx" from the transmitter to the radio. Each suite gets its own
+# library, but the chain stays where the run's last suite left it.
+_chain_by_run = {}
 
 
 def receiver_clipped(capture) -> float:
@@ -152,9 +158,6 @@ class OpenRTXAcceptance:
         self._captures = 0
         # A capture from Start Capture, until it's stopped
         self._open_capture = None
-        # Which way the attenuator chain faces: "tx" from the radio to the
-        # receiver, "rx" from the transmitter to the radio
-        self._chain = None
         # The radio's KISS TNC, when the bench has one
         self.tnc = None
         # Differs from run to run, for test traffic (Run Tag)
@@ -263,10 +266,22 @@ class OpenRTXAcceptance:
         need = chain_direction(data.tags)
         if need is None or self.operator is None or self._one_instrument():
             return
-        if self._chain is not None and need != self._chain:
+        run = self._run_key()
+        chain = _chain_by_run.get(run)
+        if chain is not None and need != chain:
             self.operator.instruct(f"Move the attenuator chain: "
                                    f"{self._chain_setup(need)}")
-        self._chain = need
+        _chain_by_run[run] = need
+
+    def _run_key(self):
+        """
+        The run this library belongs to: its output file, which the run's
+        suites share. Outside a run, as in unit tests, the library itself.
+        """
+        try:
+            return BuiltIn().get_variable_value("${OUTPUT FILE}")
+        except RobotNotRunningError:
+            return self
 
     def end_test(self, data, result):
         """
