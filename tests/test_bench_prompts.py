@@ -68,3 +68,27 @@ def test_monitor_keywords_do_nothing_without_audio():
     lib = OpenRTXAcceptance()
     lib.start_monitoring_radio_audio()
     lib.stop_monitoring_radio_audio()
+
+
+def test_listening_volume_is_the_operators_without_audio():
+    lib = OpenRTXAcceptance()
+    lib.set_radio_volume_once = lambda: pytest.fail("volume set by level")
+    assert lib.set_listening_volume() == "volume comfortable"
+    assert lib.set_listening_volume("volume unchanged") == "volume unchanged"
+
+
+def test_listening_volume_is_set_once_by_level_with_audio():
+    lib = OpenRTXAcceptance()
+    lib.audio = audio.SimAudio()
+    calls = []
+
+    def set_once():
+        # As Set Radio Volume Once: the first call sets, later ones return it
+        calls.append(1)
+        lib.radio_volume = lib.radio_volume or {"knob": "12 o'clock"}
+        return lib.radio_volume
+
+    lib.set_radio_volume_once = set_once
+    assert lib.set_listening_volume() == "volume unchanged"
+    assert lib.set_listening_volume("volume unchanged") == "volume unchanged"
+    assert len(calls) == 2 and lib.radio_volume == {"knob": "12 o'clock"}

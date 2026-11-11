@@ -1779,6 +1779,23 @@ class OpenRTXAcceptance:
         return f"{name} on the accessory jack, programming cable out"
 
     @keyword
+    def set_listening_volume(self, otherwise: str = "volume comfortable"
+                             ) -> str:
+        """
+        The volume for a listening test's setup prompt. With an audio
+        interface the radio keeps the volume Set Radio Volume Once sets for
+        the tests that record its speaker, so it is set here if no test has
+        set it yet and then left unchanged; without one the operator picks.
+
+        @param otherwise: the phrase on a bench without an audio interface.
+        @return the volume phrase for the prompt.
+        """
+        if self.audio is None:
+            return otherwise
+        self.set_radio_volume_once()
+        return "volume unchanged"
+
+    @keyword
     def start_monitoring_radio_audio(self):
         """
         Play the radio's speaker, as the audio interface captures it, on the
