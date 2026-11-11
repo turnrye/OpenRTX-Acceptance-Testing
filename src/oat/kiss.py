@@ -116,16 +116,27 @@ class Tnc:
 
 class SerialTnc(Tnc):
     """
-    A TNC on a serial port, such as the radio's USB CDC port. Opening it
-    raises DTR, as hosts do, so the radio sees a reader. Every byte read is
-    appended to `log` when given, as evidence of what the radio sent.
+    A TNC on a serial port: the radio's USB CDC port, or its UART through
+    a USB-serial adapter (the C62's), which needs `baud`; a CDC port ignores
+    it. Opening the port raises DTR, as hosts do, so the radio sees a
+    reader. Every byte read is appended to `log` when given, as evidence of
+    what the radio sent.
     """
 
-    def __init__(self, port: str, log: Path | None = None):
+    def __init__(self, port: str, log: Path | None = None,
+                 baud: int | None = None):
         super().__init__()
         self.port = port
         self._fd = os.open(port, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
         tty.setraw(self._fd, termios.TCSANOW)
+        if baud:
+            speed = getattr(termios, f"B{int(baud)}", None)
+            if speed is None:
+                os.close(self._fd)
+                raise ValueError(f"{port}: no standard rate {baud} baud")
+            attrs = termios.tcgetattr(self._fd)
+            attrs[4] = attrs[5] = speed
+            termios.tcsetattr(self._fd, termios.TCSANOW, attrs)
         termios.tcflush(self._fd, termios.TCIFLUSH)
         self._log = open(log, "ab") if log else None
         self._stop = threading.Event()
@@ -171,7 +182,7 @@ def make_tnc(cfg: dict | None, log: Path | None = None,
         return None
     kind = cfg.get("type")
     if kind == "serial":
-        return SerialTnc(cfg["port"], log)
+        return SerialTnc(cfg["port"], log, cfg.get("baud"))
     if kind == "sim":
         # It decodes with Dire Wolf's atest; without it, there's no TNC
         import shutil
