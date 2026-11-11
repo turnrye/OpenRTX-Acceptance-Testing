@@ -126,3 +126,26 @@ def test_sim_tnc_hears_strong_frames_and_loses_weak_ones():
     assert tnc.hear(audio, 48000, frames, 3000.0, -90.0) == 3
     assert [h.frame for h in tnc.heard_since(0.0)] == frames
     assert tnc.hear(audio, 48000, frames, 3000.0, -140.0) == 0
+
+
+def test_a_uart_tnc_runs_at_its_baud_rate():
+    import termios
+    controller, port = os.openpty()
+    tnc = SerialTnc(os.ttyname(port), baud=115200)
+    try:
+        attrs = termios.tcgetattr(tnc._fd)
+        assert attrs[4] == attrs[5] == termios.B115200
+    finally:
+        tnc.close()
+        os.close(controller)
+        os.close(port)
+
+
+def test_a_nonstandard_baud_rate_is_refused():
+    controller, port = os.openpty()
+    try:
+        with pytest.raises(ValueError, match="no standard rate"):
+            SerialTnc(os.ttyname(port), baud=123456)
+    finally:
+        os.close(controller)
+        os.close(port)
