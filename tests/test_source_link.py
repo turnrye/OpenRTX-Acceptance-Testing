@@ -14,7 +14,10 @@ from oat.sanitize import SourceLink, known_commit
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO = "https://github.com/example/acceptance"
-RUN = next((ROOT / "results").rglob("output.xml"), None)
+# A published run of fm/bandwidth.robot alone: a run of several suites has
+# no source of its own, only its suites do
+RUN = next(iter(sorted((ROOT / "results").glob("*/*/*-Bandwidth/output.xml"))),
+           None)
 
 
 @pytest.fixture(autouse=True)
