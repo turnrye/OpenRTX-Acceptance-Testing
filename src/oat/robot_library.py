@@ -409,7 +409,6 @@ class OpenRTXAcceptance:
             self.transmitter.stop()
         if self.audio is not None:
             self.audio.stop_playing()
-            self.audio.stop_monitor()
         if self.ptt is not None:
             try:
                 self.ptt.close()
@@ -1258,6 +1257,9 @@ class OpenRTXAcceptance:
                      interferer_tone_hz=float(interferer_tone_hz),
                      gain_offset_db=applied,
                      wanted_shortfall_db=max(0.0, wanted_db - applied))
+        # The simulated radio selects a channel half the neighbour's spacing
+        self._tx_state = {"path": path, "level_dbm": None, "mode": "fm",
+                          "channel_hz": abs(float(interferer_offset_hz)) / 2}
 
     @keyword
     def start_transmitting_m17_stream(self, source: str = "N0CALL",
@@ -1796,22 +1798,6 @@ class OpenRTXAcceptance:
         return "volume unchanged"
 
     @keyword
-    def start_monitoring_radio_audio(self):
-        """
-        Play the radio's speaker, as the audio interface captures it, on the
-        computer's output for listening tests, as the interface's plug can
-        cut the radio's own speaker. Nothing on a bench without one.
-        """
-        if self.audio is not None:
-            self.audio.start_monitor()
-
-    @keyword
-    def stop_monitoring_radio_audio(self):
-        """Stop playing the radio's speaker on the computer's output."""
-        if self.audio is not None:
-            self.audio.stop_monitor()
-
-    @keyword
     def key_radio(self):
         """
         Key the radio: through the audio interface's PTT line when the bench
@@ -1934,6 +1920,38 @@ class OpenRTXAcceptance:
                                            else self.run_dir
                                            / measurement["audio_file"])
         return samples, rate
+
+    @keyword
+    def audio_component_db(self, measurement: dict, freq_hz: float) -> float:
+        """
+        The level of a component of a recording, such as an interferer's
+        tone, relative to the recording's tone.
+
+        @param measurement: a Capture Radio Audio measurement.
+        @param freq_hz: the component's frequency.
+        @return its level, in dB under (negative) or over the tone.
+        """
+        samples, rate = self._samples(measurement)
+        component = audio_mod.tone_amplitude(samples, rate, float(freq_hz))
+        db = 20 * np.log10(max(component, 1e-12)
+                           / max(measurement["tone_amplitude"], 1e-12))
+        self._record("component", file=measurement["file"],
+                     freq_hz=float(freq_hz), tone_hz=measurement["tone_hz"],
+                     level_db=float(db))
+        return float(db)
+
+    @keyword
+    def record_value(self, what: str, value: float, unit: str = ""):
+        """
+        Record a measured value with the run's results, without a limit: an
+        observation for review rather than a pass or fail.
+
+        @param what: what the value is.
+        @param value: the value.
+        @param unit: its unit.
+        """
+        self._record("value", field=what, value=float(value), unit=unit)
+        logger.info(f"{what}: {float(value):.2f} {unit}".rstrip())
 
     @keyword
     def audio_sinad_should_be_at_least(self, measurement: dict,
@@ -2172,6 +2190,10 @@ class OpenRTXAcceptance:
                                           -tx.get("tune_offset_hz", 0))
             n_ = np.arange(len(iq))
             iq = iq * np.exp(-2j * np.pi * off * n_ / r)
+            if state.get("channel_hz"):
+                # The radio's channel filter, so a neighbour can't capture it
+                sel = butter(8, state["channel_hz"], fs=r, output="sos")
+                iq = sosfilt(sel, iq.real) + 1j * sosfilt(sel, iq.imag)
             dev = demodulated_audio(iq, r)
             g = np.gcd(rate, 48000)
             dev = resample_poly(dev, rate // g, 48000 // g)

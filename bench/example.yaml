@@ -63,9 +63,6 @@ operator:
 #  capture_device: plughw:CARD=AllInOneCable,DEV=0
 #  rate: 48000
 #  name: AIOC                      # in setup prompts; "audio interface" if left out
-#  # Where the listening tests play the captured speaker, which the
-#  # interface's plug mutes: the computer's output, never the playback_device
-#  monitor_device: default
 #  ptt: {device: /dev/ttyACM0, line: dtr}
 #  # Mixer controls set (amixer sset) at the start of every run and
 #  # recorded with the results, so desktop sound settings can't change the
