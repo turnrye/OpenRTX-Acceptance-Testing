@@ -145,6 +145,70 @@ def merge_target(run: Path) -> Path:
     return path
 
 
+@pytest.fixture(scope="module")
+def two_suite_run(tmp_path_factory):
+    """
+    Output directories of a run of two suites, given as separate files, and
+    of a rerun of the second suite's test with both files given again.
+    """
+    base = tmp_path_factory.mktemp("two")
+    suites = [base / "first.robot", base / "second.robot"]
+    for path in suites:
+        shutil.copy(ROOT / "acceptance" / "selftest.robot", path)
+    # The self-test imports it relative to itself
+    shutil.copy(ROOT / "acceptance" / "keyed.resource", base)
+    run, rerun = base / "run", base / "rerun"
+    assert robot.run(*map(str, suites), test=RERUN_TEST, outputdir=str(run),
+                     console="none", report="NONE", log="NONE") == 0
+    assert robot.run(*map(str, suites), test=RERUN_TEST, suite="Second",
+                     outputdir=str(rerun), console="none", report="NONE",
+                     log="NONE") == 0
+    return run, rerun
+
+
+def test_export_merges_a_rerun_of_one_of_several_suites(two_suite_run,
+                                                        tmp_path):
+    run, rerun = two_suite_run
+    # Robot names the rerun after the one suite left
+    assert ExecutionResult(str(rerun / "output.xml")).suite.name == "Second"
+    done = subprocess.run(["bash", str(EXPORT), "-r", str(rerun), str(run),
+                           str(tmp_path / "results")],
+                          capture_output=True, text=True, cwd=ROOT)
+    assert done.returncode == 0, done.stderr
+    folder = Path(done.stdout.strip())
+    check_run(folder)
+    suite = ExecutionResult(str(folder / "output.xml")).suite
+    assert suite.name == "First & Second"
+    assert [len(list(s.all_tests)) for s in suite.suites] == [1, 1]
+    measurements = json.loads((folder / "measurements.json").read_text())
+    assert measurements["reruns"][0]["tests"] == [RERUN_TEST]
+    files = [f for r in measurements["records"] for f in r.get("files", [])]
+    assert any(f.startswith("rerun1/") for f in files)
+
+
+def test_a_rerun_of_one_suite_from_another_commit_is_refused(two_suite_run,
+                                                              tmp_path):
+    run, rerun = two_suite_run
+    other = tmp_path / "other"
+    shutil.copytree(rerun, other)
+    path = merge_target(other)
+    m = json.loads(path.read_text())
+    path.write_text(json.dumps({**m, "suite_commit": "0000000000"}))
+    with pytest.raises(ValueError, match="suite_commit"):
+        merge_reruns(run, [other])
+
+
+def test_a_rerun_of_another_suite_is_refused(two_suite_run, tmp_path):
+    run, rerun = two_suite_run
+    other = tmp_path / "other"
+    shutil.copytree(rerun, other)
+    path = merge_target(other)
+    m = json.loads(path.read_text())
+    path.write_text(json.dumps({**m, "suite": "Third.Third"}))
+    with pytest.raises(ValueError, match="suite"):
+        merge_reruns(run, [other])
+
+
 def test_checked_in_results_are_clean():
     for output in sorted((ROOT / "results").rglob("output.xml")):
         check_run(output.parent)
