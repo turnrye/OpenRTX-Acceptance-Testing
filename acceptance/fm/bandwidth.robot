@@ -118,8 +118,9 @@ Narrow FM TX Deviates Less Than Wide
 
 FM RX At 25 kHz Is Clean Up To Full Deviation
     [Tags]    rx    manual
+    ${volume}=    Set Listening Volume
     Start Monitoring Radio Audio
-    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, volume comfortable
+    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, ${volume}
     Start Transmitting FM Tone    3000
     Operator Confirms    The radio plays a clean, steady 1 kHz tone
     Stop Transmitting
@@ -130,8 +131,9 @@ FM RX At 25 kHz Is Clean Up To Full Deviation
 
 FM RX At 12.5 kHz Is Clean Up To Full Deviation
     [Tags]    rx    manual
+    ${volume}=    Set Listening Volume    volume unchanged
     Start Monitoring Radio Audio
-    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, volume unchanged
+    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, ${volume}
     Start Transmitting FM Tone    1500
     Operator Confirms    The radio plays a clean, steady 1 kHz tone
     Stop Transmitting
@@ -208,8 +210,9 @@ FM TX Power Rises With Each Setting
 
 FM RX At 12.5 kHz Rejects An Adjacent Channel
     [Tags]    rx    manual    adjacent
+    ${volume}=    Set Listening Volume
     Start Monitoring Radio Audio
-    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, volume comfortable
+    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, ${volume}
     Start Transmitting With Interferer    1500    12500    ${ADJACENT_DB}    2500    interferer=off
     Operator Confirms    The wanted signal alone: a clean, steady 1 kHz tone
     Stop Transmitting
@@ -224,8 +227,9 @@ FM RX At 12.5 kHz Rejects An Adjacent Channel
 
 FM RX At 25 kHz Rejects An Adjacent Channel
     [Tags]    rx    manual    adjacent
+    ${volume}=    Set Listening Volume
     Start Monitoring Radio Audio
-    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, volume comfortable
+    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, ${volume}
     Start Transmitting With Interferer    3000    25000    ${ADJACENT_DB}    5000    interferer=off
     Operator Confirms    The wanted signal alone: a clean, steady 1 kHz tone
     Stop Transmitting
