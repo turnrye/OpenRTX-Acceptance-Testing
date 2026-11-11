@@ -409,6 +409,7 @@ class OpenRTXAcceptance:
             self.transmitter.stop()
         if self.audio is not None:
             self.audio.stop_playing()
+            self.audio.stop_monitor()
         if self.ptt is not None:
             try:
                 self.ptt.close()
@@ -1762,6 +1763,36 @@ class OpenRTXAcceptance:
     def bench_has_audio(self) -> bool:
         """Whether the bench has an audio interface on the radio."""
         return self.audio is not None
+
+    @keyword
+    def bench_cabling(self) -> str:
+        """
+        How the radio is cabled on this bench, for setup prompts: the audio
+        interface on the accessory jack where there is one, named as the
+        bench file's audio name says, and the programming cable out.
+
+        @return the cabling phrase.
+        """
+        if self.audio is None:
+            return "programming cable out"
+        name = self.bench["audio"].get("name", "audio interface")
+        return f"{name} on the accessory jack, programming cable out"
+
+    @keyword
+    def start_monitoring_radio_audio(self):
+        """
+        Play the radio's speaker, as the audio interface captures it, on the
+        computer's output for listening tests, as the interface's plug can
+        cut the radio's own speaker. Nothing on a bench without one.
+        """
+        if self.audio is not None:
+            self.audio.start_monitor()
+
+    @keyword
+    def stop_monitoring_radio_audio(self):
+        """Stop playing the radio's speaker on the computer's output."""
+        if self.audio is not None:
+            self.audio.stop_monitor()
 
     @keyword
     def key_radio(self):
