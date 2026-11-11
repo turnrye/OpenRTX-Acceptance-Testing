@@ -18,6 +18,9 @@ dependencies = [
 
 [dependency-groups]
 dev = ["pytest>=8"]
+site = [
+    "robotframework-dashboard>=2.5.0",
+]
 
 [build-system]
 requires = ["hatchling"]
