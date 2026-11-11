@@ -101,13 +101,13 @@ APRS RX Keeps Messages Through Position Traffic
     ...                aprs.inbox_entries) don't push a message out.
     Set Up APRS Receive
     ${entries}=    Radio Value    aprs    inbox_entries
-    ${traffic}=    Evaluate    int($entries) + 8
+    ${count}=    Evaluate    int($entries) + 8
     ${msg}=    APRS Message    ${APRS_CALLSIGN}    oat4.${RUN} still here    06
     Send APRS Packets    ${msg}    source=${SENDER}    path=${PATH}    deviation_hz=${DEVIATION_HZ}
     @{traffic}=    Evaluate
-    ...    [f"!35{i % 60:02d}.{i % 100:02d}N/090{i % 60:02d}.{i % 100:02d}W-oat4.{$RUN} position {i}" if i % 2 else f">oat4.{$RUN} status {i}" for i in range(${traffic})]
+    ...    [f"!35{i % 60:02d}.{i % 100:02d}N/090{i % 60:02d}.{i % 100:02d}W-oat4.{$RUN} position {i}" if i % 2 else f">oat4.{$RUN} status {i}" for i in range(${count})]
     Send APRS Packets    @{traffic}    source=OAT4X    path=${PATH}    deviation_hz=${DEVIATION_HZ}    gap_s=0.3
-    Operator Confirms    "oat4.${RUN} still here" is still in the inbox, and none of the ${traffic} "oat4.${RUN} position" or "oat4.${RUN} status" packets are
+    Operator Confirms    "oat4.${RUN} still here" is still in the inbox, and none of the ${count} "oat4.${RUN} position" or "oat4.${RUN} status" packets are
 
 APRS RX Decodes A Full-Size Frame
     [Documentation]    APRS-RX-5: a frame of the full AX.25 size (330 bytes: eight
