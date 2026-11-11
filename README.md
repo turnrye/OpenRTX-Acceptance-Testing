@@ -104,7 +104,11 @@ or enough of it to tell images apart: two firmware states can differ in their DS
 the C62, for example, the 16 kHz image starts `7dd697c9` and the 48 kHz one `9579b617`; factory
 firmware is `-v DSP:stock`. Tags select what runs: `--include tx`, `--include rx`,
 `--include band:2m`, `--exclude mode:m17`, and `--exclude needs:audio` or
-`--exclude needs:abs-level` on a bench without an audio interface or absolute level calibration.
+`--exclude needs:abs-level` on a bench without an audio interface or absolute level calibration,
+and `--exclude needs:tnc` without a radio TNC (`tnc:` in the bench file, a serial port the radio
+reports decoded APRS frames on as KISS; every byte read is kept in the run's `tnc.log`). Without a
+transmitter level table, level sweeps step the transmitter's gain relative to the bench's setting:
+such results compare firmware only within one session on one bench.
 On a bench of SDRs alone, add `-A bench/sdr-only.args` after the bench's own argument file: it
 excludes `needs:audio` and adds a `Profile` to the suite metadata, so a published run shows that its
 audio tests were left out on purpose.
@@ -120,7 +124,8 @@ audio tests were left out on purpose.
 | `fm/audio.robot` | FM audio through the audio interface: mic sensitivity, response, distortion, speech deviation, mic level after cold boots, 12 dB SINAD sensitivity, receive response and dropouts |
 | `m17/tx.robot` | M17 transmit: deviations and ratio, symbol rate, carrier, bandwidth, EVM, decode rate, preamble, long transmissions, power, Codec2 input level and aliasing |
 | `m17/rx.robot` | M17 receive of a generated stream: callsign, Codec2 tone, sensitivity, carrier offset, speaker images |
-| `aprs/rx.robot` | APRS receive (OpenRTX#559): messages to the radio's APRS callsign reach the inbox, matched as an address, stored once, not pushed out by other traffic; full-size frames; deviation and pre-emphasis. The operator reads the inbox |
+| `aprs/rx.robot` | APRS receive (OpenRTX#559): messages to the radio's APRS callsign reach the inbox, matched as an address, stored once, not pushed out by other traffic; full-size frames; deviation and pre-emphasis. The operator reads the inbox; message tags end in the run's tag, so reruns aren't copies |
+| `aprs/performance.robot` | APRS receive performance read from the radio's KISS TNC (needs:tnc): every frame at the bench's level, full-size and escaped frames through the TNC, a sensitivity sweep (90% and 50% points), twist, deviation, short TXDELAY, off-frequency and clock error, back-to-back frames, and a soak (tag `long`). No operator after setup |
 
 On `bench/sim.yaml` the simulated radio transmits what the audio interface plays into its mic,
 plays at its speaker what the simulated transmitter sends, and the transmitter loops back into

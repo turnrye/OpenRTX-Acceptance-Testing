@@ -241,6 +241,77 @@ class SimTransmitter(Transmitter):
                                          or p.stopped > start)]
 
 
+class SimTnc:
+    """
+    The simulated radio's KISS TNC. It hears each APRS transmission the
+    library sends: the AFSK audio scaled by its deviation, limited at 5 kHz,
+    with noise that sets 12 dB SINAD at -118 dBm at 3 kHz deviation and
+    rises 1 dB per dB below. Dire Wolf's atest decodes that audio; the TNC
+    reports as many of the transmission's frames as atest decoded, in order.
+    """
+
+    RATE = 48000
+
+    def __init__(self, clock: SimClock | None = None):
+        from oat.kiss import Tnc
+        self._tnc = Tnc()
+        self.clock = clock or SimClock()
+        self._seed = 0
+
+    def now(self) -> float:
+        return self.clock.now
+
+    def heard_since(self, start: float):
+        return self._tnc.heard_since(start)
+
+    @property
+    def junk(self) -> int:
+        return 0
+
+    def close(self) -> None:
+        pass
+
+    def hear(self, audio: np.ndarray, rate: float, frames: list[bytes],
+             deviation_hz: float, level_dbm: float | None) -> int:
+        """
+        Hear one transmission (its audio before FM, peaking at 1); returns
+        how many of its frames were decoded.
+        """
+        import subprocess
+        import tempfile
+
+        from scipy.io import wavfile
+        g = np.gcd(int(rate), self.RATE)
+        a = signal.resample_poly(audio, self.RATE // g, int(rate) // g)
+        dev = np.clip(a * float(deviation_hz), -5000.0, 5000.0)
+        sinad = 40.0 if level_dbm is None else min(40.0,
+                                                   12 + level_dbm + 118)
+        ref_rms = 3000.0 / np.sqrt(2)
+        noise_rms = ref_rms / 10 ** (sinad / 20)
+        self._seed += 1
+        rng = np.random.default_rng(self._seed)
+        noise = signal.sosfilt(signal.butter(4, (300, 3000), "bandpass",
+                                             fs=self.RATE, output="sos"),
+                               rng.normal(size=len(dev)))
+        noise *= noise_rms / (np.sqrt(np.mean(noise ** 2)) or 1.0)
+        pad = np.zeros(self.RATE // 4)
+        out = np.concatenate([pad, dev + noise, pad]) / 5000.0 * 16000
+        with tempfile.TemporaryDirectory() as d:
+            wav = Path(d) / "tx.wav"
+            wavfile.write(wav, self.RATE,
+                          np.clip(out, -32767, 32767).astype(np.int16))
+            # It echoes each frame's bytes, which needn't be UTF-8
+            text = subprocess.run(["atest", "-B", "1200", str(wav)],
+                                  capture_output=True,
+                                  encoding="latin-1").stdout
+        import re
+        m = re.search(r"(\d+) packets? decoded", text)
+        decoded = min(int(m.group(1)) if m else 0, len(frames))
+        for frame in frames[:decoded]:
+            self._tnc._add(frame, 0, self.clock.now)
+        return decoded
+
+
 def link_loopback(receiver: SimReceiver, transmitter: SimTransmitter) -> None:
     """Put a simulated receiver and transmitter on one clock and cable."""
     transmitter.clock = receiver.clock

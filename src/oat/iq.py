@@ -49,17 +49,24 @@ def iter_iq(path: Path, fmt: IqFormat, samples: int = 1 << 20):
             yield (raw[0::2] + 1j * raw[1::2]).astype(np.complex64)
 
 
-def write_iq(path: Path, iq: np.ndarray, fmt: IqFormat) -> None:
-    """Write complex samples scaled to about +-1, clipping at full scale."""
+def write_iq(path: Path, iq: np.ndarray, fmt: IqFormat,
+             append: bool = False) -> None:
+    """
+    Write complex samples scaled to about +-1, clipping at full scale;
+    append adds them to the end of the file, to write a long signal a piece
+    at a time.
+    """
     out = np.empty(2 * len(iq), dtype=np.float32)
     out[0::2] = iq.real
     out[1::2] = iq.imag
     if fmt == IqFormat.CU8:
         out = np.clip(np.round(out * CU8_ZERO + CU8_ZERO), 0, 255)
-        out.astype(np.uint8).tofile(path)
+        out = out.astype(np.uint8)
     else:
         out = np.clip(np.round(out * CS8_FULL), -CS8_FULL, CS8_FULL)
-        out.astype(np.int8).tofile(path)
+        out = out.astype(np.int8)
+    with open(path, "ab" if append else "wb") as f:
+        out.tofile(f)
 
 
 def clipped_fraction(path: Path, fmt: IqFormat) -> float:
