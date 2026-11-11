@@ -14,7 +14,9 @@ Documentation     FM follows the 12.5/25 kHz channel bandwidth setting, on trans
 ...
 ...               A bench with an audio interface on the accessory jack keys the radio
 ...               and plays the test tones into the mic itself; otherwise the operator
-...               plays a tone at the mic, whistles and keys.
+...               plays a tone at the mic, whistles and keys. The interface's plug mutes
+...               the radio's speaker, so the listening tests play what it captures on
+...               the computer's output (the audio section's monitor_device).
 ...
 ...               To measure stock firmware as a reference, exclude mode:m17.
 Library           oat.robot_library.OpenRTXAcceptance
@@ -88,7 +90,8 @@ Capture Tone Takes
 FM TX At 25 kHz Stays Within Wide Limits
     [Tags]    tx
     ${tone}=    Create Audio Tone    1000
-    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, low power, no CTCSS, programming cable out
+    ${cabling}=    Bench Cabling
+    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, low power, no CTCSS, ${cabling}
     ${tx}=    Capture Tone Takes
     ...    Play ${tone} at a fixed volume and distance from the mic, key PTT for 5 s, release. Then key PTT, whistle loudly close to the mic for 5 s, release.
     Remember Result    wide tone    ${tx}[0]
@@ -115,16 +118,19 @@ Narrow FM TX Deviates Less Than Wide
 
 FM RX At 25 kHz Is Clean Up To Full Deviation
     [Tags]    rx    manual
+    Start Monitoring Radio Audio
     Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, volume comfortable
     Start Transmitting FM Tone    3000
     Operator Confirms    The radio plays a clean, steady 1 kHz tone
     Stop Transmitting
     Start Transmitting FM Tone    5000
     Operator Confirms    The radio plays the tone louder and still undistorted
-    [Teardown]    Stop Transmitting
+    [Teardown]    Run Keywords    Stop Transmitting
+    ...    AND    Stop Monitoring Radio Audio
 
 FM RX At 12.5 kHz Is Clean Up To Full Deviation
     [Tags]    rx    manual
+    Start Monitoring Radio Audio
     Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, volume unchanged
     Start Transmitting FM Tone    1500
     Operator Confirms    The radio plays a clean, steady 1 kHz tone
@@ -132,7 +138,8 @@ FM RX At 12.5 kHz Is Clean Up To Full Deviation
     Start Transmitting FM Tone    2500
     Operator Confirms    The radio plays the tone louder and still undistorted
     Operator Reports    Compared with the louder tone at 25 kHz, is this quieter, the same, or louder?
-    [Teardown]    Stop Transmitting
+    [Teardown]    Run Keywords    Stop Transmitting
+    ...    AND    Stop Monitoring Radio Audio
 
 FM Bandwidth Survives An M17 Round Trip
     [Tags]    tx    mode:m17
@@ -201,6 +208,7 @@ FM TX Power Rises With Each Setting
 
 FM RX At 12.5 kHz Rejects An Adjacent Channel
     [Tags]    rx    manual    adjacent
+    Start Monitoring Radio Audio
     Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, volume comfortable
     Start Transmitting With Interferer    1500    12500    ${ADJACENT_DB}    2500    interferer=off
     Operator Confirms    The wanted signal alone: a clean, steady 1 kHz tone
@@ -211,10 +219,12 @@ FM RX At 12.5 kHz Rejects An Adjacent Channel
     Stop Transmitting
     Start Transmitting With Interferer    1500    -12500    ${ADJACENT_DB}    2500
     Operator Confirms    With the interferer on the channel below: still no 400 Hz tone
-    [Teardown]    Stop Transmitting
+    [Teardown]    Run Keywords    Stop Transmitting
+    ...    AND    Stop Monitoring Radio Audio
 
 FM RX At 25 kHz Rejects An Adjacent Channel
     [Tags]    rx    manual    adjacent
+    Start Monitoring Radio Audio
     Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, volume comfortable
     Start Transmitting With Interferer    3000    25000    ${ADJACENT_DB}    5000    interferer=off
     Operator Confirms    The wanted signal alone: a clean, steady 1 kHz tone
@@ -226,7 +236,8 @@ FM RX At 25 kHz Rejects An Adjacent Channel
     # Not a requirement: shows what the wide filter lets through from a narrow neighbour
     Start Transmitting With Interferer    3000    12500    ${ADJACENT_DB}    2500
     Operator Reports    With a 12.5 kHz neighbour this close, do you hear the 1 kHz tone only, both tones, or mostly 400 Hz?
-    [Teardown]    Stop Transmitting
+    [Teardown]    Run Keywords    Stop Transmitting
+    ...    AND    Stop Monitoring Radio Audio
 
 FM RX SINAD Is Unchanged After M17
     [Documentation]    MODE-1: receive SINAD and tone level at a fixed level before and

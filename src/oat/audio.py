@@ -336,6 +336,50 @@ class AudioInterface(ABC):
     def wait_playing(self) -> None:
         """Wait for a file played once to end."""
 
+    _monitor: subprocess.Popen | None = None
+
+    def _monitor_command(self) -> list[str] | None:
+        """
+        The command playing the capture on the monitor device, or None where
+        there is nothing to play it on.
+        """
+        return None
+
+    def start_monitor(self) -> None:
+        """
+        Play the radio's speaker, as the interface captures it, on the
+        monitor device for the operator to hear: the interface's plug can
+        cut the radio's own speaker.
+        """
+        self.stop_monitor()
+        cmd = self._monitor_command()
+        if cmd is not None:
+            self._monitor = subprocess.Popen(
+                cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                start_new_session=True)
+
+    def stop_monitor(self) -> None:
+        """Stop playing the capture on the monitor device."""
+        if self._monitor is not None and self._monitor.poll() is None:
+            os.killpg(self._monitor.pid, 15)
+            self._monitor.wait()
+        self._monitor = None
+
+
+def check_monitor_device(playback_device: str, monitor_device: str) -> None:
+    """
+    Refuse a monitor device that is the interface's own playback device: the
+    radio's speaker would play back into its mic.
+
+    @param playback_device: the interface's device for the radio's mic.
+    @param monitor_device: where the operator hears the radio.
+    """
+    if monitor_device == playback_device:
+        raise ValueError(
+            f"audio monitor_device {monitor_device!r} is the interface's own "
+            "playback device, so the radio's speaker would feed its mic: "
+            "name the computer's output instead")
+
 
 def alsa_card(device: str) -> str | None:
     """The card of an ALSA device name: CARD=Audio, or hw:2 / plughw:2,0."""
@@ -363,11 +407,12 @@ class AlsaAudio(AudioInterface):
 
     def __init__(self, playback_device: str = "default",
                  capture_device: str = "default", rate: int = RATE,
-                 mixer: dict | None = None):
+                 mixer: dict | None = None, monitor_device: str = "default"):
         self.playback_device = playback_device
         self.capture_device = capture_device
         self.rate = rate
         self.mixer = dict(mixer or {})
+        self.monitor_device = monitor_device
         self._proc: subprocess.Popen | None = None
         self._looping = False
 
@@ -430,6 +475,12 @@ class AlsaAudio(AudioInterface):
             self._proc.wait()
         self._proc = None
 
+    def _monitor_command(self) -> list[str]:
+        check_monitor_device(self.playback_device, self.monitor_device)
+        return ["sh", "-c", '"$0" -q -D "$1" -f S16_LE -c 1 -r "$2" | '
+                '"$3" -q -D "$4"', self._tool("arecord"), self.capture_device,
+                str(self.rate), self._tool("aplay"), self.monitor_device]
+
     def record(self, path: Path, seconds: float) -> Path:
         subprocess.run([self._tool("arecord"), "-q", "-D",
                         self.capture_device, "-f", "S16_LE", "-c", "1",
@@ -448,10 +499,12 @@ class CoreAudio(AudioInterface):
     """
 
     def __init__(self, playback_device: str = "default",
-                 capture_device: str = "default", rate: int = RATE):
+                 capture_device: str = "default", rate: int = RATE,
+                 monitor_device: str = "default"):
         self.playback_device = playback_device
         self.capture_device = capture_device
         self.rate = rate
+        self.monitor_device = monitor_device
         self._proc: subprocess.Popen | None = None
 
     @staticmethod
@@ -477,6 +530,11 @@ class CoreAudio(AudioInterface):
             self._proc.terminate()
             self._proc.wait()
         self._proc = None
+
+    def _monitor_command(self) -> list[str]:
+        check_monitor_device(self.playback_device, self.monitor_device)
+        return [self._sox(), "-q", "-t", "coreaudio", self.capture_device,
+                "-t", "coreaudio", self.monitor_device]
 
     def record(self, path: Path, seconds: float) -> Path:
         subprocess.run([self._sox(), "-q", "-t", "coreaudio",
@@ -616,14 +674,16 @@ def make_audio(cfg: dict | None) -> AudioInterface | None:
     if kind == "alsa":
         return AlsaAudio(cfg.get("playback_device", "default"),
                          cfg.get("capture_device", "default"),
-                         int(cfg.get("rate", RATE)), cfg.get("mixer"))
+                         int(cfg.get("rate", RATE)), cfg.get("mixer"),
+                         cfg.get("monitor_device", "default"))
     if kind == "coreaudio":
         if cfg.get("mixer"):
             raise ValueError("audio mixer needs ALSA; on macOS set the levels "
                              "in Audio MIDI Setup and leave mixer out")
         return CoreAudio(cfg.get("playback_device", "default"),
                          cfg.get("capture_device", "default"),
-                         int(cfg.get("rate", RATE)))
+                         int(cfg.get("rate", RATE)),
+                         cfg.get("monitor_device", "default"))
     if kind == "sim":
         return SimAudio(int(cfg.get("rate", RATE)))
     raise ValueError(f"unknown audio type {kind!r}")

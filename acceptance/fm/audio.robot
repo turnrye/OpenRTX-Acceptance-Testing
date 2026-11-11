@@ -70,7 +70,8 @@ FM TX Mic Sensitivity
     [Documentation]    FM-TX-1: the 1 kHz level at the mic input that deviates 60% of the
     ...                25 kHz peak limit, in dBFS of the interface and mVrms when calibrated.
     [Tags]    tx
-    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, low power, no CTCSS, audio interface plugged in
+    ${cabling}=    Bench Cabling
+    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, low power, no CTCSS, ${cabling}
     ${target}=    Test Deviation    BW_25
     Inject Audio Tone    1000    ${PROBE_DBFS}
     ${tx}=    Capture Keyed Transmission
