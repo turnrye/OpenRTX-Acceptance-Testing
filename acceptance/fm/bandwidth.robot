@@ -7,16 +7,16 @@ Documentation     FM follows the 12.5/25 kHz channel bandwidth setting, on trans
 ...               and on receive, on every band the radio has.
 ...
 ...               Run it with a bench's argument file (bench/example.args), whose
-...               oat.expand repeats each test on every band in the radio file. Transmit is measured from the SDR capture; receive is
-...               judged by the operator, until the radio can report its own audio.
+...               oat.expand repeats each test on every band in the radio file. Transmit is measured from the SDR capture. Receive is judged by
+...               the operator, or, on a bench with an audio interface, measured
+...               from its recording of the speaker once Set Radio Volume Once has
+...               set the volume by level.
 ...               The programming cable stays out throughout: it disconnects the mic
 ...               and the speaker.
 ...
 ...               A bench with an audio interface on the accessory jack keys the radio
 ...               and plays the test tones into the mic itself; otherwise the operator
-...               plays a tone at the mic, whistles and keys. The interface's plug mutes
-...               the radio's speaker, so the listening tests play what it captures on
-...               the computer's output (the audio section's monitor_device).
+...               plays a tone at the mic, whistles and keys.
 ...
 ...               To measure stock firmware as a reference, exclude mode:m17.
 Library           oat.robot_library.OpenRTXAcceptance
@@ -60,6 +60,14 @@ ${ADJACENT_DB}    20
 ${TONE_DBFS}      -35
 ${LOUD_HZ}        2000
 ${LOUD_DBFS}      -10
+# Receive tests measured through an audio interface. A full-deviation tone
+# must be louder than the nominal one by the deviation step within this, and
+# with the interferer ${ADJACENT_DB} dB up its 400 Hz tone must stay this far
+# under the wanted 1 kHz tone and SINAD drop no more than this. Bench
+# judgement, tune later. Clean means the radio file's rx THD+N limit.
+${STEP_TOLERANCE_DB}         1.5
+${MAX_INTERFERER_TONE_DB}    -20
+${MAX_SINAD_DROP_DB}         3
 
 *** Keywords ***
 Capture Tone Takes
@@ -85,6 +93,53 @@ Capture Tone Takes
     Stop Injecting Audio
     ${tx}=    Stop Capture And Measure FM    expected=${count}
     RETURN    ${tx}
+
+Take Received Tone
+    [Documentation]    The speaker, recorded for 3 s, receiving a 1 kHz tone at a deviation.
+    [Arguments]    ${deviation}
+    Start Transmitting FM Tone    ${deviation}
+    Wait Seconds    1
+    ${take}=    Capture Radio Audio    3    1000
+    Stop Transmitting
+    RETURN    ${take}
+
+Measure Clean Reception
+    [Documentation]    The speaker at the nominal and at full deviation: both clean (the
+    ...                radio file's rx THD+N limit), full deviation louder by the deviation
+    ...                step. Returns the full-deviation take.
+    [Arguments]    ${nominal_hz}    ${full_hz}
+    ${nominal}=    Take Received Tone    ${nominal_hz}
+    ${full}=    Take Received Tone    ${full_hz}
+    Run Keyword And Continue On Failure    Audio Distortion Should Meet Limits    ${nominal}    rx
+    Run Keyword And Continue On Failure    Audio Distortion Should Meet Limits    ${full}    rx
+    ${step}=    Evaluate    20 * math.log10($full['tone_amplitude'] / $nominal['tone_amplitude'])
+    ${expected}=    Evaluate    20 * math.log10(${full_hz} / ${nominal_hz})
+    Value Should Be Within    ${step}    ${expected}    ${STEP_TOLERANCE_DB}
+    ...    full over nominal deviation level (dB)    relative=False
+    RETURN    ${full}
+
+Take With Interferer
+    [Documentation]    The speaker, recorded for 3 s, receiving the wanted 1 kHz tone with a
+    ...                400 Hz interferer ${ADJACENT_DB} dB up at an offset (or the wanted
+    ...                signal alone), and the interferer's tone relative to the wanted one.
+    [Arguments]    ${deviation}    ${offset}    ${interferer_deviation}    ${interferer}=${True}
+    Start Transmitting With Interferer    ${deviation}    ${offset}    ${ADJACENT_DB}
+    ...    ${interferer_deviation}    interferer=${interferer}
+    Wait Seconds    1
+    ${take}=    Capture Radio Audio    3    1000
+    Stop Transmitting
+    ${tone_db}=    Audio Component Db    ${take}    400
+    RETURN    ${take}    ${tone_db}
+
+Neighbour Should Not Break Through
+    [Documentation]    The interferer's 400 Hz tone stays under the wanted tone, and SINAD
+    ...                drops little from the wanted signal alone.
+    [Arguments]    ${alone}    ${take}    ${tone_db}    ${where}
+    Run Keyword And Continue On Failure    Value Should Be At Most    ${tone_db}
+    ...    ${MAX_INTERFERER_TONE_DB}    400 Hz from the channel ${where} over the 1 kHz tone (dB)
+    ${drop}=    Evaluate    $alone['sinad_db'] - $take['sinad_db']
+    Value Should Be At Most    ${drop}    ${MAX_SINAD_DROP_DB}
+    ...    SINAD drop with the channel ${where} (dB)
 
 *** Test Cases ***
 FM TX At 25 kHz Stays Within Wide Limits
@@ -119,29 +174,41 @@ Narrow FM TX Deviates Less Than Wide
 FM RX At 25 kHz Is Clean Up To Full Deviation
     [Tags]    rx    manual
     ${volume}=    Set Listening Volume
-    Start Monitoring Radio Audio
+    ${audio}=    Bench Has Audio
     Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, ${volume}
-    Start Transmitting FM Tone    3000
-    Operator Confirms    The radio plays a clean, steady 1 kHz tone
-    Stop Transmitting
-    Start Transmitting FM Tone    5000
-    Operator Confirms    The radio plays the tone louder and still undistorted
-    [Teardown]    Run Keywords    Stop Transmitting
-    ...    AND    Stop Monitoring Radio Audio
+    IF    ${audio}
+        ${full}=    Measure Clean Reception    3000    5000
+        Remember Result    wide full tone    ${full}
+    ELSE
+        Start Transmitting FM Tone    3000
+        Operator Confirms    The radio plays a clean, steady 1 kHz tone
+        Stop Transmitting
+        Start Transmitting FM Tone    5000
+        Operator Confirms    The radio plays the tone louder and still undistorted
+    END
+    [Teardown]    Stop Transmitting
 
 FM RX At 12.5 kHz Is Clean Up To Full Deviation
     [Tags]    rx    manual
     ${volume}=    Set Listening Volume    volume unchanged
-    Start Monitoring Radio Audio
+    ${audio}=    Bench Has Audio
     Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, ${volume}
-    Start Transmitting FM Tone    1500
-    Operator Confirms    The radio plays a clean, steady 1 kHz tone
-    Stop Transmitting
-    Start Transmitting FM Tone    2500
-    Operator Confirms    The radio plays the tone louder and still undistorted
-    Operator Reports    Compared with the louder tone at 25 kHz, is this quieter, the same, or louder?
-    [Teardown]    Run Keywords    Stop Transmitting
-    ...    AND    Stop Monitoring Radio Audio
+    IF    ${audio}
+        ${full}=    Measure Clean Reception    1500    2500
+        ${wide}=    Recall Result    wide full tone
+        IF    $wide is not None
+            ${louder}=    Evaluate    20 * math.log10($full['tone_amplitude'] / $wide['tone_amplitude'])
+            Record Value    12.5 kHz full-deviation level over 25 kHz    ${louder}    dB
+        END
+    ELSE
+        Start Transmitting FM Tone    1500
+        Operator Confirms    The radio plays a clean, steady 1 kHz tone
+        Stop Transmitting
+        Start Transmitting FM Tone    2500
+        Operator Confirms    The radio plays the tone louder and still undistorted
+        Operator Reports    Compared with the louder tone at 25 kHz, is this quieter, the same, or louder?
+    END
+    [Teardown]    Stop Transmitting
 
 FM Bandwidth Survives An M17 Round Trip
     [Tags]    tx    mode:m17
@@ -211,37 +278,56 @@ FM TX Power Rises With Each Setting
 FM RX At 12.5 kHz Rejects An Adjacent Channel
     [Tags]    rx    manual    adjacent
     ${volume}=    Set Listening Volume
-    Start Monitoring Radio Audio
+    ${audio}=    Bench Has Audio
     Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 12.5 kHz bandwidth, no CTCSS, ${volume}
-    Start Transmitting With Interferer    1500    12500    ${ADJACENT_DB}    2500    interferer=off
-    Operator Confirms    The wanted signal alone: a clean, steady 1 kHz tone
-    Stop Transmitting
-    Start Transmitting With Interferer    1500    12500    ${ADJACENT_DB}    2500
-    Operator Confirms    The 1 kHz tone continues with no 400 Hz tone from the channel above
-    Operator Reports    Any added noise compared with the wanted signal alone?
-    Stop Transmitting
-    Start Transmitting With Interferer    1500    -12500    ${ADJACENT_DB}    2500
-    Operator Confirms    With the interferer on the channel below: still no 400 Hz tone
-    [Teardown]    Run Keywords    Stop Transmitting
-    ...    AND    Stop Monitoring Radio Audio
+    IF    ${audio}
+        ${alone}    ${_}=    Take With Interferer    1500    12500    2500    interferer=${False}
+        ${above}    ${above_db}=    Take With Interferer    1500    12500    2500
+        ${below}    ${below_db}=    Take With Interferer    1500    -12500    2500
+        Run Keyword And Continue On Failure
+        ...    Neighbour Should Not Break Through    ${alone}    ${above}    ${above_db}    above
+        Neighbour Should Not Break Through    ${alone}    ${below}    ${below_db}    below
+    ELSE
+        Start Transmitting With Interferer    1500    12500    ${ADJACENT_DB}    2500    interferer=off
+        Operator Confirms    The wanted signal alone: a clean, steady 1 kHz tone
+        Stop Transmitting
+        Start Transmitting With Interferer    1500    12500    ${ADJACENT_DB}    2500
+        Operator Confirms    The 1 kHz tone continues with no 400 Hz tone from the channel above
+        Operator Reports    Any added noise compared with the wanted signal alone?
+        Stop Transmitting
+        Start Transmitting With Interferer    1500    -12500    ${ADJACENT_DB}    2500
+        Operator Confirms    With the interferer on the channel below: still no 400 Hz tone
+    END
+    [Teardown]    Stop Transmitting
 
 FM RX At 25 kHz Rejects An Adjacent Channel
     [Tags]    rx    manual    adjacent
     ${volume}=    Set Listening Volume
-    Start Monitoring Radio Audio
+    ${audio}=    Bench Has Audio
     Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, no CTCSS, ${volume}
-    Start Transmitting With Interferer    3000    25000    ${ADJACENT_DB}    5000    interferer=off
-    Operator Confirms    The wanted signal alone: a clean, steady 1 kHz tone
-    Stop Transmitting
-    Start Transmitting With Interferer    3000    25000    ${ADJACENT_DB}    5000
-    Operator Confirms    The 1 kHz tone continues with no 400 Hz tone from the channel above
-    Operator Reports    Any added noise compared with the wanted signal alone?
-    Stop Transmitting
-    # Not a requirement: shows what the wide filter lets through from a narrow neighbour
-    Start Transmitting With Interferer    3000    12500    ${ADJACENT_DB}    2500
-    Operator Reports    With a 12.5 kHz neighbour this close, do you hear the 1 kHz tone only, both tones, or mostly 400 Hz?
-    [Teardown]    Run Keywords    Stop Transmitting
-    ...    AND    Stop Monitoring Radio Audio
+    IF    ${audio}
+        ${alone}    ${_}=    Take With Interferer    3000    25000    5000    interferer=${False}
+        ${above}    ${above_db}=    Take With Interferer    3000    25000    5000
+        Run Keyword And Continue On Failure
+        ...    Neighbour Should Not Break Through    ${alone}    ${above}    ${above_db}    above
+        # Not a requirement: what the wide filter lets through from a narrow neighbour
+        ${narrow}    ${narrow_db}=    Take With Interferer    3000    12500    2500
+        Record Value    400 Hz from a 12.5 kHz neighbour over the 1 kHz tone    ${narrow_db}    dB
+        ${drop}=    Evaluate    $alone['sinad_db'] - $narrow['sinad_db']
+        Record Value    SINAD drop with a 12.5 kHz neighbour    ${drop}    dB
+    ELSE
+        Start Transmitting With Interferer    3000    25000    ${ADJACENT_DB}    5000    interferer=off
+        Operator Confirms    The wanted signal alone: a clean, steady 1 kHz tone
+        Stop Transmitting
+        Start Transmitting With Interferer    3000    25000    ${ADJACENT_DB}    5000
+        Operator Confirms    The 1 kHz tone continues with no 400 Hz tone from the channel above
+        Operator Reports    Any added noise compared with the wanted signal alone?
+        Stop Transmitting
+        # Not a requirement: shows what the wide filter lets through from a narrow neighbour
+        Start Transmitting With Interferer    3000    12500    ${ADJACENT_DB}    2500
+        Operator Reports    With a 12.5 kHz neighbour this close, do you hear the 1 kHz tone only, both tones, or mostly 400 Hz?
+    END
+    [Teardown]    Stop Transmitting
 
 FM RX SINAD Is Unchanged After M17
     [Documentation]    MODE-1: receive SINAD and tone level at a fixed level before and

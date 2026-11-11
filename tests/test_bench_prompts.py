@@ -2,12 +2,26 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-"""Setup prompts that name the bench's cabling, and the listening monitor."""
+"""Setup prompts that follow the bench, and measured listening tests."""
 
 import pytest
 
 from oat import audio
+from oat import robot_library
 from oat.robot_library import OpenRTXAcceptance
+
+
+class FakeBuiltIn:
+    def get_variable_value(self, name, default=None):
+        return default
+
+
+@pytest.fixture
+def lib(tmp_path, monkeypatch):
+    monkeypatch.setattr(robot_library, "BuiltIn", FakeBuiltIn)
+    lib = OpenRTXAcceptance()
+    lib.run_dir = tmp_path
+    return lib
 
 
 def test_cabling_without_an_audio_interface():
@@ -25,49 +39,6 @@ def test_cabling_names_the_audio_interface():
     lib.bench["audio"]["name"] = "Digirig Mobile"
     assert lib.bench_cabling() == ("Digirig Mobile on the accessory jack, "
                                    "programming cable out")
-
-
-def test_monitor_refuses_the_interfaces_own_output():
-    with pytest.raises(ValueError, match="feed its mic"):
-        audio.check_monitor_device("USB Audio Device", "USB Audio Device")
-    audio.check_monitor_device("USB Audio Device", "default")
-
-
-def test_monitor_commands_play_the_capture_on_the_monitor_device(monkeypatch):
-    monkeypatch.setattr(audio.shutil, "which", lambda name: f"/bin/{name}")
-    core = audio.make_audio({"type": "coreaudio",
-                             "playback_device": "USB Audio Device",
-                             "capture_device": "USB Audio Device"})
-    assert core._monitor_command() == [
-        "/bin/sox", "-q", "-t", "coreaudio", "USB Audio Device",
-        "-t", "coreaudio", "default"]
-    alsa = audio.make_audio({"type": "alsa", "playback_device": "plughw:1",
-                             "capture_device": "plughw:1",
-                             "monitor_device": "plughw:0"})
-    cmd = alsa._monitor_command()
-    assert cmd[3:] == ["/bin/arecord", "plughw:1", str(audio.RATE),
-                       "/bin/aplay", "plughw:0"]
-    # Both on the default device would loop the speaker into the mic
-    with pytest.raises(ValueError):
-        audio.make_audio({"type": "alsa"})._monitor_command()
-
-
-def test_monitor_starts_and_stops():
-    sim = audio.SimAudio()
-    sim.start_monitor()               # nothing to play it on
-    assert sim._monitor is None
-    sim._monitor_command = lambda: ["sleep", "30"]
-    sim.start_monitor()
-    proc = sim._monitor
-    assert proc.poll() is None
-    sim.stop_monitor()
-    assert proc.poll() is not None and sim._monitor is None
-
-
-def test_monitor_keywords_do_nothing_without_audio():
-    lib = OpenRTXAcceptance()
-    lib.start_monitoring_radio_audio()
-    lib.stop_monitoring_radio_audio()
 
 
 def test_listening_volume_is_the_operators_without_audio():
@@ -92,3 +63,20 @@ def test_listening_volume_is_set_once_by_level_with_audio():
     assert lib.set_listening_volume() == "volume unchanged"
     assert lib.set_listening_volume("volume unchanged") == "volume unchanged"
     assert len(calls) == 2 and lib.radio_volume == {"knob": "12 o'clock"}
+
+
+def test_an_interferers_tone_is_measured_under_the_wanted_one(lib, tmp_path):
+    x = audio.tone(1000, 3.0, -12) + audio.tone(400, 3.0, -32)
+    path = audio.write_wav(tmp_path / "speaker.wav", x)
+    m = {"file": "speaker.wav", "tone_hz": 1000.0,
+         "tone_amplitude": audio.tone_amplitude(x, audio.RATE, 1000)}
+    assert lib.audio_component_db(m, 400) == pytest.approx(-20, abs=0.2)
+    assert lib.records[-1]["kind"] == "component"
+    assert lib.records[-1]["file"] == path.name
+
+
+def test_a_value_is_recorded_without_a_limit(lib):
+    lib.record_value("SINAD drop", "1.25", "dB")
+    assert lib.records[-1] == {"test": "", "band": None, "kind": "value",
+                               "field": "SINAD drop", "value": 1.25,
+                               "unit": "dB"}
