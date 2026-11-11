@@ -112,6 +112,31 @@ def test_a_rerun_of_other_firmware_is_refused(selftest_run, selftest_rerun,
         merge_reruns(selftest_run, [other])
 
 
+def test_export_combines_a_run_of_several_suites(tmp_path):
+    # Two suites in one robot run each write their own measurements.json
+    suites = tmp_path / "Both"
+    suites.mkdir()
+    for name in ("first", "second"):
+        shutil.copy(ROOT / "acceptance" / "selftest.robot",
+                    suites / f"{name}.robot")
+    out = tmp_path / "run"
+    assert robot.run(str(suites), test=RERUN_TEST, outputdir=str(out),
+                     console="none", report="NONE", log="NONE") == 0
+
+    done = subprocess.run(["bash", str(EXPORT), str(out),
+                           str(tmp_path / "results")],
+                          capture_output=True, text=True, cwd=ROOT)
+    assert done.returncode == 0, done.stderr
+    folder = Path(done.stdout.strip())
+    assert folder.name.endswith("-sim-Both")
+    check_run(folder)
+    measurements = json.loads((folder / "measurements.json").read_text())
+    assert measurements["suites"] == ["Both.First", "Both.Second"]
+    files = [f for r in measurements["records"] for f in r.get("files", [])]
+    assert any(f.startswith("bench-Both.First/") for f in files)
+    assert any(f.startswith("bench-Both.Second/") for f in files)
+
+
 def merge_target(run: Path) -> Path:
     """A run's measurements.json."""
     path, = run.glob("bench-*/measurements.json")
