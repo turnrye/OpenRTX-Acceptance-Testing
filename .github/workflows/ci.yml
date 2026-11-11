@@ -4,19 +4,71 @@
 
 name: CI
 
+# Branches get CI through their pull request; main on every push. The weekly
+# run catches drift in the runner image, the Ubuntu packages and the
+# dependencies between commits, and keeps the package cache warm.
 on:
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 6 * * 1"
+
+# A newer push to a pull request replaces its running checks; main keeps each
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  APT_PACKAGES: codec2 direwolf
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
       - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          cache-dependency-glob: uv.lock
+      # Normal runs install from cached packages and never reach the Ubuntu
+      # mirrors; only a cache miss downloads, with retries
+      - name: Restore the Codec2 and Dire Wolf packages
+        id: apt-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/apt-debs
+          # Change with APT_PACKAGES or the runner image
+          key: apt-ubuntu-26.04-codec2-direwolf-v1
       - name: Codec2 for the M17 voice tests, Dire Wolf to check APRS packets
-        run: sudo apt-get update && sudo apt-get install -y codec2 direwolf
-      - run: uv sync
+        env:
+          CACHE_HIT: ${{ steps.apt-cache.outputs.cache-hit }}
+        run: |
+          set -euo pipefail
+          read -ra packages <<< "$APT_PACKAGES"
+          apt=(sudo apt-get -o Acquire::Retries=5 -o Acquire::http::Timeout=30
+               -o Acquire::https::Timeout=30)
+          if [ "$CACHE_HIT" != true ]; then
+            "${apt[@]}" update
+            "${apt[@]}" install -y --download-only \
+              "${packages[@]}"
+            mkdir -p ~/apt-debs
+            cp /var/cache/apt/archives/*.deb ~/apt-debs/
+          fi
+          # A newer runner image can need other versions: then use the mirrors
+          sudo apt-get install -y ~/apt-debs/*.deb \
+            || { "${apt[@]}" update &&
+                 "${apt[@]}" install -y \
+                   "${packages[@]}"; }
+      - run: uv sync --locked
       - run: uv run pytest
       - name: Robot self-test on the simulated bench
         run: uv run robot --outputdir runs/selftest --xunit xunit.xml acceptance/selftest.robot
@@ -61,13 +113,25 @@ jobs:
           -v RADIO:radios/c62.yaml -v BENCH:bench/sim.yaml
           -v CALIBRATION:calibration/sim.yaml -v FIRMWARE:dryrun
           -v HARDWARE:dryrun -v DSP:dryrun acceptance
+      # Logs and reports always; the captures only when something failed
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: robot-results
+          path: |
+            runs/**/*.xml
+            runs/**/*.html
+            runs/**/measurements.json
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: robot-runs
           path: runs/
+          retention-days: 14
   reuse:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
       - uses: fsfe/reuse-action@v5
