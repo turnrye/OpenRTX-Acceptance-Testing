@@ -20,12 +20,37 @@ SAME_METADATA = ("Firmware", "Radio", "Station", "Calibration", "Hardware",
                  "DSP", "Suite commit")
 
 
-def measurements_file(run: Path) -> Path:
-    """The one bench-*/measurements.json of a run's output directory."""
+def run_measurements(run: Path) -> dict:
+    """
+    A run's measurements. A run of several suites (robot given several
+    files) has a bench-*/measurements.json per suite: they are combined
+    under the run's top suite, each suite's capture files named under its
+    bench folder. Refuses suites run on different firmware, radios or
+    benches.
+    """
     found = sorted(Path(run).glob("bench-*/measurements.json"))
-    if len(found) != 1:
-        raise ValueError(f"{run}: expected one bench-*/measurements.json")
-    return found[0]
+    if not found:
+        raise ValueError(f"{run}: no bench-*/measurements.json")
+    parts = [json.loads(f.read_text()) for f in found]
+    if len(parts) == 1:
+        return parts[0]
+    first = parts[0]
+    differ = sorted({k for p in parts[1:] for k in SAME_RUN
+                     if k != "suite" and p.get(k) != first.get(k)})
+    if differ:
+        raise ValueError(f"{run}: its suites differ in {', '.join(differ)}")
+    combined = {**first,
+                "suite": ExecutionResult(str(Path(run) / "output.xml"))
+                .suite.name,
+                "started": min(p["started"] for p in parts),
+                "suites": [p["suite"] for p in parts],
+                "records": [renamed(r, f"{f.parent.name}/")
+                            for f, p in zip(found, parts)
+                            for r in p["records"]],
+                "operator": [x for p in parts for x in p.get("operator", [])]}
+    if any("tnc_junk" in p for p in parts):
+        combined["tnc_junk"] = sum(p.get("tnc_junk", 0) for p in parts)
+    return combined
 
 
 def merge_reruns(run: Path, reruns: list[Path]) -> dict:
@@ -35,10 +60,10 @@ def merge_reruns(run: Path, reruns: list[Path]) -> dict:
     capture files named under rerun<N>/. Refuses a rerun of a different
     firmware, radio, bench, calibration or suite commit.
     """
-    merged = json.loads(measurements_file(run).read_text())
+    merged = run_measurements(run)
     meta = ExecutionResult(str(Path(run) / "output.xml")).suite.metadata
     for i, rerun in enumerate(reruns, 1):
-        again = json.loads(measurements_file(rerun).read_text())
+        again = run_measurements(rerun)
         result = ExecutionResult(str(Path(rerun) / "output.xml"))
         differ = [k for k in SAME_RUN if again.get(k) != merged.get(k)]
         differ += [k for k in SAME_METADATA

@@ -34,18 +34,14 @@ for r in ${reruns[@]+"${reruns[@]}"}; do
     merge=(--merge)
 done
 
-shopt -s nullglob
-measurements=("$run"/bench-*/measurements.json)
-if [ ${#measurements[@]} -ne 1 ]; then
-    echo "$run: expected one bench-*/measurements.json" >&2
-    exit 1
-fi
-
 # The git sha in the firmware name (v0.4.5-88-g1ceed9f8 -> 1ceed9f8), or the
-# name made path-safe when it has none (stock-1.2)
-dest=$(uv run python - "${measurements[0]}" "$results" <<'PY'
-import json, re, sys
-m = json.load(open(sys.argv[1]))
+# name made path-safe when it has none (stock-1.2). A run of several suites
+# is published as one, named after its top suite.
+dest=$(uv run python - "$run" "$results" <<'PY'
+import re, sys
+from pathlib import Path
+from oat.results import run_measurements
+m = run_measurements(Path(sys.argv[1]))
 safe = lambda s: re.sub(r"[^A-Za-z0-9._-]", "_", s)
 sha = re.search(r"(?:^|-g)([0-9a-f]{7,40})$", m["firmware"])
 firmware = sha.group(1) if sha else safe(m["firmware"])
