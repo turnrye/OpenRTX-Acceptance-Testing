@@ -27,6 +27,7 @@ from oat.iq import IqFormat, clipped_fraction, write_iq
 from oat.kiss import make_tnc
 from oat.sanitize import scrub
 from oat.operator import make_operator
+from oat import recorded
 from oat.sdr import make_receiver, make_transmitter
 from oat.sdr.sim import SimBurst, SimReceiver, SimTransmitter, link_loopback
 from oat.m17 import codec as m17_codec
@@ -1553,6 +1554,71 @@ class OpenRTXAcceptance:
                else "n/a")
             + f", 50% at {result['level_50']:+.1f} {result['unit']}",
             append=True)
+        return result
+
+    @keyword
+    def play_aprs_recording(self, track: str, reference: str,
+                            deviation_hz: float = 3000.0, channel: int = 0,
+                            start_s: float = 0.0, duration_s=None,
+                            level_dbm=None, level_db=None,
+                            settle_s: float = 3.0) -> dict:
+        """
+        Play a recording of off-air APRS traffic (a 16-bit WAV) as FM on the
+        test frequency and score what the radio's TNC reported against
+        `reference`, Dire Wolf's atest output for the same file. The track's
+        peak deviates the carrier by deviation_hz; nothing is pre-emphasized,
+        so play a flat (discriminator) track. start_s and duration_s play
+        part of the track, scored against the reference frames that ended in
+        it. The recordings carry real callsigns: cabled bench only, no
+        antenna. Returns the counts and the fraction of the reference heard.
+        """
+        tnc = self._need_tnc()
+        if hasattr(tnc, "hear"):
+            BuiltIn().skip("A recording needs a radio: the simulated TNC "
+                           "hears only the frames the library builds")
+        tx = self.bench["transmitter"]
+        audio_rate, samples = recorded.open_track(Path(str(track)),
+                                                  int(channel))
+        peak = recorded.track_peak(samples)
+        first = int(float(start_s) * audio_rate)
+        last = (len(samples) if duration_s in (None, "", "None")
+                else first + int(float(duration_s) * audio_rate))
+        samples = samples[first:last]
+        seconds = len(samples) / audio_rate
+        iq = recorded.fm_blocks(samples, audio_rate, tx["rate"],
+                                float(deviation_hz),
+                                self._tx_baseband_offset(), peak)
+        self._aprs_sends += 1
+        start = tnc.now()
+        level = self._play(iq, f"tx-aprs-recording-{self._aprs_sends:03d}",
+                           level_dbm, repeat=False, mode="aprs",
+                           level_db=level_db)
+        self.wait_seconds(seconds + float(settle_s))
+        played = self._tx_state["path"]
+        self.stop_transmitting()
+        # A whole track is gigabytes of IQ: keep only the audio's name
+        played.unlink(missing_ok=True)
+        end = float(start_s) + seconds
+        # A frame ends a little before atest reports it
+        wanted = [line for at, line in recorded.read_reference(
+                      Path(str(reference)))
+                  if float(start_s) <= at <= end + 1.0]
+        result = recorded.score(wanted,
+                                [h.frame for h in tnc.heard_since(start)])
+        missed = result.pop("missed_frames")
+        (self.run_dir / f"aprs-recording-{self._aprs_sends:03d}-missed.txt"
+         ).write_text("\n".join(missed) + "\n")
+        result.update(track=Path(str(track)).name, start_s=float(start_s),
+                      seconds=seconds, deviation_hz=float(deviation_hz),
+                      track_peak=peak, junk=tnc.junk, **level)
+        self._record("aprs-recording", **result)
+        logger.info(f"{result['track']} at {float(deviation_hz):.0f} Hz: "
+                    f"{result['common']} of {result['reference']} reference "
+                    f"frames ({result['rate']:.1%}), {result['extra']} the "
+                    f"reference didn't have, {result['not_ui']} not UI frames")
+        BuiltIn().set_test_message(
+            f"{float(deviation_hz):.0f} Hz: {result['common']}/"
+            f"{result['reference']}", append=True)
         return result
 
     @keyword
