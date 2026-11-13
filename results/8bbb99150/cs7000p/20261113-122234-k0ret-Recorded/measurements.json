@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "suite": "Recorded",
+  "started": "2026-11-13T12:22:34+00:00",
+  "station": "k0ret",
+  "radio": "Connect Systems CS7000-PLUS",
+  "radio_file": "cs7000p",
+  "firmware": "v0.4.5-87-g8bbb99150",
+  "hardware": "Connect Systems CS7000-PLUS",
+  "suite_commit": "2bd5f60a1c",
+  "bands": {
+    "70cm": 445925000
+  },
+  "calibration": {
+    "method": "assumed",
+    "measured": "2026-10-20",
+    "expires": "2026-12-31",
+    "sha256": "d55ce4aa0a3c"
+  },
+  "records": [
+    {
+      "test": "70cm: APRS Recording Frames Heard",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Check the transmitter is cabled to the radio through the attenuators with no antenna connected, and set the radio to APRS on 445.925 MHz with its TNC port connected",
+      "answer": ""
+    },
+    {
+      "test": "70cm: APRS Recording Frames Heard",
+      "band": "70cm",
+      "kind": "aprs-recording",
+      "reference": 95,
+      "heard": 37,
+      "common": 37,
+      "missed": 58,
+      "extra": 0,
+      "not_ui": 0,
+      "rate": 0.3894736842105263,
+      "track": "t1.wav",
+      "start_s": 0.0,
+      "seconds": 120.0,
+      "deviation_hz": 3000.0,
+      "track_peak": 32767,
+      "junk": 0
+    }
+  ],
+  "tnc_junk": 0,
+  "operator": [
+    {
+      "kind": "instruct",
+      "text": "Plan for Recorded:\n  Radio: Connect Systems CS7000-PLUS as Connect Systems CS7000-PLUS (radios/cs7000p.yaml), firmware v0.4.5-87-g8bbb99150\n  Bench: k0ret, receiver hackrf, transmitter hackrf, calibration assumed of 2026-10-20\n  70cm: 445.925 MHz (to receiver 58.0 dB, from transmitter 58.3 dB)\n  Modes: aprs\n  Every test: attenuator chain between the radio and the hackrf, where it stays\n  Tests (1):\n    - 70cm: APRS Recording Frames Heard\nCheck the setup, then continue to begin.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Check the transmitter is cabled to the radio through the attenuators with no antenna connected, and set the radio to APRS on 445.925 MHz with its TNC port connected",
+      "answer": ""
+    }
+  ]
+}
