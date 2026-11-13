@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Rebot 7.5 (Python 3.13.13 on darwin)" generated="2026-11-13T07:13:06.877154" rpa="false" schemaversion="5">
+<suite id="s1" name="Recorded" source="acceptance/aprs/recorded.robot">
+<kw name="Open Bench" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-13T06:22:34.733838" level="INFO">Results in runs/aprs-recording-smoke/bench-Recorded</msg>
+<msg time="2026-11-13T06:22:34.759886" level="INFO">Set suite metadata 'Firmware' to value 'v0.4.5-87-g8bbb99150'.</msg>
+<msg time="2026-11-13T06:22:34.760002" level="INFO">Set suite metadata 'Radio' to value 'Connect Systems CS7000-PLUS (cs7000p)'.</msg>
+<msg time="2026-11-13T06:22:34.760023" level="INFO">Set suite metadata 'Hardware' to value 'Connect Systems CS7000-PLUS'.</msg>
+<msg time="2026-11-13T06:22:34.760051" level="INFO">Set suite metadata 'Station' to value 'k0ret'.</msg>
+<msg time="2026-11-13T06:22:34.760062" level="INFO">Set suite metadata 'TNC' to value 'serial'.</msg>
+<msg time="2026-11-13T06:22:34.760072" level="INFO">Set suite metadata 'Calibration' to value 'assumed, measured 2026-10-20 (d55ce4aa0a3c)'.</msg>
+<msg time="2026-11-13T06:22:34.760084" level="INFO">Set suite metadata 'Suite commit' to value '2bd5f60a1c'.</msg>
+<arg>${BENCH}</arg>
+<arg>${CALIBRATION}</arg>
+<arg>${RADIO}</arg>
+<arg>${FIRMWARE}</arg>
+<arg>${HARDWARE}</arg>
+<arg>dsp=${DSP}</arg>
+<doc>Load the bench, its calibration and the radio file, and prepare the
+instruments. All five are mandatory and differ from tester to tester,
+so suites take them from the command line (-v BENCH:... and so on).
+`firmware` names what the radio runs, such as a git describe;
+`hardware` names the unit, by model and serial number, since units of
+one model measure differently. `dsp` names the DSP image the radio's
+audio processor runs, such as its sha256; it is mandatory for radio
+files with dsp_image: true, whose firmware states can differ in it
+alone.</doc>
+<status status="PASS" start="2026-11-13T06:22:34.728607" elapsed="19.030377"/>
+</kw>
+<test id="s1-t1" name="70cm: APRS Recording Frames Heard" line="39">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-13T06:22:53.762066" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-13T06:22:53.762292" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-13T06:22:53.761272" elapsed="0.001065"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Check the transmitter is cabled to the radio through the attenuators with no antenna connected, and set the radio to APRS on ${FREQUENCY_MHZ} MHz with its TNC port connected</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-11-13T06:22:53.762511" elapsed="10.453550"/>
+</kw>
+<kw name="Split String" owner="String">
+<msg time="2026-11-13T06:23:04.216908" level="INFO">@{deviations} = [ 3000 ]</msg>
+<var>@{deviations}</var>
+<arg>${DEVIATIONS_HZ}</arg>
+<arg>,</arg>
+<doc>Splits the `string` using `separator` as a delimiter string.</doc>
+<status status="PASS" start="2026-11-13T06:23:04.216511" elapsed="0.000423"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Play Aprs Recording" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-13T06:25:11.223927" level="INFO">t1.wav at 3000 Hz: 37 of 95 reference frames (38.9%), 0 the reference didn't have, 0 not UI frames</msg>
+<msg time="2026-11-13T06:25:11.224115" level="INFO">Set test message to:
+3000 Hz: 37/95</msg>
+<arg>${TRACK}</arg>
+<arg>${REFERENCE}</arg>
+<arg>deviation_hz=${dev}</arg>
+<arg>start_s=${START_S}</arg>
+<arg>duration_s=${DURATION_S}</arg>
+<doc>Play a recording of off-air APRS traffic (a 16-bit WAV) as FM on the
+test frequency and score what the radio's TNC reported against
+`reference`, Dire Wolf's atest output for the same file. The track's
+peak deviates the carrier by deviation_hz; nothing is pre-emphasized,
+so play a flat (discriminator) track. start_s and duration_s play
+part of the track, scored against the reference frames that ended in
+it. The recordings carry real callsigns: cabled bench only, no
+antenna. Returns the counts and the fraction of the reference heard.</doc>
+<status status="PASS" start="2026-11-13T06:23:04.217461" elapsed="127.008108"/>
+</kw>
+<var name="${dev}">3000</var>
+<status status="PASS" start="2026-11-13T06:23:04.217375" elapsed="127.008279"/>
+</iter>
+<var>${dev}</var>
+<value>@{deviations}</value>
+<status status="PASS" start="2026-11-13T06:23:04.217061" elapsed="127.008646"/>
+</for>
+<doc>APRS-REC-1: the fraction of the reference decoder's frames
+the radio reports, at each deviation.</doc>
+<tag>band:70cm</tag>
+<tag>long</tag>
+<tag>mode:aprs</tag>
+<tag>needs:tnc</tag>
+<tag>per-band</tag>
+<tag>recording</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-13T06:22:53.759708" elapsed="137.466220">3000 Hz: 37/95</status>
+</test>
+<kw name="Close Bench" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the instruments and write measurements.json: every capture,
+check and operator answer, with the run's provenance. Absolute paths
+are made relative, so the file can be published as it is.</doc>
+<status status="PASS" start="2026-11-13T06:25:11.226576" elapsed="0.048876"/>
+</kw>
+<doc>APRS receive against a recording of real traffic: the transmitter
+plays the track as FM, the radio reports every frame it decodes on
+its KISS TNC, and the count is compared with what Dire Wolf's atest
+decodes from the same file. See docs/aprs-recorded-benchmark.md for
+the track, the reference file and the wiring.
+
+The recording carries real callsigns and its author asks that it
+never be played over the air: run this only with the transmitter
+cabled to the radio through the attenuators, no antenna anywhere.
+Results are recorded for comparison; there is no limit yet.</doc>
+<meta name="Calibration">assumed, measured 2026-10-20 (d55ce4aa0a3c)</meta>
+<meta name="Firmware">v0.4.5-87-g8bbb99150</meta>
+<meta name="Hardware">Connect Systems CS7000-PLUS</meta>
+<meta name="Radio">Connect Systems CS7000-PLUS (cs7000p)</meta>
+<meta name="Station">k0ret</meta>
+<meta name="Suite commit">2bd5f60a1c</meta>
+<meta name="TNC">serial</meta>
+<status status="PASS" start="2026-11-13T06:22:34.410178" elapsed="156.865366"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="1" fail="0" skip="0">band:70cm</stat>
+<stat pass="1" fail="0" skip="0">long</stat>
+<stat pass="1" fail="0" skip="0">mode:aprs</stat>
+<stat pass="1" fail="0" skip="0">needs:tnc</stat>
+<stat pass="1" fail="0" skip="0">per-band</stat>
+<stat pass="1" fail="0" skip="0">recording</stat>
+<stat pass="1" fail="0" skip="0">rx</stat>
+</tag>
+<suite>
+<stat name="Recorded" id="s1" pass="1" fail="0" skip="0">Recorded</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
