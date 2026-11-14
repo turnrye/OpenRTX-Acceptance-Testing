@@ -1,0 +1,505 @@
+{
+  "schema": 1,
+  "suite": "Bandwidth",
+  "started": "2026-11-14T01:52:15+00:00",
+  "station": "k0ret",
+  "radio": "Retevis C62/C2",
+  "radio_file": "c62",
+  "firmware": "v0.4.5-65-g43f751553",
+  "hardware": "Retevis C62 2501R0621100415",
+  "dsp": "9579b617",
+  "suite_commit": "4d5168bba8",
+  "bands": {
+    "2m": 146580000,
+    "70cm": 445975000
+  },
+  "calibration": {
+    "method": "assumed",
+    "measured": "2026-11-04",
+    "expires": "2027-05-04",
+    "sha256": "dee02e7e4963"
+  },
+  "records": [
+    {
+      "test": "2m: CTCSS Deviation Follows The Bandwidth",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Set the radio to FM, 146.580 MHz, 25 kHz bandwidth, low power, 250.3 Hz CTCSS tone on transmit",
+      "answer": ""
+    },
+    {
+      "test": "2m: CTCSS Deviation Follows The Bandwidth",
+      "band": "2m",
+      "kind": "capture",
+      "instruction": "Key PTT for 5 s without speaking, release.",
+      "files": [
+        "capture01.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 3.611428,
+          "duration_s": 4.470316,
+          "carrier_offset_hz": 249984.43566279692,
+          "peak_deviation_hz": 182.96456811903616,
+          "max_deviation_hz": 242.48099063548244,
+          "rms_deviation_hz": 104.9777521532617,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 250.2799079167783,
+          "ctcss_deviation_hz": 147.23768550060322,
+          "occupied_bandwidth_hz": 1000.0,
+          "power_db": -8.285736083984375,
+          "carrier_level_db": -0.768885107547615,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -15.56433720307541,
+          "audio_file": "capture01/tx1.wav"
+        }
+      ]
+    },
+    {
+      "test": "2m: CTCSS Deviation Follows The Bandwidth",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Set the bandwidth to 12.5 kHz, CTCSS tone unchanged",
+      "answer": ""
+    },
+    {
+      "test": "2m: CTCSS Deviation Follows The Bandwidth",
+      "band": "2m",
+      "kind": "capture",
+      "instruction": "Key PTT for 5 s without speaking, release.",
+      "files": [
+        "capture02.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 2.17826,
+          "duration_s": 3.688592,
+          "carrier_offset_hz": 249982.71863321215,
+          "peak_deviation_hz": 120.06184025304894,
+          "max_deviation_hz": 162.19726660971892,
+          "rms_deviation_hz": 54.323608043853966,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 250.27989849323765,
+          "ctcss_deviation_hz": 73.62135842203888,
+          "occupied_bandwidth_hz": 1200.0,
+          "power_db": -8.254605293273926,
+          "carrier_level_db": -0.18986740650511288,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -17.281366787850857,
+          "audio_file": "capture02/tx1.wav"
+        }
+      ]
+    },
+    {
+      "test": "2m: CTCSS Deviation Follows The Bandwidth",
+      "band": "2m",
+      "kind": "ratio",
+      "what": "narrow/wide CTCSS deviation",
+      "value": 0.5000170857870301,
+      "low": 0.4,
+      "high": 0.65,
+      "passed": true
+    },
+    {
+      "test": "2m: CTCSS Deviation Follows The Bandwidth",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    },
+    {
+      "test": "2m: CTCSS Level Meets Limits",
+      "band": "2m",
+      "kind": "limit",
+      "field": "ctcss_hz",
+      "value": 250.2799079167783,
+      "limit": "250.3 Hz +-0.5%",
+      "bandwidth": "BW_25",
+      "passed": true
+    },
+    {
+      "test": "2m: CTCSS Level Meets Limits",
+      "band": "2m",
+      "kind": "limit",
+      "field": "ctcss_deviation_hz",
+      "value": 147.23768550060322,
+      "limit": "500-1000 Hz",
+      "bandwidth": "BW_25",
+      "passed": false
+    },
+    {
+      "test": "2m: CTCSS Level Meets Limits",
+      "band": "2m",
+      "kind": "limit",
+      "field": "ctcss_hz",
+      "value": 250.27989849323765,
+      "limit": "250.3 Hz +-0.5%",
+      "bandwidth": "BW_12_5",
+      "passed": true
+    },
+    {
+      "test": "2m: CTCSS Level Meets Limits",
+      "band": "2m",
+      "kind": "limit",
+      "field": "ctcss_deviation_hz",
+      "value": 73.62135842203888,
+      "limit": "350-600 Hz",
+      "bandwidth": "BW_12_5",
+      "passed": false
+    },
+    {
+      "test": "2m: FM Restores CTCSS After M17",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Set the radio to FM, 146.580 MHz, 12.5 kHz bandwidth, low power, 250.3 Hz CTCSS tone on transmit, then switch to M17",
+      "answer": ""
+    },
+    {
+      "test": "2m: FM Restores CTCSS After M17",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Key PTT once for 2 s, then switch back to FM",
+      "answer": ""
+    },
+    {
+      "test": "2m: FM Restores CTCSS After M17",
+      "band": "2m",
+      "kind": "capture",
+      "instruction": "Key PTT for 5 s without speaking, release.",
+      "files": [
+        "capture03.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 3.442636,
+          "duration_s": 3.478952,
+          "carrier_offset_hz": 249981.41689985365,
+          "peak_deviation_hz": 106.42504446205078,
+          "max_deviation_hz": 379.6059084386556,
+          "rms_deviation_hz": 53.579459582195604,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 250.27985944444052,
+          "ctcss_deviation_hz": 73.5861471267355,
+          "occupied_bandwidth_hz": 1000.0,
+          "power_db": -8.227461814880371,
+          "carrier_level_db": -0.18931120243529048,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -18.58310014635208,
+          "audio_file": "capture03/tx1.wav"
+        }
+      ]
+    },
+    {
+      "test": "2m: FM Restores CTCSS After M17",
+      "band": "2m",
+      "kind": "ratio",
+      "what": "CTCSS deviation after M17 / before",
+      "value": 0.9995217244552657,
+      "low": 0.9,
+      "high": 1.1,
+      "passed": true
+    },
+    {
+      "test": "2m: FM Restores CTCSS After M17",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    },
+    {
+      "test": "70cm: CTCSS Deviation Follows The Bandwidth",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the radio to FM, 445.975 MHz, 25 kHz bandwidth, low power, 250.3 Hz CTCSS tone on transmit",
+      "answer": ""
+    },
+    {
+      "test": "70cm: CTCSS Deviation Follows The Bandwidth",
+      "band": "70cm",
+      "kind": "capture",
+      "instruction": "Key PTT for 5 s without speaking, release.",
+      "files": [
+        "capture04.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.2167,
+          "duration_s": 2.808056,
+          "carrier_offset_hz": 249947.7069920332,
+          "peak_deviation_hz": 215.65987299422616,
+          "max_deviation_hz": 265.64138393544016,
+          "rms_deviation_hz": 106.18168494280073,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 250.27981909571673,
+          "ctcss_deviation_hz": 147.2248356994654,
+          "occupied_bandwidth_hz": 1000.0,
+          "power_db": -12.683485984802246,
+          "carrier_level_db": -0.7717988236282364,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -52.29300796680036,
+          "audio_file": "capture04/tx1.wav"
+        }
+      ]
+    },
+    {
+      "test": "70cm: CTCSS Deviation Follows The Bandwidth",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the bandwidth to 12.5 kHz, CTCSS tone unchanged",
+      "answer": ""
+    },
+    {
+      "test": "70cm: CTCSS Deviation Follows The Bandwidth",
+      "band": "70cm",
+      "kind": "capture",
+      "instruction": "Key PTT for 5 s without speaking, release.",
+      "files": [
+        "capture05.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 2.26724,
+          "duration_s": 1.889208,
+          "carrier_offset_hz": 249943.24837719774,
+          "peak_deviation_hz": 156.4920258500124,
+          "max_deviation_hz": 217.29967534357826,
+          "rms_deviation_hz": 55.98160273350074,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 250.27991533466752,
+          "ctcss_deviation_hz": 73.61860676379278,
+          "occupied_bandwidth_hz": 1000.0,
+          "power_db": -12.704809188842773,
+          "carrier_level_db": -0.19152194480101614,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -56.75162280225777,
+          "audio_file": "capture05/tx1.wav"
+        }
+      ]
+    },
+    {
+      "test": "70cm: CTCSS Deviation Follows The Bandwidth",
+      "band": "70cm",
+      "kind": "ratio",
+      "what": "narrow/wide CTCSS deviation",
+      "value": 0.5000420371605829,
+      "low": 0.4,
+      "high": 0.65,
+      "passed": true
+    },
+    {
+      "test": "70cm: CTCSS Deviation Follows The Bandwidth",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    },
+    {
+      "test": "70cm: CTCSS Level Meets Limits",
+      "band": "70cm",
+      "kind": "limit",
+      "field": "ctcss_hz",
+      "value": 250.27981909571673,
+      "limit": "250.3 Hz +-0.5%",
+      "bandwidth": "BW_25",
+      "passed": true
+    },
+    {
+      "test": "70cm: CTCSS Level Meets Limits",
+      "band": "70cm",
+      "kind": "limit",
+      "field": "ctcss_deviation_hz",
+      "value": 147.2248356994654,
+      "limit": "500-1000 Hz",
+      "bandwidth": "BW_25",
+      "passed": false
+    },
+    {
+      "test": "70cm: CTCSS Level Meets Limits",
+      "band": "70cm",
+      "kind": "limit",
+      "field": "ctcss_hz",
+      "value": 250.27991533466752,
+      "limit": "250.3 Hz +-0.5%",
+      "bandwidth": "BW_12_5",
+      "passed": true
+    },
+    {
+      "test": "70cm: CTCSS Level Meets Limits",
+      "band": "70cm",
+      "kind": "limit",
+      "field": "ctcss_deviation_hz",
+      "value": 73.61860676379278,
+      "limit": "350-600 Hz",
+      "bandwidth": "BW_12_5",
+      "passed": false
+    },
+    {
+      "test": "70cm: FM Restores CTCSS After M17",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the radio to FM, 445.975 MHz, 12.5 kHz bandwidth, low power, 250.3 Hz CTCSS tone on transmit, then switch to M17",
+      "answer": "\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bg\u001bgyg\u001by\u001byyyyyyyyyygyyymy"
+    },
+    {
+      "test": "70cm: FM Restores CTCSS After M17",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Key PTT once for 2 s, then switch back to FM",
+      "answer": ""
+    },
+    {
+      "test": "70cm: FM Restores CTCSS After M17",
+      "band": "70cm",
+      "kind": "capture",
+      "instruction": "Key PTT for 5 s without speaking, release.",
+      "files": [
+        "capture06.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.516744,
+          "duration_s": 4.020564,
+          "carrier_offset_hz": 249963.28545202923,
+          "peak_deviation_hz": 108.82384767528364,
+          "max_deviation_hz": 230.67878644014277,
+          "rms_deviation_hz": 53.85606593571234,
+          "tone_hz": 0.0,
+          "tone_deviation_hz": 0.0,
+          "ctcss_hz": 250.27988261735123,
+          "ctcss_deviation_hz": 73.66435854867963,
+          "occupied_bandwidth_hz": 800.0,
+          "power_db": -12.675637245178223,
+          "carrier_level_db": -0.19005719970139612,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -36.71454797076876,
+          "audio_file": "capture06/tx1.wav"
+        }
+      ]
+    },
+    {
+      "test": "70cm: FM Restores CTCSS After M17",
+      "band": "70cm",
+      "kind": "ratio",
+      "what": "CTCSS deviation after M17 / before",
+      "value": 1.000621470398559,
+      "low": 0.9,
+      "high": 1.1,
+      "passed": true
+    },
+    {
+      "test": "70cm: FM Restores CTCSS After M17",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    }
+  ],
+  "operator": [
+    {
+      "kind": "instruct",
+      "text": "Plan for Bandwidth:\n  Radio: Retevis C62 2501R0621100415 as Retevis C62/C2 (radios/c62.yaml), firmware v0.4.5-65-g43f751553, DSP image 9579b617\n  Bench: k0ret, receiver hackrf, transmitter hackrf, calibration assumed of 2026-11-04\n  2m: 146.580 MHz (to receiver 61.0 dB, from transmitter 61.0 dB)\n  70cm: 445.975 MHz (to receiver 61.0 dB, from transmitter 61.0 dB)\n  Modes: fm, m17\n  Every test: attenuator chain between the radio and the hackrf, where it stays\n  Tests (6):\n    - 2m: CTCSS Deviation Follows The Bandwidth\n    - 2m: CTCSS Level Meets Limits\n    - 2m: FM Restores CTCSS After M17\n    - 70cm: CTCSS Deviation Follows The Bandwidth\n    - 70cm: CTCSS Level Meets Limits\n    - 70cm: FM Restores CTCSS After M17\nCheck the setup, then continue to begin.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 146.580 MHz, 25 kHz bandwidth, low power, 250.3 Hz CTCSS tone on transmit",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT for 5 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the bandwidth to 12.5 kHz, CTCSS tone unchanged",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT for 5 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 146.580 MHz, 12.5 kHz bandwidth, low power, 250.3 Hz CTCSS tone on transmit, then switch to M17",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT once for 2 s, then switch back to FM",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT for 5 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 445.975 MHz, 25 kHz bandwidth, low power, 250.3 Hz CTCSS tone on transmit",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT for 5 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the bandwidth to 12.5 kHz, CTCSS tone unchanged",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT for 5 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to FM, 445.975 MHz, 12.5 kHz bandwidth, low power, 250.3 Hz CTCSS tone on transmit, then switch to M17",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT once for 2 s, then switch back to FM",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Key PTT for 5 s without speaking, release. Leave a second of silence before keying up and after the last release, then press Enter.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Turn the CTCSS tone off",
+      "answer": ""
+    }
+  ]
+}
