@@ -15,6 +15,7 @@ dependencies = [
     "pyyaml>=6",
     "robotframework>=7",
     "pystoi>=0.4.1",
+    "matplotlib>=3.11.2",
 ]
 
 [dependency-groups]

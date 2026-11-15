@@ -232,6 +232,16 @@ uv run python -m oat.analysis capture.cu8 --rate 250000 --offset 75000 --audio-d
 lists each transmission's carrier offset, peak and RMS deviation, dominant tone, 99% occupied
 bandwidth, and CTCSS tone and deviation. `oat.m17.phy.measure_m17_capture` does the same for M17.
 
+### The M17 microphone chain on the emulator
+
+`scripts/emu-mic-campaign.py` sends test signals (tones, speech at a range of levels, a level
+step, speech over a noise bed) through the OpenRTX Linux emulator's M17 transmit chain, for
+firmware variants that differ in C defines, decodes them with the M17 decoder here and Codec2, and
+writes tables, charts and a report comparing each variant with the baseline. It needs no bench
+and is not a suite: it is evidence for firmware changes to the microphone chain, to be confirmed
+on a radio. Method, signals, metrics and limits:
+[docs/emulator-mic-campaign.md](docs/emulator-mic-campaign.md).
+
 ## Sharing results
 
 Runs stay local. To publish one as evidence (a release's acceptance run, or the run behind a merged
@@ -266,6 +276,7 @@ links to the suite on `main` instead, so push before you run.
 | `radios/` | Radio files: bands, modes, limits |
 | `results/` | Published evidence runs, append-only |
 | `scripts/export-run.sh` | Adds a run to `results/` |
+| `scripts/emu-mic-campaign.py` | The M17 microphone chain campaign on the OpenRTX emulator |
 | `scripts/m17-reference-vectors.py` | Writes the M17 test vectors from a libm17 build |
 | `src/oat/` | The Robot library: SDR and VNA backends, signals, FM and M17 analysis, audio, operator, keywords, modifiers, calibration and comparison tools |
 | `tests/` | Unit tests of the library (`uv run pytest`) |

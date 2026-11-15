@@ -20,9 +20,10 @@ mid-scale bias, with white noise in LSBs.
 
 from __future__ import annotations
 
+import hashlib
+import json
 import os
 import subprocess
-import tempfile
 from dataclasses import dataclass, field
 from math import gcd
 from pathlib import Path
@@ -61,6 +62,15 @@ PROFILES = {
 }
 
 
+def sha256(path: Path) -> str:
+    """The SHA-256 of a file, hex."""
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for block in iter(lambda: f.read(1 << 20), b""):
+            h.update(block)
+    return h.hexdigest()
+
+
 def provenance(repo: Path) -> dict:
     """The exact OpenRTX source a build came from, with any uncommitted diff."""
     def git(*args: str) -> str:
@@ -74,16 +84,35 @@ def provenance(repo: Path) -> dict:
     }
 
 
-def build(repo: Path, build_dir: Path, profile: Profile) -> Path:
-    """Configure and build openrtx_linux for a profile, with firmware codec2."""
+def build(repo: Path, build_dir: Path, profile: Profile,
+          extra_c_args: tuple[str, ...] | list[str] = ()) -> Path:
+    """
+    Configure and build openrtx_linux for a profile, with firmware codec2 and
+    any extra C arguments (a variant's defines). An existing build directory is
+    reconfigured only when its C arguments differ; ninja rebuilds only what
+    changed.
+    """
     build_dir = Path(build_dir)
+    c_args = " ".join([profile.c_args(), *extra_c_args])
     if not (build_dir / "build.ninja").exists():
         subprocess.run(["meson", "setup", str(build_dir), "-Dsystem_codec2=false",
-                        f"-Dc_args={profile.c_args()}"],
+                        f"-Dc_args={c_args}"],
+                       cwd=repo, check=True, capture_output=True)
+    elif configured_c_args(build_dir) != c_args.split():
+        subprocess.run(["meson", "configure", str(build_dir), f"-Dc_args={c_args}"],
                        cwd=repo, check=True, capture_output=True)
     subprocess.run(["meson", "compile", "-C", str(build_dir), "openrtx_linux"],
                    cwd=repo, check=True, capture_output=True)
     return build_dir / "openrtx_linux"
+
+
+def configured_c_args(build_dir: Path) -> list[str]:
+    """The c_args a meson build directory is configured with."""
+    info = Path(build_dir) / "meson-info" / "intro-buildoptions.json"
+    for opt in json.loads(info.read_text()):
+        if opt["name"] == "c_args":
+            return list(opt["value"])
+    return []
 
 
 def adc_shape(speech: np.ndarray, rate: int, profile: Profile,
@@ -93,11 +122,26 @@ def adc_shape(speech: np.ndarray, rate: int, profile: Profile,
     encodeFunc: at 8 kHz times the oversampling ratio, its peak at peak_dbfs of
     the ADC's half range, quantised around mid-scale, as int16 samples.
     """
+    x = to_adc_rate(speech, rate, profile)
+    x = x / (np.max(np.abs(x)) + 1e-12) * 10 ** (peak_dbfs / 20)
+    return adc_quantize(x, profile, seed)
+
+
+def to_adc_rate(x: np.ndarray, rate: int, profile: Profile) -> np.ndarray:
+    """Resample float audio to the ADC's rate, 8 kHz times the oversampling."""
     out_rate = CODEC2_RATE * profile.oversample
     g = gcd(rate, out_rate)
-    x = signal.resample_poly(speech.astype(float), out_rate // g, rate // g)
+    return signal.resample_poly(np.asarray(x, dtype=float), out_rate // g, rate // g)
+
+
+def adc_quantize(x: np.ndarray, profile: Profile, seed: int = 17) -> np.ndarray:
+    """
+    Float samples at the ADC's rate, 1.0 meaning its half range, as the ADC
+    delivers them: white noise of noise_lsb RMS added, rounded, biased to
+    mid-scale and clipped to the converter's range, as int16.
+    """
     half = 2 ** (profile.adc_bits - 1)
-    x = x / (np.max(np.abs(x)) + 1e-12) * half * 10 ** (peak_dbfs / 20)
+    x = np.asarray(x, dtype=float) * half
     rng = np.random.default_rng(seed)
     x = x + rng.normal(0, profile.noise_lsb, len(x))
     if profile.adc_bits >= 16:
@@ -113,11 +157,13 @@ class TxRun:
 
 
 def transmit(binary: Path, mic: np.ndarray, rate: int, workdir: Path,
-             key_s: float | None = None, timeout_s: float = 120) -> TxRun:
+             key_s: float | None = None, timeout_s: float = 120,
+             overs: int = 1, gap_ms: int = 1500) -> TxRun:
     """
-    Key one M17 transmission in a fresh emulator: switch the VFO to M17
+    Key M17 transmissions in a fresh emulator: switch the VFO to M17
     (macro MONI+5), PTT for the length of the microphone file (or key_s),
-    then quit. Returns the TX baseband file.
+    overs times with gap_ms between them, then quit. The microphone file
+    plays from its start at every key-up. Returns the TX baseband file.
     """
     workdir = Path(workdir)
     (workdir / "state").mkdir(parents=True, exist_ok=True)
@@ -126,14 +172,19 @@ def transmit(binary: Path, mic: np.ndarray, rate: int, workdir: Path,
     tx_path = workdir / "tx.raw"
     tx_path.unlink(missing_ok=True)
     key_ms = int(1000 * (key_s if key_s is not None else len(mic) / rate))
-    script = "\n".join(["sleep 1500", "keycombo MONI 5", "sleep 800", "ptt",
-                        f"sleep {key_ms}", "ptt", "sleep 1500", "quit", ""])
+    lines = ["sleep 1500", "keycombo MONI 5", "sleep 800"]
+    for i in range(overs):
+        if i:
+            lines.append(f"sleep {gap_ms}")
+        lines += ["ptt", f"sleep {key_ms}", "ptt"]
+    script = "\n".join([*lines, "sleep 1500", "quit", ""])
     env = dict(os.environ, XDG_STATE_HOME=str(workdir / "state"),
                SDL_VIDEODRIVER="dummy", SDL_AUDIODRIVER="dummy",
                OPENRTX_MIC_FILE=str(mic_path),
                OPENRTX_M17_TX_BASEBAND=str(tx_path))
     proc = subprocess.run([str(binary)], input=script, text=True, env=env,
-                          cwd=workdir, capture_output=True, timeout=timeout_s)
+                          cwd=workdir, capture_output=True,
+                          timeout=timeout_s + overs * key_ms / 1000)
     return TxRun(tx_path, proc.stdout + proc.stderr)
 
 
@@ -224,11 +275,11 @@ def _envelope(x: np.ndarray, hop: int) -> np.ndarray:
     return np.maximum(e, e.max() - 40) - np.mean(np.maximum(e, e.max() - 40))
 
 
-def align(ref: np.ndarray, x: np.ndarray, max_lag_s: float = 0.5,
-          rate: int = CODEC2_RATE) -> tuple[np.ndarray, np.ndarray]:
+def find_lag(ref: np.ndarray, x: np.ndarray, max_lag_s: float = 0.5,
+             rate: int = CODEC2_RATE) -> int:
     """
-    Trim two signals to a common alignment. A vocoder does not keep the
-    waveform, so the lag comes from the cross-correlation of 2.5 ms log-energy
+    The delay of x behind ref, in samples. A vocoder does not keep the
+    waveform, so it comes from the cross-correlation of 2.5 ms log-energy
     envelopes, searched within +-max_lag_s.
     """
     hop = rate // 400
@@ -244,7 +295,13 @@ def align(ref: np.ndarray, x: np.ndarray, max_lag_s: float = 0.5,
         c = float(np.dot(a[:n], b[:n]) / n)
         if c > best:
             best, lag = c, k
-    lag *= hop
+    return lag * hop
+
+
+def align(ref: np.ndarray, x: np.ndarray, max_lag_s: float = 0.5,
+          rate: int = CODEC2_RATE) -> tuple[np.ndarray, np.ndarray]:
+    """Trim two signals to a common alignment (see find_lag)."""
+    lag = find_lag(ref, x, max_lag_s, rate)
     if lag > 0:
         x = x[lag:]
     else:
