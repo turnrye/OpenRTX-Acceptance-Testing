@@ -212,9 +212,10 @@ def main() -> None:
         rows, envs = [], []
         for i in range(meta["overs_keyed"]):
             vo = camp.read_voice(out / "takes" / v / tid, i)
-            m, env = camp.score(r, vo, mic, profile, clean)
+            pre = camp.read_voice(out / "takes" / v / tid, i, "precodec")
+            m, env = camp.score(r, vo, pre, mic, profile, clean)
             if vmeta[v]["float_chain"]:
-                m["pre_codec_clip_fraction"] = None
+                m["model_clip_fraction"] = None
             rows.append({**base, "over": i + 1, **m, **meta["overs"][i]})
             for name, (hop, e) in env.items():
                 envs.append({"variant": v, "test": name, "signal": base["signal"],
@@ -227,11 +228,11 @@ def main() -> None:
         mic = camp.mic_input(r, profile, speech_dir)
         clean = camp.clean_source(r, speech_dir)
         rows, envs = [], []
-        for name, x in camp.references(r, mic, profile, clean).items():
+        for name, (pre, x) in camp.references(r, mic, profile, clean).items():
             v = f"codec-only ({name})"
-            m, env = camp.score(r, x, mic, profile, clean)
+            m, env = camp.score(r, x, pre, mic, profile, clean)
             if name != "nominal":
-                m["pre_codec_clip_fraction"] = None
+                m["model_clip_fraction"] = None
             rows.append({"variant": v, "profile": profile.name, "test": t,
                          "signal": camp.signal_name(r), "level": level_of(r),
                          "take": camp.take_id(r), "over": 1, **m})

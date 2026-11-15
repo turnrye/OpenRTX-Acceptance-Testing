@@ -153,6 +153,7 @@ def adc_quantize(x: np.ndarray, profile: Profile, seed: int = 17) -> np.ndarray:
 class TxRun:
     baseband: Path
     log: str
+    precodec: Path | None = None
     overs: list = field(default_factory=list)
 
 
@@ -163,7 +164,9 @@ def transmit(binary: Path, mic: np.ndarray, rate: int, workdir: Path,
     Key M17 transmissions in a fresh emulator: switch the VFO to M17
     (macro MONI+5), PTT for the length of the microphone file (or key_s),
     overs times with gap_ms between them, then quit. The microphone file
-    plays from its start at every key-up. Returns the TX baseband file.
+    plays from its start at every key-up. Returns the TX baseband file and,
+    from firmware with the tap (OPENRTX_MIC_PRECODEC_FILE), the file of the
+    8 kHz s16le samples codec2 encoded, every over back to back.
     """
     workdir = Path(workdir)
     (workdir / "state").mkdir(parents=True, exist_ok=True)
@@ -171,6 +174,8 @@ def transmit(binary: Path, mic: np.ndarray, rate: int, workdir: Path,
     mic.astype("<i2").tofile(mic_path)
     tx_path = workdir / "tx.raw"
     tx_path.unlink(missing_ok=True)
+    pre_path = workdir / "precodec.raw"
+    pre_path.unlink(missing_ok=True)
     key_ms = int(1000 * (key_s if key_s is not None else len(mic) / rate))
     lines = ["sleep 1500", "keycombo MONI 5", "sleep 800"]
     for i in range(overs):
@@ -181,11 +186,13 @@ def transmit(binary: Path, mic: np.ndarray, rate: int, workdir: Path,
     env = dict(os.environ, XDG_STATE_HOME=str(workdir / "state"),
                SDL_VIDEODRIVER="dummy", SDL_AUDIODRIVER="dummy",
                OPENRTX_MIC_FILE=str(mic_path),
-               OPENRTX_M17_TX_BASEBAND=str(tx_path))
+               OPENRTX_M17_TX_BASEBAND=str(tx_path),
+               OPENRTX_MIC_PRECODEC_FILE=str(pre_path))
     proc = subprocess.run([str(binary)], input=script, text=True, env=env,
                           cwd=workdir, capture_output=True,
                           timeout=timeout_s + overs * key_ms / 1000)
-    return TxRun(tx_path, proc.stdout + proc.stderr)
+    return TxRun(tx_path, proc.stdout + proc.stderr,
+                 pre_path if pre_path.exists() else None)
 
 
 def _iq_from_baseband(bb: np.ndarray) -> tuple[np.ndarray, int]:
@@ -212,6 +219,27 @@ def decode(baseband: Path) -> list:
         overs.append(m)
         i += (m.stream_frames + FRAMES_OUTSIDE_STREAM) * FRAME_SAMPLES
     return overs
+
+
+def split_overs(pcm: np.ndarray, frames: list[int],
+                block: int = 160) -> list[np.ndarray]:
+    """
+    The pre-codec tap of a session (every codec2 block of every over, back
+    to back) cut into overs. Each M17 stream frame carries two codec2 blocks;
+    the encoder runs a block or so longer than the frames sent, so the blocks
+    left over are shared out evenly between the overs.
+    """
+    total = len(pcm) // block
+    base = [2 * f for f in frames]
+    extra = total - sum(base)
+    share = [extra // len(frames)] * len(frames)
+    share[-1] += extra - sum(share)
+    out, i = [], 0
+    for b, e in zip(base, share):
+        n = max(0, b + e) * block
+        out.append(pcm[i: i + n])
+        i += n
+    return out
 
 
 def voice(m) -> np.ndarray:

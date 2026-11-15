@@ -20,6 +20,8 @@ recipe ─► float signal ─► ADC model ─► mic.raw ─► openrtx_linux 
                                                   codec2, M17       baseband)      deviation)
                                                   modulator)
 IQ ─► OAT M17 decoder (oat.m17.phy) ─► codec2 3200 frames ─► c2dec ─► voice.wav ─► metrics
+
+openrtx_linux: encodeFunc ─► samples codec2 encodes ─► precodec.raw (tap) ─► precodec.wav ─► metrics
 ```
 
 1. **Signal.** Each test signal is a recipe (a JSON object in `run.json`): a tone, a speech file at
@@ -42,11 +44,22 @@ IQ ─► OAT M17 decoder (oat.m17.phy) ─► codec2 3200 frames ─► c2dec �
    the signal passes through the real `encodeFunc` (decimator, DC block, gain, and any
    experimental processing), the real codec2 3200 encoder and the real M17 framing and modulator,
    in real time.
+
+   **The pre-codec tap.** With `OPENRTX_MIC_PRECODEC_FILE` set (Linux builds of the experiment
+   branch), the firmware appends every 160-sample block it passes to `codec2_encode` to that file
+   as raw s16le: exactly what codec2 sees, at 8 kHz. `emu.transmit` sets it to `precodec.raw` in
+   the take's directory. The tap writes only while the encoder runs, so the overs of a session are
+   back to back; `emu.split_overs` cuts them apart by the decoded stream frames (two codec2 blocks
+   per M17 frame), sharing out the block or so per over that the encoder runs beyond the frames
+   sent. Each over's tap is kept as `precodec.wav` (`precodec-2.wav` for the second).
 4. **Decoder.** The baseband is FM-modulated to IQ at nominal deviation (outer symbols ±2.4 kHz),
    then decoded by OAT's M17 decoder, the same code that measures a real radio's transmissions,
    and the codec2 payload is decoded with Codec2's `c2dec` (3200 mode). Each over keyed gives one
    decoded transmission; its LSF CRC and frame count are kept with the take.
-5. **Metrics** are computed from the decoded audio (8 kHz) and the recipe. They are recomputed on
+5. **Metrics** are computed from the decoded audio (8 kHz), from the pre-codec tap (the same
+   metrics, prefixed `pre_`, without STOI) and from the recipe. The tap shows what each variant
+   does to the level without codec2's own artefacts; the decoded audio shows what a listener
+   gets. They are recomputed on
    every invocation from the saved `voice.wav`, so the emulator only runs again when the binary or
    the input changes.
 
@@ -94,8 +107,8 @@ speech at -6 dBFS). The level step (attack, overshoot, release) and the STOI swe
 show that trade-off.
 
 With `MIC_EXP_HPF` or `MIC_EXP_AGC` the firmware runs a float chain in which the fixed gain no
-longer saturates, so the pre-codec clip model (below) does not apply: those variants report it as
-N/A, not 0.
+longer saturates. The pre-codec clip is measured at the tap for every variant; the old model of
+the integer chain is kept only as a cross-check, and left out for the float chain.
 
 ## Test signals
 
@@ -146,25 +159,31 @@ the difference:
 
 ## Metrics
 
-Output levels are dBFS of the decoded audio, where 1.0 is int16 full scale; RMS is plain RMS (a
-full-scale sine reads -3 dBFS). Every output leaves out its last 0.2 s.
+Levels are dBFS of the decoded audio or of the tap, where 1.0 is int16 full scale; RMS is plain
+RMS (a full-scale sine reads -3 dBFS). Every output leaves out its last 0.2 s. Each metric below
+is computed on both streams: plain names are after codec2, `pre_` names before it. For the
+codec-only references, the pre-codec stream is the int16 signal handed to `c2enc`.
 
 - **Output RMS** (tones): the RMS from 0.5 s into the tone to 0.3 s before its end.
 - **Active speech level**: a simplified ITU-T P.56. The audio is cut into 20 ms frames; frames
   within 30 dB of the loudest frame and above -60 dBFS are active; the level is the RMS over the
   active frames. **Spread**, the headline level metric, is the maximum minus the minimum, over the
-  input levels, of the active level averaged over the speech files: 0 dB means the output level
-  does not depend on how loud the speaker is.
+  input levels, of the active level averaged over the speech files: 0 dB means the level does not
+  depend on how loud the speaker is. It is given before codec2 (the cleanest view of a level
+  control) and after it.
 - **Peak**: the largest sample magnitude, leaving out the first 100 ms.
-- **Onset peak** (key-up click): the largest sample magnitude in the first 100 ms of the decoded
-  audio. The test signals all start quietly, so a loud onset is the firmware's own transient.
+- **Onset peak** (key-up click): the largest sample magnitude in the first 100 ms. The test
+  signals all start quietly, so a loud onset is the firmware's own transient. Codec2 smooths it,
+  so the pre-codec onset is the larger and the truer one (baseline's DC block start reaches full
+  scale at the tap).
 - **Floor**: the 10th percentile of the 20 ms frame levels.
-- **Pre-codec clip**: the fraction of samples the integer chain saturates before codec2, from a
-  model of it applied to the input (`emu.chain_clip_fraction`: average each block of oversampled
-  codes, remove the mean, multiply by the gain, count the magnitudes at int16 full scale). It is
-  a property of the input under the integer chain, valid for baseline, prime_dc and keep_sum
-  (whose sum, multiplied by the gain and divided by the oversampling ratio, clips at the same
-  point), and N/A for the float chain. The emulator does not expose the samples codec2 receives.
+- **Pre-codec clip** (`pre_clip_fraction`): the fraction of the samples codec2 receives that sit
+  at int16 full scale (|x| ≥ 32767), measured at the tap, over the measured span (speech: the
+  whole over including the onset; tones: the steady window; step and gate: the aligned signal).
+  `model_clip_fraction` is the earlier model of the integer chain applied to the input
+  (`emu.chain_clip_fraction`: average each block of oversampled codes, remove the mean, multiply
+  by the gain, count the magnitudes at full scale), kept as a cross-check for baseline, prime_dc
+  and keep_sum and left blank for the float chain.
 - **Post-codec clip**: the fraction of decoded samples at full scale.
 - **STOI**: short-time objective intelligibility (pystoi, not extended) of the decoded speech
   against the clean source, both at 8 kHz, after alignment. A vocoder does not keep the waveform,
@@ -172,8 +191,10 @@ full-scale sine reads -3 dBFS). Every output leaves out its last 0.2 s.
   (floored 40 dB below their peak, mean removed), searched within ±0.5 s (`emu.find_lag`).
   **STOI deficit** is codec-only (ideal) STOI minus the variant's, per take, averaged over the
   takes: what the firmware chain loses against the best possible processing of the same ADC input.
-- **Envelope**: the RMS level in consecutive 50 ms blocks of the output, aligned to the input by
-  the same envelope lag, found against the ideal chain's output. Kept in `data/envelopes.csv`.
+- **Envelope**: the RMS level in consecutive 50 ms blocks, aligned to the input by the same
+  envelope lag, found against the ideal chain's output, for the output (`step`, `gate`) and the
+  tap (`step_precodec`, `gate_precodec`). Kept in `data/envelopes.csv`. The headline attack and
+  release come from the pre-codec envelope.
 - **Step response** (from the envelope): the settled levels are medians, before the step (the last
   0.9 s of the first segment), in the loud segment (its last 0.9 s) and after it (the last 1.4 s).
   **Rise** is the loud level minus the level before (20 dB for a linear chain). **Attack** is the
@@ -225,7 +246,7 @@ uv run python scripts/emu-mic-campaign.py --openrtx ~/OpenRTX --profile cs7000p 
   takes the sum of the signals' lengths plus about 4 s per take, divided by the jobs: roughly
   2 minutes per variant at 6 jobs.
 - A take is skipped when its directory already holds a decoded take for the same binary SHA-256,
-  input SHA-256 and number of overs, so an interrupted campaign resumes, and adding a variant or a
+  input SHA-256 and number of overs (and its tap, when the firmware wrote one), so an interrupted campaign resumes, and adding a variant or a
   level runs only the new takes. Rebuilt firmware changes the binary and reruns its takes.
 
 ## Output
@@ -239,11 +260,12 @@ REPORT.md       headline metrics and tables per test, each variant against basel
 METHODS.md      this document, and the run's command
 data/           tones.csv, speech.csv, step.csv, gate.csv: one row per take and over
                 (variant, profile, test, signal, level, metrics); envelopes.csv; headline.csv
-charts/         PNG and SVG: level-tones, level-speech, stoi, envelope-step, envelope-gate,
-                onset, gate
+charts/         PNG and SVG: level-tones(-precodec), level-speech(-precodec), stoi,
+                envelope-step(-precodec), envelope-gate(-precodec), onset, gate
 takes/<variant>/<take>/
                 take.json (recipe, binary and input SHA-256, frames, LSF CRC),
-                voice.wav (decoded first over), voice-2.wav (second over, step test)
+                voice.wav (decoded first over), voice-2.wav (second over, step test),
+                precodec.wav, precodec-2.wav (the tap, 8 kHz int16, per over)
 ```
 
 `run.json` names files without their directories, and the command has the home directory as `~`.
@@ -266,7 +288,8 @@ transient, speech deviation) stay in `m17/tx.robot`.
   and the floor), for the level real speech reaches at the ADC (which says where on the sweeps a
   user is), and for the analog response.
 - Every take is the first transmission after boot, except the step test's second over.
-- The pre-codec clip is a model, not a measurement, and only of the integer chain.
+- The pre-codec tap needs the experiment branch's Linux tap; on firmware without it the `pre_`
+  metrics are simply absent. The split between overs is by frame count, exact to a block or so.
 - STOI models intelligibility under noise and distortion; it is not tuned to vocoders. Read small
   differences (under about 0.01) as no difference, and listen to the `voice.wav` files.
 - Each take is one boot and one realisation of the noise; differences smaller than the spread

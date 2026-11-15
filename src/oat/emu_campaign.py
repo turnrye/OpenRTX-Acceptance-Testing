@@ -255,18 +255,19 @@ def at_active(x: np.ndarray, target_dbfs: float = TARGET_ACTIVE_DBFS) -> np.ndar
 
 
 def references(r: dict, mic: np.ndarray, profile: emu.Profile,
-               clean: np.ndarray | None) -> dict[str, np.ndarray]:
+               clean: np.ndarray | None) -> dict[str, tuple[np.ndarray, np.ndarray]]:
     """
-    Codec-only references for a take, each straight through codec2 3200:
+    Codec-only references for a take, each straight through codec2 3200, as
+    {name: (codec2's input, codec2's output)}:
       nominal: the same ADC codes through the ideal chain at the fixed gain;
       ideal:   the same codes, ideal chain, set to -21 dBFS active (speech);
       clean:   the clean source at -21 dBFS active, no ADC (speech).
     """
-    refs = {"nominal": emu.codec_only(ideal_chain(mic, profile))}
+    ins = {"nominal": ideal_chain(mic, profile)}
     if r["kind"] == "speech":
-        refs["ideal"] = emu.codec_only(at_active(ideal_chain(mic, profile, clip=False)))
-        refs["clean"] = emu.codec_only(at_active(clean))
-    return refs
+        ins["ideal"] = at_active(ideal_chain(mic, profile, clip=False))
+        ins["clean"] = at_active(clean)
+    return {k: (codec_input(x), emu.codec_only(x)) for k, x in ins.items()}
 
 
 # --- metrics -----------------------------------------------------------------
@@ -365,43 +366,65 @@ def speech_in(x: np.ndarray, segs: list, rate: int = RATE) -> np.ndarray:
     return np.concatenate([x[int(a * rate): int(b * rate)] for a, b in segs])
 
 
-def score(r: dict, v: np.ndarray, mic: np.ndarray, profile: emu.Profile,
-          clean: np.ndarray | None) -> tuple[dict, dict]:
-    """
-    Metrics of one output (8 kHz float, as decoded) for its recipe, and any
-    envelope to keep ({name: (hop_s, dB array)}).
-    """
+def _metrics(r: dict, x: np.ndarray, mic: np.ndarray, profile: emu.Profile,
+             clean: np.ndarray | None, clip_at: float) -> tuple[dict, dict]:
+    """Metrics of one 8 kHz stream (decoded or pre-codec) for its recipe."""
     n = int(content_seconds(r) * RATE)
-    pre_clip = emu.chain_clip_fraction(mic, profile)
     k = r["kind"]
     if k == "tone":
-        seg = v[int(0.5 * RATE): max(int(0.5 * RATE) + 1, n - int(0.3 * RATE))]
+        seg = x[int(0.5 * RATE): max(int(0.5 * RATE) + 1, n - int(0.3 * RATE))]
         return {"rms_dbfs": rms_db(seg),
-                "post_clip_fraction": float(np.mean(np.abs(seg) >= 32766 / 32768)),
-                "pre_codec_clip_fraction": pre_clip}, {}
-    lag = max(0, emu.find_lag(ideal_chain(mic, profile)[:n], v))
+                "clip_fraction": float(np.mean(np.abs(seg) >= clip_at))}, {}
+    lag = max(0, emu.find_lag(ideal_chain(mic, profile)[:n], x))
     if k == "speech":
-        out = v[: lag + n - int(END_GUARD_S * RATE)]
+        out = x[: lag + n - int(END_GUARD_S * RATE)]
         lv = emu.levels(out, skip_s=0.1)
-        lv.pop("clip_fraction")
-        lv["post_clip_fraction"] = float(np.mean(np.abs(out[int(0.1 * RATE):]) >= 32766 / 32768))
-        return {**lv, "stoi": emu.stoi(clean, out), "lag_ms": 1000 * lag / RATE,
-                "pre_codec_clip_fraction": pre_clip}, {}
-    al = v[lag: lag + n]
+        lv["clip_fraction"] = float(np.mean(np.abs(out) >= clip_at))
+        m = {**lv, "lag_ms": 1000 * lag / RATE}
+        if clean is not None:
+            m["stoi"] = emu.stoi(clean, out)
+        return m, {}
+    al = x[lag: lag + n]
     env = envelope_db(al)
+    clip = float(np.mean(np.abs(al) >= clip_at))
     if k == "step":
         t_up = r["segments"][0][0]
         t_down = t_up + r["segments"][1][0]
         m = step_response(env, 0.05, t_up, t_down, content_seconds(r))
-        return {**m, "lag_ms": 1000 * lag / RATE,
-                "pre_codec_clip_fraction": pre_clip}, {"step": (0.05, env)}
+        return {**m, "clip_fraction": clip, "lag_ms": 1000 * lag / RATE}, {"step": (0.05, env)}
     sp, pa = gate_segments(r)
     act = emu.levels(speech_in(al, sp))["active_dbfs"]
     ps = pause_stats(al, pa)
-    return {"speech_active_dbfs": act, **ps,
-            "speech_to_pause_db": act - ps["pause_dbfs"],
-            "lag_ms": 1000 * lag / RATE,
-            "pre_codec_clip_fraction": pre_clip}, {"gate": (0.05, env)}
+    return {"speech_active_dbfs": act, **ps, "speech_to_pause_db": act - ps["pause_dbfs"],
+            "clip_fraction": clip, "lag_ms": 1000 * lag / RATE}, {"gate": (0.05, env)}
+
+
+PRE_CLIP = 32767 / 32768      # int16 full scale, either sign
+POST_CLIP = 32766 / 32768
+
+
+def score(r: dict, v: np.ndarray, pre: np.ndarray | None, mic: np.ndarray,
+          profile: emu.Profile, clean: np.ndarray | None) -> tuple[dict, dict]:
+    """
+    Metrics of one over for its recipe: of the decoded output v, and of the
+    pre-codec tap (the samples codec2 encoded, 8 kHz float) prefixed pre_,
+    with the integer-chain clip model as a cross-check (model_clip_fraction).
+    Also the envelopes to keep ({name: (hop_s, dB array)}), the pre-codec
+    ones suffixed _precodec.
+    """
+    m, envs = _metrics(r, v, mic, profile, clean, POST_CLIP)
+    m["post_clip_fraction"] = m.pop("clip_fraction")
+    if pre is not None:
+        pm, penv = _metrics(r, pre, mic, profile, None, PRE_CLIP)
+        m.update({f"pre_{k}": val for k, val in pm.items()})
+        envs.update({f"{k}_precodec": e for k, e in penv.items()})
+    m["model_clip_fraction"] = emu.chain_clip_fraction(mic, profile)
+    return m, envs
+
+
+def codec_input(x: np.ndarray) -> np.ndarray:
+    """Float audio as the int16 samples emu.codec_only gives codec2, as float."""
+    return np.clip(np.round(x * 32767), -32768, 32767) / 32768
 
 
 # --- takes -------------------------------------------------------------------
@@ -416,7 +439,8 @@ def run_take(binary: Path, binary_sha: str, r: dict, mic: np.ndarray,
     """
     Emulator transmissions of a recipe (overs key-ups in one session), unless
     workdir already holds them for this binary and this input. Leaves
-    voice.wav (first over), voice-2.wav (second) ... and take.json.
+    voice.wav (first over), voice-2.wav (second) ..., the pre-codec tap of
+    each over as precodec.wav, precodec-2.wav ..., and take.json.
     """
     workdir = Path(workdir)
     meta_path = workdir / "take.json"
@@ -425,7 +449,9 @@ def run_take(binary: Path, binary_sha: str, r: dict, mic: np.ndarray,
         meta = json.loads(meta_path.read_text())
         if (meta.get("binary_sha256") == binary_sha and meta.get("mic_sha256") == msha
                 and meta.get("overs_keyed", 1) == overs and "error" not in meta
-                and all((workdir / voice_name(i)).exists() for i in range(overs))):
+                and all((workdir / voice_name(i)).exists() for i in range(overs))
+                and (not meta.get("precodec") or all(
+                    (workdir / voice_name(i, "precodec")).exists() for i in range(overs)))):
             meta["cached"] = True
             return meta
     workdir.mkdir(parents=True, exist_ok=True)
@@ -443,21 +469,35 @@ def run_take(binary: Path, binary_sha: str, r: dict, mic: np.ndarray,
             wavfile.write(workdir / voice_name(i), RATE, pcm.astype(np.int16))
             meta["overs"].append({"frames": m.stream_frames,
                                   "lsf_crc_ok": bool(m.lsf_crc_ok)})
+        meta["precodec"] = tx.precodec is not None
+        if tx.precodec is not None:
+            tap = np.fromfile(tx.precodec, dtype="<i2")
+            parts = emu.split_overs(tap, [o["frames"] for o in meta["overs"]])
+            for i, part in enumerate(parts):
+                wavfile.write(workdir / voice_name(i, "precodec"), RATE, part)
+                meta["overs"][i]["precodec_blocks"] = len(part) // 160
     meta_path.write_text(json.dumps(meta, indent=2))
     if not keep_raw:
         (workdir / "mic.raw").unlink(missing_ok=True)
         (workdir / "tx.raw").unlink(missing_ok=True)
+        (workdir / "precodec.raw").unlink(missing_ok=True)
+        for f in workdir.glob("*.rtxc"):       # the emulator's settings file
+            f.unlink()
         shutil.rmtree(workdir / "state", ignore_errors=True)
     meta["cached"] = False
     return meta
 
 
-def voice_name(i: int) -> str:
-    return "voice.wav" if i == 0 else f"voice-{i + 1}.wav"
+def voice_name(i: int, stem: str = "voice") -> str:
+    return f"{stem}.wav" if i == 0 else f"{stem}-{i + 1}.wav"
 
 
-def read_voice(workdir: Path, i: int = 0) -> np.ndarray:
-    _, pcm = wavfile.read(Path(workdir) / voice_name(i))
+def read_voice(workdir: Path, i: int = 0, stem: str = "voice") -> np.ndarray | None:
+    """An over's decoded audio (stem voice) or pre-codec tap (precodec)."""
+    path = Path(workdir) / voice_name(i, stem)
+    if not path.exists():
+        return None
+    _, pcm = wavfile.read(path)
     return pcm.astype(float) / 32768
 
 
@@ -465,6 +505,7 @@ def float_chain(defines: tuple[str, ...] | list[str]) -> bool:
     """
     Whether a variant runs the firmware's float microphone chain (high-pass
     or AGC), where the fixed gain no longer saturates and
-    emu.chain_clip_fraction, a model of the integer chain, does not apply.
+    emu.chain_clip_fraction, a model of the integer chain, does not apply:
+    its model_clip_fraction cross-check is left out.
     """
     return any(d in ("-DMIC_EXP_HPF", "-DMIC_EXP_AGC") for d in defines)

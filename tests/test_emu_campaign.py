@@ -169,10 +169,12 @@ def test_headline_spread_and_deficit():
     for lv, act, st in ((-30, -40.0, 0.6), (-10, -20.0, 0.8)):
         rows.append({"variant": "baseline", "test": "speech", "signal": "a",
                      "level": lv, "active_dbfs": act, "stoi": st,
-                     "onset_peak_dbfs": -8.0, "pre_codec_clip_fraction": 0.0})
+                     "onset_peak_dbfs": -8.0, "pre_clip_fraction": 0.02,
+                     "pre_active_dbfs": act + 2, "pre_onset_peak_dbfs": 0.0})
         rows.append({"variant": "agc", "test": "speech", "signal": "a", "level": lv,
                      "active_dbfs": -21.0 + lv / 100, "stoi": st + 0.05,
-                     "onset_peak_dbfs": -40.0, "pre_codec_clip_fraction": None})
+                     "onset_peak_dbfs": -40.0, "pre_clip_fraction": 0.0,
+                     "pre_active_dbfs": -21.0, "pre_onset_peak_dbfs": -60.0})
         rows.append({"variant": "codec-only (ideal)", "test": "speech", "signal": "a",
                      "level": lv, "stoi": 0.85})
     h = {x["variant"]: x for x in emu_report.headline(rows, ["baseline", "agc"])}
@@ -180,8 +182,11 @@ def test_headline_spread_and_deficit():
     assert h["agc"]["speech_spread_db"] == pytest.approx(0.2)
     assert h["baseline"]["stoi_deficit"] == pytest.approx(0.15)
     assert h["agc"]["stoi_deficit"] == pytest.approx(0.10)
-    assert h["agc"]["pre_clip_max"] is None
-    assert h["baseline"]["pre_clip_max"] == 0.0
+    assert h["agc"]["pre_clip_max"] == 0.0
+    assert h["baseline"]["pre_clip_max"] == 0.02
+    assert h["baseline"]["pre_spread_db"] == pytest.approx(20)
+    assert h["agc"]["pre_spread_db"] == pytest.approx(0)
+    assert h["agc"]["pre_onset_median_dbfs"] == -60.0
 
 
 def test_write_csv_union_of_columns(tmp_path):
@@ -203,3 +208,39 @@ def test_configured_c_args(tmp_path):
     (tmp_path / "meson-info" / "intro-buildoptions.json").write_text(json.dumps(
         [{"name": "c_args", "value": ["-DCONFIG_MIC_GAIN=32", "-DMIC_EXP_AGC"]}]))
     assert emu.configured_c_args(tmp_path) == ["-DCONFIG_MIC_GAIN=32", "-DMIC_EXP_AGC"]
+
+
+def test_split_overs_shares_the_extra_blocks():
+    blocks = [np.full(160, i, dtype=np.int16) for i in range(642)]
+    parts = emu.split_overs(np.concatenate(blocks), [160, 160])
+    assert [len(x) // 160 for x in parts] == [321, 321]
+    assert parts[1][0] == 321
+    one = emu.split_overs(np.zeros(173 * 160, dtype=np.int16), [86])
+    assert len(one[0]) == 173 * 160
+
+
+def test_score_measures_the_tap():
+    r = camp.tone_recipe(1000, -3, 2.0)
+    mic = camp.mic_input(r, P)
+    n = int(2.5 * 8000)
+    t = np.arange(n) / 8000
+    out = 0.1 * np.sin(2 * np.pi * 1000 * t)
+    pre = np.clip(1.5 * np.sin(2 * np.pi * 1000 * t), -32768 / 32768, 32767 / 32768)
+    m, _ = camp.score(r, out, pre, mic, P, None)
+    assert m["rms_dbfs"] == pytest.approx(-23, abs=0.1)
+    assert m["post_clip_fraction"] == 0.0
+    assert m["pre_clip_fraction"] > 0.3
+    assert m["pre_rms_dbfs"] > -3
+    assert m["model_clip_fraction"] > 0
+    m, _ = camp.score(r, out, None, mic, P, None)
+    assert "pre_clip_fraction" not in m
+
+
+def test_step_score_has_both_envelopes():
+    r = camp.step_recipe([(1.5, -30), (1.5, -10), (3, -30)])
+    mic = camp.mic_input(r, P)
+    pre, out = camp.references(r, mic, P, None)["nominal"]
+    m, envs = camp.score(r, out, pre, mic, P, None)
+    assert set(envs) == {"step", "step_precodec"}
+    assert m["pre_rise_db"] == pytest.approx(20, abs=0.5)
+    assert m["pre_attack_s"] <= 0.1
