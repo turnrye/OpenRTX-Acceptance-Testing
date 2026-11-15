@@ -244,3 +244,39 @@ def test_step_score_has_both_envelopes():
     assert set(envs) == {"step", "step_precodec"}
     assert m["pre_rise_db"] == pytest.approx(20, abs=0.5)
     assert m["pre_attack_s"] <= 0.1
+
+
+def _voiced(seconds=4.0, rate=8000, seed=2):
+    rng = np.random.default_rng(seed)
+    t = np.arange(int(seconds * rate)) / rate
+    env = (np.sin(2 * np.pi * 1.5 * t) > 0).astype(float)
+    x = env * sum(np.sin(2 * np.pi * f * t + rng.uniform(0, 6)) / k
+                  for k, f in enumerate((180, 360, 720, 1100, 1900, 2600), 1))
+    return x / np.max(np.abs(x))
+
+
+def test_listening_buries_a_quiet_output():
+    clean = _voiced()
+    loud = camp.listening(clean, 0.3 * clean, -35)
+    quiet = camp.listening(clean, 0.003 * clean, -35)
+    assert loud["listen_stoi"] > quiet["listen_stoi"] + 0.2
+    assert loud["listen_snr_db"] == pytest.approx(quiet["listen_snr_db"] + 40, abs=0.5)
+    # Plain STOI normalises level, so it can't tell them apart
+    assert emu.stoi(clean, 0.3 * clean) == pytest.approx(emu.stoi(clean, 0.003 * clean),
+                                                         abs=0.01)
+
+
+def test_listening_summary_worst_cell_and_deficit():
+    rows = []
+    for nl in (-45, -35):
+        for lv, st in ((-40, 0.3), (-10, 0.7)):
+            rows.append({"variant": "baseline", "test": "listen", "signal": "a",
+                         "level": lv, "noise_dbfs": nl, "listen_stoi": st + (nl == -45) * 0.1})
+            rows.append({"variant": "codec-only (ideal)", "test": "listen", "signal": "a",
+                         "level": lv, "noise_dbfs": nl, "listen_stoi": 0.8})
+    h = emu_report.listening_summary(rows, "baseline")
+    assert h["listen_stoi_worst"] == pytest.approx(0.3)
+    assert (h["listen_worst_level_dbfs"], h["listen_worst_noise_dbfs"]) == (-40, -35)
+    assert h["listen_deficit_worst"] == pytest.approx(0.5)
+    assert h["listen_stoi_mean"] == pytest.approx(0.55)
+    assert emu_report.listening_summary(rows, "agc") == {}

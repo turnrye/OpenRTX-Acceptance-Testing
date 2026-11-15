@@ -126,7 +126,7 @@ audio tests were left out on purpose.
 | `m17/rx.robot` | M17 receive of a generated stream: callsign, Codec2 tone, sensitivity, carrier offset, speaker images, receive right after a transmission, key presses during receive |
 | `aprs/rx.robot` | APRS receive (OpenRTX#559): messages to the radio's APRS callsign reach the inbox, matched as an address, stored once, not pushed out by other traffic; full-size frames; deviation and pre-emphasis. The operator reads the inbox; message tags end in the run's tag, so reruns aren't copies |
 | `aprs/performance.robot` | APRS receive performance read from the radio's KISS TNC (needs:tnc): every frame at the bench's level, full-size and escaped frames through the TNC, a sensitivity sweep (90% and 50% points), twist, deviation, short TXDELAY, off-frequency and clock error, back-to-back frames, and a soak (tag `long`). No operator after setup |
-| `m17/mic-chain.robot` | The M17 microphone chain on the emulator bench (`needs:emulator`): level against input for tones and speech, clipping and intelligibility before and after codec2, the key-up transient, AGC step response and noise pumping in pauses, per firmware variant and radio mic chain model |
+| `m17/mic-chain.robot` | The M17 microphone chain on the emulator bench (`needs:emulator`): level against input for tones and speech, clipping and intelligibility before and after codec2, intelligibility at a fixed listening volume over background noise, the key-up transient, AGC step response and noise pumping in pauses, per firmware variant and radio mic chain model |
 
 On `bench/sim.yaml` the simulated radio transmits what the audio interface plays into its mic,
 plays at its speaker what the simulated transmitter sends, and the transmitter loops back into

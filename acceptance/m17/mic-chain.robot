@@ -51,6 +51,8 @@ ${SPEECH_SECONDS}    12
 ${STEP}           3:-30 3:-10 6:-30
 ${STEP_OVERS}     2
 ${GATE_NOISE}     -55 -40
+# Pink noise at the listener, dBFS RMS of the decoded audio's full scale
+${LISTEN_NOISE}    -45 -35
 
 *** Test Cases ***
 Static Level Curve
@@ -78,6 +80,18 @@ Key-up Onset
     ...                before codec2: the DC block's start must not click.
     ${m}=    Measure Key-up Onset    ${SPEECH_FILES}    ${SPEECH_LEVELS}    ${SPEECH_SECONDS}
     Mic Chain Should Meet Limit    ${m}    pre_onset_max_dbfs    max_pre_onset_peak_dbfs
+
+Listening-Condition Intelligibility
+    [Documentation]    The speech sweep's decoded audio as a listener hears it at a fixed
+    ...                receiver volume, at its own level with pink noise added: STOI
+    ...                normalises level, so only here does a quiet talker buried at the
+    ...                listener count against the chain. In every cell of input and noise
+    ...                level the chain should come within the limit of the codec-only ideal
+    ...                reference (the same input, ideally processed to -21 dBFS active).
+    ...                Re-scores the sweep's takes; no new emulator runs.
+    ${m}=    Measure Listening Intelligibility    ${SPEECH_FILES}    ${SPEECH_LEVELS}
+    ...    ${SPEECH_SECONDS}    ${LISTEN_NOISE}
+    Mic Chain Should Meet Limit    ${m}    listen_deficit_worst    max_listen_stoi_deficit
 
 AGC Step Response
     [Documentation]    A sustained vowel stepping +20 dB then -20 dB, keyed twice in one

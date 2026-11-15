@@ -137,6 +137,7 @@ def headline(rows: list[dict], variants: list[str]) -> list[dict]:
             p = "pre_" if "pre_attack_s" in s else ""
             for k in ("attack_s", "release_s", "release_rate_db_s", "rise_db"):
                 h[k] = s.get(p + k)
+        h.update(listening_summary(rows, v))
         ga = [r for r in rows if r["variant"] == v and r["test"] == "gate"
               and "error" not in r]
         if ga:
@@ -144,6 +145,35 @@ def headline(rows: list[dict], variants: list[str]) -> list[dict]:
             h["pause_drift_db"] = float(np.mean([_num(r["pause_drift_db"]) for r in ga]))
         out.append(h)
     return out
+
+
+def listening_summary(rows: list[dict], variant: str) -> dict:
+    """
+    The listening test's figures for a variant: mean STOI over files per
+    (noise level, input level); its mean, its worst cell and that cell's
+    input and noise level, and the worst deficit against the codec-only
+    ideal reference in the same cell.
+    """
+    def cells(v):
+        acc: dict = {}
+        for r in rows:
+            if r["test"] == "listen" and r["variant"] == v and "error" not in r:
+                acc.setdefault((r["noise_dbfs"], r["level"]), []).append(
+                    _num(r["listen_stoi"]))
+        return {k: float(np.mean(x)) for k, x in acc.items()}
+
+    mine, ideal = cells(variant), cells("codec-only (ideal)")
+    if not mine:
+        return {}
+    worst = min(mine, key=mine.get)
+    deficits = {k: ideal[k] - mine[k] for k in mine if k in ideal}
+    dk = max(deficits, key=deficits.get) if deficits else None
+    return {"listen_stoi_mean": float(np.mean(list(mine.values()))),
+            "listen_stoi_worst": mine[worst],
+            "listen_worst_level_dbfs": worst[1], "listen_worst_noise_dbfs": worst[0],
+            "listen_deficit_worst": deficits[dk] if dk else None,
+            "listen_deficit_worst_level_dbfs": dk[1] if dk else None,
+            "listen_deficit_worst_noise_dbfs": dk[0] if dk else None}
 
 
 def _f(v, fmt="{:.1f}", none="—") -> str:
@@ -332,6 +362,27 @@ def chart_onset(rows, variants, out) -> str | None:
     return _save(fig, out, "onset")
 
 
+def chart_listening(rows, variants, out) -> str | None:
+    li = [r for r in rows if r["test"] == "listen" and "error" not in r]
+    if not li:
+        return None
+    plt = _plt()
+    noises = sorted({r["noise_dbfs"] for r in li})
+    fig, axes = plt.subplots(1, len(noises), figsize=(5.6 * len(noises), 4.2),
+                             sharey=True, squeeze=False)
+    for ax, nl in zip(axes[0], noises):
+        for v in [*variants, "codec-only (ideal)", "codec-only (nominal)"]:
+            by = mean_by(li, "level", "listen_stoi", variant=v, noise_dbfs=nl)
+            if by:
+                _series(ax, list(by), list(by.values()), v)
+        ax.set_title(f"Pink noise at {nl:+.0f} dBFS RMS at the listener", fontsize=10)
+        ax.set_xlabel("Input speech peak (dBFS of ADC range)")
+    axes[0][0].set_ylabel("STOI at a fixed receiver volume")
+    axes[0][-1].legend(fontsize=8, loc="lower right")
+    fig.suptitle("Listening-condition intelligibility (mean over speech files)")
+    return _save(fig, out, "listening")
+
+
 def chart_gate(rows, variants, out) -> str | None:
     ga = [r for r in rows if r["test"] == "gate" and "error" not in r]
     if not ga:
@@ -383,6 +434,7 @@ def charts(rows, envs, variants, out: Path) -> dict:
                                         "Speech bursts and pauses over a noise bed, into codec2 "
                                         "(tap)"),
         "onset": chart_onset(rows, variants, out),
+        "listen": chart_listening(rows, variants, out),
         "gate": chart_gate(rows, variants, out),
     }.items() if p}
 
@@ -428,6 +480,8 @@ def report(meta: dict, rows: list[dict], variants: list[str], charts_: dict) -> 
             ("speech_spread_db", "spread dB", "{:.1f}", "{:+.1f}"),
             ("stoi_mean", "STOI", "{:.3f}", "{:+.3f}"),
             ("stoi_deficit", "STOI deficit", "{:.3f}", "{:+.3f}"),
+            ("listen_stoi_worst", "listening STOI worst", "{:.3f}", "{:+.3f}"),
+            ("listen_deficit_worst", "listening deficit worst", "{:.3f}", "{:+.3f}"),
             ("pre_onset_median_dbfs", "pre-codec onset dBFS", "{:.1f}", "{:+.1f}"),
             ("onset_median_dbfs", "onset dBFS", "{:.1f}", "{:+.1f}"),
             ("pre_clip_max", "pre-codec clip max %", "{:.2f}", None),
@@ -540,6 +594,49 @@ def report(meta: dict, rows: list[dict], variants: list[str], charts_: dict) -> 
                              _f(r[p + "dip_db"]), _f(r[p + "release_rate_db_s"])])
         L += _table(["variant", "over", "where", "before dBFS", "loud dBFS", "after dBFS", "rise dB",
                      "attack s", "overshoot dB", "release s", "dip dB", "release dB/s"], body)
+
+    li = [r for r in rows if r["test"] == "listen" and "error" not in r]
+    if li:
+        L += ["## Listening-condition intelligibility", ""]
+        if "listen" in charts_:
+            L += [f"![listen]({charts_['listen']})", ""]
+        L += ["The speech sweep's decoded audio at its own level (a fixed receiver volume, no "
+              "normalisation) with pink noise added at the listener, STOI against the clean "
+              "source. Worst: the lowest mean STOI over the input and noise levels; deficit: "
+              "codec-only (ideal) minus the variant in the same cell, at its largest.", ""]
+        body = []
+        for v in variants:
+            h = listening_summary(rows, v)
+            b = listening_summary(rows, "baseline")
+            if not h:
+                continue
+            body.append([v, _f(h["listen_stoi_mean"], "{:.3f}"),
+                         "" if v == "baseline" else _delta(h["listen_stoi_mean"],
+                                                           b.get("listen_stoi_mean"), "{:+.3f}"),
+                         _f(h["listen_stoi_worst"], "{:.3f}"),
+                         f"{h['listen_worst_level_dbfs']:+.0f} / {h['listen_worst_noise_dbfs']:+.0f}",
+                         "" if v == "baseline" else _delta(h["listen_stoi_worst"],
+                                                           b.get("listen_stoi_worst"), "{:+.3f}"),
+                         _f(h["listen_deficit_worst"], "{:.3f}")])
+        L += _table(["variant", "mean STOI", "Δ", "worst STOI", "at input / noise dBFS", "Δ",
+                     "worst deficit vs ideal"], body)
+        for nl in sorted({r["noise_dbfs"] for r in li}):
+            levels = sorted({r["level"] for r in li if r["noise_dbfs"] == nl})
+            bb = mean_by(li, "level", "listen_stoi", variant="baseline", noise_dbfs=nl)
+            body = []
+            for v in [*variants, "codec-only (ideal)", "codec-only (nominal)"]:
+                by = mean_by(li, "level", "listen_stoi", variant=v, noise_dbfs=nl)
+                if not by:
+                    continue
+                cells = []
+                for lv in levels:
+                    c = _f(by.get(lv), "{:.3f}")
+                    if not is_ref(v) and v != "baseline" and lv in by and lv in bb:
+                        c += f" ({_delta(by[lv], bb[lv], '{:+.3f}')})"
+                    cells.append(c)
+                body.append([v, *cells])
+            L += [f"Noise {nl:+.0f} dBFS: STOI by input peak, Δ vs baseline in brackets:", "",
+                  *_table(["variant", *[f"{lv:+.0f} dBFS" for lv in levels]], body)]
 
     ga = [r for r in rows if r["test"] == "gate" and "error" not in r]
     if ga:

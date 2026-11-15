@@ -51,7 +51,7 @@ VARIANTS: dict[str, tuple[str, ...]] = {
                 "-DMIC_EXP_AGC_ATTACK=0.3f", "-DMIC_EXP_AGC_KNEE=-3.0f"),
 }
 
-TESTS = ("tones", "speech", "step", "gate")
+TESTS = ("tones", "speech", "step", "gate", "listen")
 
 
 # --- signals -----------------------------------------------------------------
@@ -756,3 +756,66 @@ def read_tables(data: Path) -> tuple[list[dict], list[dict]]:
                 e["level_dbfs"].append(float(r["level_dbfs"]))
     return rows, [{**e, "t_s": np.array(e["t_s"]),
                    "level_dbfs": np.array(e["level_dbfs"])} for e in envs.values()]
+
+
+# --- listening-condition intelligibility --------------------------------------
+
+LISTEN_NOISE_DBFS = (-45.0, -35.0)
+LISTEN_SEED = 11
+
+
+def listening(clean: np.ndarray, v: np.ndarray, noise_dbfs: float,
+              seed: int = LISTEN_SEED) -> dict:
+    """
+    Intelligibility as a listener at a fixed receiver volume hears it: the
+    decoded audio at its own level (no normalisation), aligned to the clean
+    source, with pink noise of noise_dbfs RMS (of int16 full scale) added
+    and the sum clipped at full scale, scored with STOI and ESTOI against
+    the clean source. A quiet output is buried in the noise, which STOI on
+    the bare output, normalising level per segment, cannot see.
+    """
+    from pystoi import stoi as _stoi
+    a, b = emu.align(clean, v)
+    noise = 10 ** (noise_dbfs / 20) * colored_noise(len(b), "pink", seed)
+    x = np.clip(b + noise, -1, 1)
+    return {"listen_stoi": float(_stoi(a, x, RATE, extended=False)),
+            "listen_estoi": float(_stoi(a, x, RATE, extended=True)),
+            "listen_active_dbfs": emu.levels(b)["active_dbfs"],
+            "listen_snr_db": emu.levels(b)["active_dbfs"] - noise_dbfs}
+
+
+def listening_rows(variant: str, recipes: list[dict], where: dict,
+                   profile: emu.Profile, speech_dir: Path,
+                   noise_levels=LISTEN_NOISE_DBFS, jobs: int = 6,
+                   references_too: bool = True) -> list[dict]:
+    """
+    The speech sweep's takes re-scored under listening conditions (no new
+    emulator runs), at each noise level, with the codec-only nominal and
+    ideal references under the same conditions.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
+    def job(r):
+        tid = take_id(r)
+        mic = mic_input(r, profile, speech_dir)
+        clean = clean_source(r, speech_dir)
+        n = int(content_seconds(r) * RATE)
+        outs = {}
+        v = read_voice(where[tid])
+        lag = max(0, emu.find_lag(ideal_chain(mic, profile)[:n], v))
+        outs[variant] = v[: lag + n - int(END_GUARD_S * RATE)]
+        if references_too:
+            refs = references(r, mic, profile, clean)
+            for name in ("nominal", "ideal"):
+                outs[f"codec-only ({name})"] = refs[name][1]
+        rows = []
+        for name, x in outs.items():
+            for nl in noise_levels:
+                rows.append({"variant": name, "profile": profile.name, "test": "listen",
+                             "signal": signal_name(r), "level": level_of(r),
+                             "noise_dbfs": float(nl), "take": tid,
+                             **listening(clean, x, float(nl))})
+        return rows
+
+    with ThreadPoolExecutor(jobs) as pool:
+        return [x for rs in pool.map(job, recipes) for x in rs]

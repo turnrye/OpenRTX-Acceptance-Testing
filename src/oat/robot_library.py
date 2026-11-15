@@ -597,6 +597,30 @@ class OpenRTXAcceptance:
         return summary
 
     @keyword
+    def measure_listening_intelligibility(self, files="",
+                                          levels="-40 -30 -20 -12 -6 -1",
+                                          seconds: float = 12.0,
+                                          noise_levels="-45 -35") -> dict:
+        """
+        The speech sweep's decoded audio as a listener hears it at a fixed
+        receiver volume: at its own level, with pink noise at each level
+        (dBFS RMS of full scale) added, scored with STOI against the clean
+        source, beside the codec-only references under the same conditions.
+        No new emulator runs: the sweep's takes are re-scored (and run
+        first, from the cache, when this run hasn't). Returns the mean, the
+        worst cell and the worst deficit against the ideal reference.
+        """
+        em = self._need_emulator()
+        if not em.measured("speech"):
+            self.measure_speech_level_sweep(files, levels, seconds)
+        rows = em.measure_listening(self._floats(noise_levels))
+        for r in rows:
+            self._record("mic-take", **r)
+        summary = em.summary("listen")
+        self._record("mic-chain", what="listen", **summary)
+        return summary
+
+    @keyword
     def measure_agc_step_response(self, segments="3:-30 3:-10 6:-30",
                                   overs: int = 2) -> dict:
         """

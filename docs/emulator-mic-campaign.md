@@ -139,7 +139,8 @@ the integer chain is kept only as a cross-check, and left out for the float chai
 | `step` | a sustained synthetic vowel: 3 s at -30, 3 s at -10, 6 s at -30 dBFS peak, keyed twice in one session | |
 | `gate` | the first 9 s of the first speech file as three 3 s bursts at -12 dBFS peak, each followed by a 4 s pause, over a pink noise bed | noise bed -55 and -40 dBFS RMS |
 
-The key-up onset is read from the speech takes.
+The key-up onset is read from the speech takes, and the listening-condition test re-scores
+them (below): neither needs emulator runs of its own.
 
 - **Speech**: the Open Speech Repository's American English Harvard sentences,
   `OSR_us_000_0010_8k.wav` and `OSR_us_000_0011_8k.wav` (male), `OSR_us_000_0030_8k.wav` and
@@ -226,6 +227,23 @@ codec-only references, the pre-codec stream is the int16 signal handed to `c2enc
   line fitted to the envelope from that lowest point until it first comes within 2 dB of the
   settled level (or to the end of the segment), so it is given even when the release does not
   settle (blank when the dip is within 2 dB).
+- **Listening-condition intelligibility**: STOI normalises the level of each segment it
+  compares, so it scores a quiet output exactly as a loud one, and cannot see what a level
+  control is for: a talker who arrives at -48 dBFS is, at the fixed volume a receiver is set to,
+  buried in whatever noise is around the listener. This test takes each decoded speech take as
+  the receiver plays it at a fixed volume: at its own level, the decoded int16 scale standing for
+  the listener's level, without any normalisation. It aligns it to the clean source (the same
+  envelope lag), adds pink noise at a fixed level (-45 and -35 dBFS RMS of full scale by default,
+  `LISTEN_NOISE`; seed 11, the same noise for every take), clips the sum at full scale and scores
+  STOI and ESTOI (`pystoi`, extended) against the clean source. The codec-only nominal and ideal
+  references are scored under the same conditions; the ideal one is the same input processed to
+  -21 dBFS active, what a perfect level control would deliver. At -21 dBFS active the noise
+  levels give 24 and 14 dB SNR; a -48 dBFS talker gets -3 and -13 dB. The figures are the mean
+  STOI over the speech files in each cell of input level and noise level; the **worst** cell
+  (lowest mean) with its input and noise level; and the **worst deficit**, the largest
+  difference from the ideal reference in the same cell. The take's own level is kept as
+  `listen_active_dbfs`, its SNR at the listener as `listen_snr_db`. It re-scores the speech
+  sweep's takes: no emulator runs.
 - **Gate**: in the aligned output, the speech level is the active level over the three bursts; the
   **pause level** is the RMS in each pause from 0.3 s after its start to 0.3 s before its end,
   power-averaged over the pauses; **speech/pause** is their difference. **Drift** is the RMS of the
@@ -250,6 +268,7 @@ today's fixed-gain chain is expected to miss some:
 | | attack | 1 s |
 | | overshoot | 6 dB |
 | Silence Gate | pre-codec pause drift, worst pause | 3 dB |
+| Listening-Condition Intelligibility | worst deficit against the ideal reference, any input and noise level | 0.05 |
 
 Each test also records every take (`mic-take`, shown by `python -m oat.compare --all`) and its
 figures (`mic-chain`).
@@ -291,6 +310,9 @@ uv run robot -A bench/emulator.args -v RADIO:radios/cs7000p.yaml \
 - A take is reused when a cache holds a decoded take for the same binary SHA-256, input SHA-256
   and number of overs (and its tap, when the firmware wrote one), so an interrupted run resumes
   and a rerun costs nothing. Rebuilt firmware changes the binary and reruns its takes.
+- A run always writes its whole output folder, so to add a test to existing runs (such as the
+  listening test), run the whole suite again with the same take cache: every take is reused and
+  only the scoring runs. `-t` alone would leave a run with only that test.
 
 Every variant, then a report comparing them (each variant is an ordinary run in
 `runs/<variant>/` under `--out`):
@@ -304,7 +326,9 @@ scripts/export-run.sh runs/mic-cs7000p/runs/agc
 ```
 
 `--var NAME:VALUE` passes suite variables, `--test` picks tests, `--reuse-takes` adds caches and
-`--report-only` rebuilds the comparison from runs already made.
+`--report-only` rebuilds the comparison from runs already made. Running the campaign again with
+the same `--out` (and so the same `takes/`) and firmware reuses every take: that is how a new
+test, such as the listening test, is added to a campaign.
 
 ## Output
 
@@ -320,10 +344,10 @@ run.json        provenance: OpenRTX sha, describe, branch; this repository's des
 openrtx.patch   the uncommitted OpenRTX changes, when the checkout was dirty
 REPORT.md       headline figures and tables per test
 METHODS.md      this document
-data/           tones.csv, speech.csv, step.csv, gate.csv: one row per take and over
+data/           tones.csv, speech.csv, step.csv, gate.csv, listen.csv: one row per take and over
                 (variant, profile, test, signal, level, metrics), envelopes.csv,
                 headline.csv, rows.json (the same rows, for the campaign's comparison)
-charts/         PNG and SVG: level-tones(-precodec), level-speech(-precodec), stoi,
+charts/         PNG and SVG: level-tones(-precodec), level-speech(-precodec), stoi, listening,
                 envelope-step(-precodec), envelope-gate(-precodec), onset, gate
 ```
 
@@ -346,6 +370,9 @@ the recipes, seeds and firmware recorded in the run, so they are not published.
   metrics are simply absent. The encoder runs for as long as each key-up and a few hundred
   milliseconds less than the input, so a session's tap is cut into overs where the input's level
   pattern matches (block energies cross-correlated), not by frame count.
+- The listening test models the listener with one fixed volume and one noise spectrum; the
+  absolute STOI depends on both, the comparison between variants and against the ideal
+  reference is the result.
 - STOI models intelligibility under noise and distortion; it is not tuned to vocoders. Read small
   differences (under about 0.01) as no difference, and listen to the `voice.wav` files.
 - Each take is one boot and one realisation of the noise; differences smaller than the spread

@@ -19,7 +19,7 @@ from oat.sanitize import private_paths
 ROOT = Path(__file__).resolve().parents[1]
 LIMITS = {"max_pre_onset_peak_dbfs", "max_pre_speech_spread_db", "max_pre_clip_percent",
           "max_stoi_deficit", "max_pre_step_rise_db", "max_pre_attack_s",
-          "max_pre_overshoot_db", "max_pre_pause_drift_db"}
+          "max_pre_overshoot_db", "max_pre_pause_drift_db", "max_listen_stoi_deficit"}
 
 
 def radios_with_models():

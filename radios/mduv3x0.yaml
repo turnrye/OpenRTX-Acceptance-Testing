@@ -119,6 +119,7 @@ mic_chain:
     max_pre_speech_spread_db: 6       # active level over the speech sweep
     max_pre_clip_percent: 0           # samples at int16 full scale
     max_stoi_deficit: 0.02            # against the ideal codec-only reference
+    max_listen_stoi_deficit: 0.05     # fixed volume, noise at the listener
     max_pre_step_rise_db: 6           # output step for a +20 dB input step
     max_pre_attack_s: 1.0             # to within 2 dB after the step up
     max_pre_overshoot_db: 6           # above the settled level after it

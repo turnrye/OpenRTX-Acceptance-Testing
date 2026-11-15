@@ -107,6 +107,7 @@ class EmulatorSession:
         self.rows: list[dict] = []
         self.envs: list[dict] = []
         self.recipes: dict[str, list[dict]] = {}
+        self.where: dict[str, dict] = {}
         self.started = datetime.datetime.now(datetime.timezone.utc)
 
     def describe(self) -> dict:
@@ -127,16 +128,28 @@ class EmulatorSession:
         if test in ("speech", "gate") and not self.speech_dir:
             raise ValueError("The speech and gate tests need the speech files: "
                              "-v SPEECH_DIR:<directory>")
-        rows, envs, _ = camp.run_variant(
+        rows, envs, where = camp.run_variant(
             self.variant, self.binary, self.binary_sha, self.float_chain,
             {test: recipes}, self.profile, self.takes, self.speech_dir, self.jobs,
             step_overs, self.reuse, progress=progress)
         self.rows = [r for r in self.rows if r["test"] != test] + rows
         self.envs = [e for e in self.envs if e["test"].split("_")[0] != test] + envs
         self.recipes[test] = recipes
+        self.where[test] = where
         errors = [r for r in rows if "error" in r]
         if errors:
             raise RuntimeError("; ".join(f"{r['take']}: {r['error']}" for r in errors))
+        return rows
+
+    def measure_listening(self, noise_levels) -> list[dict]:
+        """Re-score the speech sweep's takes under listening conditions."""
+        rows = camp.listening_rows(self.variant, self.recipes["speech"],
+                                   self.where["speech"], self.profile, self.speech_dir,
+                                   noise_levels, self.jobs)
+        self.rows = [r for r in self.rows if r["test"] != "listen"] + rows
+        self.recipes["listen"] = [{"kind": "listen", "of": "speech",
+                                   "noise": "pink", "seed": camp.LISTEN_SEED,
+                                   "noise_dbfs": [float(n) for n in noise_levels]}]
         return rows
 
     def measured(self, test: str) -> bool:
@@ -174,6 +187,8 @@ class EmulatorSession:
             return {"over": last.get("over", 1),
                     **{f"pre_{k}": last.get(f"pre_{k}") for k in keys},
                     **{k: last.get(k) for k in keys}}
+        if test == "listen":
+            return emu_report.listening_summary(self.rows, self.variant)
         if test == "gate":
             return {"pre_pause_drift_max_db": worst("pre_pause_drift_max_db"),
                     "pre_speech_to_pause_db": worst("pre_speech_to_pause_db", min),
@@ -203,7 +218,8 @@ class EmulatorSession:
             "tail_s": camp.TAIL_S,
             "speech_files": {r["file"]: r["sha256"] for rs in self.recipes.values()
                              for r in rs if "sha256" in r},
-            "signals": {t: [{"take": camp.take_id(r), **r} for r in rs]
+            "signals": {t: [{"take": camp.take_id(r), **r} if r["kind"] != "listen" else r
+                            for r in rs]
                         for t, rs in self.recipes.items()},
         }
         (run_dir / "run.json").write_text(scrub(json.dumps(run, indent=2)) + "\n")
