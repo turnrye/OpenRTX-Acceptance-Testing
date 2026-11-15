@@ -17,6 +17,7 @@ STOI against the clean source. A codec-only reference (the clean speech at a
 """
 
 import argparse
+import dataclasses
 import json
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -52,11 +53,15 @@ def main() -> None:
     ap.add_argument("--levels", type=float, nargs="+",
                     default=[-40, -30, -20, -12, -6, -1])
     ap.add_argument("--seconds", type=float, default=12.0)
+    ap.add_argument("--noise-lsb", type=float, default=None,
+                    help="ADC noise in LSB RMS (default: the profile's)")
     ap.add_argument("--jobs", type=int, default=4)
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
 
     profile = emu.PROFILES[a.profile]
+    if a.noise_lsb is not None:
+        profile = dataclasses.replace(profile, noise_lsb=a.noise_lsb)
     a.out.mkdir(parents=True, exist_ok=True)
     prov = emu.provenance(a.openrtx)
     (a.out / "openrtx.patch").write_text(prov.pop("diff"))
@@ -100,7 +105,8 @@ def main() -> None:
     (a.out / "results.json").write_text(json.dumps(rows, indent=2, default=str))
 
     print(f"OpenRTX {prov['describe']} ({prov['branch']}), profile {profile.name}"
-          f" (oversample {profile.oversample}, gain {profile.gain})")
+          f" (oversample {profile.oversample}, gain {profile.gain},"
+          f" ADC noise {profile.noise_lsb} LSB)")
     print("| speech | ADC peak | path | active dBFS | peak dBFS | pre-codec clip % | key-up click dBFS | floor dBFS | STOI |")
     print("|---|---|---|---|---|---|---|---|---|")
     for r in rows:
