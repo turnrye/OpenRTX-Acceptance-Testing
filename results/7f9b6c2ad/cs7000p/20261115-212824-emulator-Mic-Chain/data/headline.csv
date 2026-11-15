@@ -1,0 +1,2 @@
+variant,speech_spread_db,stoi_mean,stoi_deficit,pre_spread_db,onset_median_dbfs,pre_onset_median_dbfs,pre_clip_max,attack_s,release_s,release_rate_db_s,rise_db,listen_stoi_mean,listen_stoi_worst,listen_worst_level_dbfs,listen_worst_noise_dbfs,listen_deficit_worst,listen_deficit_worst_level_dbfs,listen_deficit_worst_noise_dbfs,speech_to_pause_db,pause_drift_db
+full,7.74683,0.71032,0.0248499,11.9277,-43.6787,-47.7418,0,0.25,4.5,4.0016,0.00237673,0.634961,0.522146,-40,-35,0.0638087,-30,-35,26.2715,3.33758

@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Rebot 7.5 (Python 3.13.13 on linux)" generated="2026-11-15T16:56:16.335690" rpa="false" schemaversion="5">
+<suite id="s1" name="Mic-Chain" source="acceptance/m17/mic-chain.robot">
+<kw name="Open Emulator Bench" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-15T16:52:22.489112" level="INFO">Set suite metadata 'Firmware' to value 'agc_mid@f50482756'.</msg>
+<msg time="2026-11-15T16:52:22.489264" level="INFO">Set suite metadata 'Radio' to value 'TYT MD-UV3x0 (mduv3x0), emulated'.</msg>
+<msg time="2026-11-15T16:52:22.489304" level="INFO">Set suite metadata 'Hardware' to value 'emulated: OpenRTX Linux emulator (openrtx_linux) with the TYT MD-UV3x0 mic chain model'.</msg>
+<msg time="2026-11-15T16:52:22.489327" level="INFO">Set suite metadata 'Station' to value 'emulator'.</msg>
+<msg time="2026-11-15T16:52:22.489345" level="INFO">Set suite metadata 'Variant' to value 'agc_mid: -DMIC_EXP_AGC -DMIC_EXP_AGC_FASTDOWN=0.0f -DMIC_EXP_AGC_ATTACK=0.3f -DMIC_EXP_AGC_KNEE=-3.0f'.</msg>
+<msg time="2026-11-15T16:52:22.489362" level="INFO">Set suite metadata 'OpenRTX' to value 'v0.4.5-54-gf50482756 (private/mic-exp)'.</msg>
+<msg time="2026-11-15T16:52:22.489381" level="INFO">Set suite metadata 'Mic chain model' to value 'oversample 8, gain 32, 12-bit ADC, mid-scale bias, noise 2 LSB'.</msg>
+<msg time="2026-11-15T16:52:22.489401" level="INFO">Set suite metadata 'Calibration' to value 'model, measured 2026-11-15 (aad63cdbfbc4)'.</msg>
+<msg time="2026-11-15T16:52:22.489419" level="INFO">Set suite metadata 'Suite commit' to value '0dd602b9be'.</msg>
+<msg time="2026-11-15T16:52:22.489433" level="INFO">Built build_emu_mduv3x0_agc_mid (-DCONFIG_MIC_GAIN=32 -DCONFIG_MIC_OVERSAMPLE=8 -DMIC_EXP_AGC -DMIC_EXP_AGC_FASTDOWN=0.0f -DMIC_EXP_AGC_ATTACK=0.3f -DMIC_EXP_AGC_KNEE=-3.0f), results in bench-Mic-Chain</msg>
+<arg>${BENCH}</arg>
+<arg>${CALIBRATION}</arg>
+<arg>${RADIO}</arg>
+<arg>${FIRMWARE}</arg>
+<arg>${VARIANT}</arg>
+<arg>hardware=${HARDWARE}</arg>
+<arg>openrtx=${OPENRTX}</arg>
+<arg>build_root=${BUILD_ROOT}</arg>
+<arg>speech_dir=${SPEECH_DIR}</arg>
+<arg>takes=${TAKES}</arg>
+<arg>reuse_takes=${REUSE_TAKES}</arg>
+<arg>jobs=${JOBS}</arg>
+<doc>Open the emulator bench: build the OpenRTX Linux emulator for the
+radio file's mic_chain model (its CONFIG_MIC_* values) and the
+variant's defines, ready to send test signals through its M17
+microphone chain. `firmware` is &lt;variant&gt;@&lt;OpenRTX commit&gt;, checked
+against the checkout. The paths are the tester's (a local bench
+file's emulator section, or these arguments) and never reach the
+results. `hardware` is optional and only appended: the unit is
+always named as emulated.</doc>
+<status status="PASS" start="2026-11-15T16:52:22.043511" elapsed="0.445964"/>
+</kw>
+<test id="s1-t1" name="Static Level Curve" line="58">
+<kw name="Measure Static Level Curve" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-15T16:53:05.117956" level="INFO">${m} = {'pre_clip_max_percent': 0.0, 'post_clip_max_percent': 0.0}</msg>
+<var>${m}</var>
+<arg>${TONE_FREQS}</arg>
+<arg>${TONE_LEVELS}</arg>
+<doc>Tones at each frequency and ADC peak level (dBFS of the ADC range;
+default -50 to -2 in 3 dB steps and 0) through the emulator: output
+and pre-codec RMS and clipping per take. Returns the worst clipping.</doc>
+<status status="PASS" start="2026-11-15T16:52:22.490079" elapsed="42.627916"/>
+</kw>
+<kw name="Mic Chain Should Meet Limit" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${m}</arg>
+<arg>pre_clip_max_percent</arg>
+<arg>max_pre_clip_percent</arg>
+<doc>Fail unless summary[field] is at most the radio file's
+mic_chain.limits[limit]. A figure that couldn't be measured (a
+release that never settled) fails.</doc>
+<status status="PASS" start="2026-11-15T16:53:05.118117" elapsed="0.000150"/>
+</kw>
+<doc>1 kHz and 400 Hz tones over the ADC's range: the level into codec2
+and out of it against the input, beside the codec-only reference.
+Nothing may reach full scale before codec2.</doc>
+<tag>mode:m17</tag>
+<tag>needs:emulator</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-11-15T16:52:22.489604" elapsed="42.628736"/>
+</test>
+<test id="s1-t2" name="Speech Level Sweep" line="65">
+<kw name="Measure Speech Level Sweep" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-15T16:54:34.789665" level="INFO">${m} = {'pre_speech_spread_db': 13.349721985218938, 'speech_spread_db': 10.773175746094946, 'stoi_mean': 0.7128395454601728, 'stoi_deficit': 0.028458677833757367, 'pre_clip_max_percent': 0.0}</msg>
+<var>${m}</var>
+<arg>${SPEECH_FILES}</arg>
+<arg>${SPEECH_LEVELS}</arg>
+<arg>${SPEECH_SECONDS}</arg>
+<doc>Speech files (default the four Harvard-sentence recordings in
+SPEECH_DIR) at each ADC peak level: active level, peak, onset,
+clipping and STOI, before and after codec2, with the codec-only
+references. Returns the level spread over the input range, the STOI
+deficit against the ideal reference and the worst clipping.</doc>
+<status status="PASS" start="2026-11-15T16:53:05.118842" elapsed="89.670875"/>
+</kw>
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Mic Chain Should Meet Limit" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-15T16:54:34.790393" level="FAIL">pre_speech_spread_db 13.35, limit 6 (max_pre_speech_spread_db)</msg>
+<arg>${m}</arg>
+<arg>pre_speech_spread_db</arg>
+<arg>max_pre_speech_spread_db</arg>
+<doc>Fail unless summary[field] is at most the radio file's
+mic_chain.limits[limit]. A figure that couldn't be measured (a
+release that never settled) fails.</doc>
+<status status="FAIL" start="2026-11-15T16:54:34.790219" elapsed="0.000866">pre_speech_spread_db 13.35, limit 6 (max_pre_speech_spread_db)</status>
+</kw>
+<arg>Mic Chain Should Meet Limit</arg>
+<arg>${m}</arg>
+<arg>pre_speech_spread_db</arg>
+<arg>max_pre_speech_spread_db</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="FAIL" start="2026-11-15T16:54:34.789873" elapsed="0.001262">pre_speech_spread_db 13.35, limit 6 (max_pre_speech_spread_db)</status>
+</kw>
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Mic Chain Should Meet Limit" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${m}</arg>
+<arg>pre_clip_max_percent</arg>
+<arg>max_pre_clip_percent</arg>
+<doc>Fail unless summary[field] is at most the radio file's
+mic_chain.limits[limit]. A figure that couldn't be measured (a
+release that never settled) fails.</doc>
+<status status="PASS" start="2026-11-15T16:54:34.791377" elapsed="0.000103"/>
+</kw>
+<arg>Mic Chain Should Meet Limit</arg>
+<arg>${m}</arg>
+<arg>pre_clip_max_percent</arg>
+<arg>max_pre_clip_percent</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-15T16:54:34.791211" elapsed="0.000299"/>
+</kw>
+<kw name="Mic Chain Should Meet Limit" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-15T16:54:34.791657" level="FAIL">stoi_deficit 0.02846, limit 0.02 (max_stoi_deficit)</msg>
+<arg>${m}</arg>
+<arg>stoi_deficit</arg>
+<arg>max_stoi_deficit</arg>
+<doc>Fail unless summary[field] is at most the radio file's
+mic_chain.limits[limit]. A figure that couldn't be measured (a
+release that never settled) fails.</doc>
+<status status="FAIL" start="2026-11-15T16:54:34.791557" elapsed="0.000272">stoi_deficit 0.02846, limit 0.02 (max_stoi_deficit)</status>
+</kw>
+<doc>Harvard sentences from -40 to -1 dBFS peak at the ADC: the active
+level into codec2 should hardly depend on the input level, nothing
+should clip, and intelligibility should stay near the best any
+firmware could reach on the same input (the ideal codec-only
+reference).</doc>
+<tag>mode:m17</tag>
+<tag>needs:emulator</tag>
+<tag>tx</tag>
+<status status="FAIL" start="2026-11-15T16:53:05.118499" elapsed="89.673443">Several failures occurred:
+
+1) pre_speech_spread_db 13.35, limit 6 (max_pre_speech_spread_db)
+
+2) stoi_deficit 0.02846, limit 0.02 (max_stoi_deficit)</status>
+</test>
+<test id="s1-t3" name="Key-up Onset" line="78">
+<kw name="Measure Key-up Onset" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-15T16:54:34.793015" level="INFO">${m} = {'pre_onset_max_dbfs': -1.0001519038096112, 'pre_onset_median_dbfs': np.float64(-1.0001519038096112), 'onset_max_dbfs': -8.20015760313813, 'onset_median_dbfs': np.float64(-8.266158309389752)}</msg>
+<var>${m}</var>
+<arg>${SPEECH_FILES}</arg>
+<arg>${SPEECH_LEVELS}</arg>
+<arg>${SPEECH_SECONDS}</arg>
+<doc>The key-up transient: the peak of the first 100 ms of every speech
+take, before and after codec2. Uses the speech sweep's takes, running
+them first when this run hasn't.</doc>
+<status status="PASS" start="2026-11-15T16:54:34.792420" elapsed="0.000614"/>
+</kw>
+<kw name="Mic Chain Should Meet Limit" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-15T16:54:34.793201" level="FAIL">pre_onset_max_dbfs -1, limit -30 (max_pre_onset_peak_dbfs)</msg>
+<arg>${m}</arg>
+<arg>pre_onset_max_dbfs</arg>
+<arg>max_pre_onset_peak_dbfs</arg>
+<doc>Fail unless summary[field] is at most the radio file's
+mic_chain.limits[limit]. A figure that couldn't be measured (a
+release that never settled) fails.</doc>
+<status status="FAIL" start="2026-11-15T16:54:34.793092" elapsed="0.000263">pre_onset_max_dbfs -1, limit -30 (max_pre_onset_peak_dbfs)</status>
+</kw>
+<doc>The transient at key-up, the first 100 ms of every speech take,
+before codec2: the DC block's start must not click.</doc>
+<tag>mode:m17</tag>
+<tag>needs:emulator</tag>
+<tag>tx</tag>
+<status status="FAIL" start="2026-11-15T16:54:34.792166" elapsed="0.001265">pre_onset_max_dbfs -1, limit -30 (max_pre_onset_peak_dbfs)</status>
+</test>
+<test id="s1-t4" name="Listening-Condition Intelligibility" line="84">
+<kw name="Measure Listening Intelligibility" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-15T16:54:47.594599" level="INFO">${m} = {'listen_stoi_mean': 0.6395202322220063, 'listen_stoi_worst': 0.5151934009666234, 'listen_worst_level_dbfs': -40.0, 'listen_worst_noise_dbfs': -35.0, 'listen_deficit_worst': 0.06512154006273407, 'list...</msg>
+<var>${m}</var>
+<arg>${SPEECH_FILES}</arg>
+<arg>${SPEECH_LEVELS}</arg>
+<arg>${SPEECH_SECONDS}</arg>
+<arg>${LISTEN_NOISE}</arg>
+<doc>The speech sweep's decoded audio as a listener hears it at a fixed
+receiver volume: at its own level, with pink noise at each level
+(dBFS RMS of full scale) added, scored with STOI against the clean
+source, beside the codec-only references under the same conditions.
+No new emulator runs: the sweep's takes are re-scored (and run
+first, from the cache, when this run hasn't). Returns the mean, the
+worst cell and the worst deficit against the ideal reference.</doc>
+<status status="PASS" start="2026-11-15T16:54:34.794032" elapsed="12.800613"/>
+</kw>
+<kw name="Mic Chain Should Meet Limit" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-15T16:54:47.595011" level="FAIL">listen_deficit_worst 0.06512, limit 0.05 (max_listen_stoi_deficit)</msg>
+<arg>${m}</arg>
+<arg>listen_deficit_worst</arg>
+<arg>max_listen_stoi_deficit</arg>
+<doc>Fail unless summary[field] is at most the radio file's
+mic_chain.limits[limit]. A figure that couldn't be measured (a
+release that never settled) fails.</doc>
+<status status="FAIL" start="2026-11-15T16:54:47.594793" elapsed="0.000479">listen_deficit_worst 0.06512, limit 0.05 (max_listen_stoi_deficit)</status>
+</kw>
+<doc>The speech sweep's decoded audio as a listener hears it at a fixed
+receiver volume, at its own level with pink noise added: STOI
+normalises level, so only here does a quiet talker buried at the
+listener count against the chain. In every cell of input and noise
+level the chain should come within the limit of the codec-only ideal
+reference (the same input, ideally processed to -21 dBFS active).
+Re-scores the sweep's takes; no new emulator runs.</doc>
+<tag>mode:m17</tag>
+<tag>needs:emulator</tag>
+<tag>tx</tag>
+<status status="FAIL" start="2026-11-15T16:54:34.793540" elapsed="12.801842">listen_deficit_worst 0.06512, limit 0.05 (max_listen_stoi_deficit)</status>
+</test>
+<test id="s1-t5" name="AGC Step Response" line="96">
+<kw name="Measure Agc Step Response" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-15T16:55:20.528341" level="INFO">${m} = {'over': 2, 'pre_rise_db': 0.013878761239418225, 'pre_attack_s': 1.2000000000000002, 'pre_overshoot_db': 16.895448339861584, 'pre_release_s': 4.500000000000002, 'pre_release_rate_db_s': 4.000062522283...</msg>
+<var>${m}</var>
+<arg>${STEP}</arg>
+<arg>${STEP_OVERS}</arg>
+<doc>A sustained vowel stepping in level (seconds:dBFS segments), keyed
+`overs` times in one emulator session: attack, overshoot, release
+and the size of the output step, from the envelope before and after
+codec2. Returns the figures of the last over (steady state).</doc>
+<status status="PASS" start="2026-11-15T16:54:47.595958" elapsed="32.932420"/>
+</kw>
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Mic Chain Should Meet Limit" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${m}</arg>
+<arg>pre_rise_db</arg>
+<arg>max_pre_step_rise_db</arg>
+<doc>Fail unless summary[field] is at most the radio file's
+mic_chain.limits[limit]. A figure that couldn't be measured (a
+release that never settled) fails.</doc>
+<status status="PASS" start="2026-11-15T16:55:20.528735" elapsed="0.000112"/>
+</kw>
+<arg>Mic Chain Should Meet Limit</arg>
+<arg>${m}</arg>
+<arg>pre_rise_db</arg>
+<arg>max_pre_step_rise_db</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="PASS" start="2026-11-15T16:55:20.528495" elapsed="0.000379"/>
+</kw>
+<kw name="Run Keyword And Continue On Failure" owner="BuiltIn">
+<kw name="Mic Chain Should Meet Limit" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-15T16:55:20.529162" level="FAIL">pre_attack_s 1.2, limit 1 (max_pre_attack_s)</msg>
+<arg>${m}</arg>
+<arg>pre_attack_s</arg>
+<arg>max_pre_attack_s</arg>
+<doc>Fail unless summary[field] is at most the radio file's
+mic_chain.limits[limit]. A figure that couldn't be measured (a
+release that never settled) fails.</doc>
+<status status="FAIL" start="2026-11-15T16:55:20.529043" elapsed="0.000330">pre_attack_s 1.2, limit 1 (max_pre_attack_s)</status>
+</kw>
+<arg>Mic Chain Should Meet Limit</arg>
+<arg>${m}</arg>
+<arg>pre_attack_s</arg>
+<arg>max_pre_attack_s</arg>
+<doc>Runs the keyword and continues execution even if a failure occurs.</doc>
+<status status="FAIL" start="2026-11-15T16:55:20.528923" elapsed="0.000490">pre_attack_s 1.2, limit 1 (max_pre_attack_s)</status>
+</kw>
+<kw name="Mic Chain Should Meet Limit" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-15T16:55:20.529559" level="FAIL">pre_overshoot_db 16.9, limit 6 (max_pre_overshoot_db)</msg>
+<arg>${m}</arg>
+<arg>pre_overshoot_db</arg>
+<arg>max_pre_overshoot_db</arg>
+<doc>Fail unless summary[field] is at most the radio file's
+mic_chain.limits[limit]. A figure that couldn't be measured (a
+release that never settled) fails.</doc>
+<status status="FAIL" start="2026-11-15T16:55:20.529457" elapsed="0.000219">pre_overshoot_db 16.9, limit 6 (max_pre_overshoot_db)</status>
+</kw>
+<doc>A sustained vowel stepping +20 dB then -20 dB, keyed twice in one
+emulator session; the second over is the steady state. A level
+control should compress the step, settle soon and not overshoot.</doc>
+<tag>mode:m17</tag>
+<tag>needs:emulator</tag>
+<tag>tx</tag>
+<status status="FAIL" start="2026-11-15T16:54:47.595565" elapsed="32.934208">Several failures occurred:
+
+1) pre_attack_s 1.2, limit 1 (max_pre_attack_s)
+
+2) pre_overshoot_db 16.9, limit 6 (max_pre_overshoot_db)</status>
+</test>
+<test id="s1-t6" name="Silence Gate" line="107">
+<kw name="Measure Silence Gate" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-15T16:55:49.548391" level="INFO">${m} = {'pre_pause_drift_max_db': 9.745358725965282, 'pre_speech_to_pause_db': 15.879600956070234, 'pause_drift_max_db': 9.456225965874157, 'speech_to_pause_db': 17.11658786818421}</msg>
+<var>${m}</var>
+<arg>${GATE_NOISE}</arg>
+<doc>Speech bursts and pauses over a pink noise bed at each level (dBFS
+RMS of the ADC range): the level in the pauses, its drift within a
+pause (noise pumping) and the speech-to-pause ratio.</doc>
+<status status="PASS" start="2026-11-15T16:55:20.530146" elapsed="29.018285"/>
+</kw>
+<kw name="Mic Chain Should Meet Limit" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-15T16:55:49.548788" level="FAIL">pre_pause_drift_max_db 9.745, limit 3 (max_pre_pause_drift_db)</msg>
+<arg>${m}</arg>
+<arg>pre_pause_drift_max_db</arg>
+<arg>max_pre_pause_drift_db</arg>
+<doc>Fail unless summary[field] is at most the radio file's
+mic_chain.limits[limit]. A figure that couldn't be measured (a
+release that never settled) fails.</doc>
+<status status="FAIL" start="2026-11-15T16:55:49.548590" elapsed="0.000405">pre_pause_drift_max_db 9.745, limit 3 (max_pre_pause_drift_db)</status>
+</kw>
+<doc>Speech bursts and 4 s pauses over a pink noise bed: the noise in a
+pause must not be pumped up as the pause goes on.</doc>
+<tag>mode:m17</tag>
+<tag>needs:emulator</tag>
+<tag>tx</tag>
+<status status="FAIL" start="2026-11-15T16:55:20.529916" elapsed="29.019168">pre_pause_drift_max_db 9.745, limit 3 (max_pre_pause_drift_db)</status>
+</test>
+<kw name="Close Bench" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the instruments and write measurements.json: every capture,
+check and operator answer, with the run's provenance. Absolute paths
+are made relative, so the file can be published as it is.</doc>
+<status status="PASS" start="2026-11-15T16:55:49.549403" elapsed="2.635727"/>
+</kw>
+<doc>The M17 microphone chain, on the emulator bench: test signals shaped
+by the radio file's mic_chain model (oversampling, gain, ADC) go
+through the OpenRTX Linux emulator's real encodeFunc, codec2 and M17
+modulator; the decoded voice and the samples codec2 was given (the
+firmware's pre-codec tap) are measured. The firmware is one variant of
+an OpenRTX checkout, built with that radio's CONFIG_MIC_* values.
+
+Limits are the radio file's mic_chain.limits: the target of the
+microphone-chain change, which today's fixed-gain chain is expected to
+miss. The method, the signals and the metrics are in
+docs/emulator-mic-campaign.md, which each run keeps as METHODS.md
+next to its tables and charts.
+
+Run it with bench/emulator.args; it needs the emulator bench, so other
+benches exclude it (needs:emulator).</doc>
+<meta name="Calibration">model, measured 2026-11-15 (aad63cdbfbc4)</meta>
+<meta name="Firmware">agc_mid@f50482756</meta>
+<meta name="Hardware">emulated: OpenRTX Linux emulator (openrtx_linux) with the TYT MD-UV3x0 mic chain model</meta>
+<meta name="Mic chain model">oversample 8, gain 32, 12-bit ADC, mid-scale bias, noise 2 LSB</meta>
+<meta name="OpenRTX">v0.4.5-54-gf50482756 (private/mic-exp)</meta>
+<meta name="Radio">TYT MD-UV3x0 (mduv3x0), emulated</meta>
+<meta name="Station">emulator</meta>
+<meta name="Suite commit">0dd602b9be</meta>
+<meta name="Variant">agc_mid: -DMIC_EXP_AGC -DMIC_EXP_AGC_FASTDOWN=0.0f -DMIC_EXP_AGC_ATTACK=0.3f -DMIC_EXP_AGC_KNEE=-3.0f</meta>
+<status status="FAIL" start="2026-11-15T16:52:21.525268" elapsed="210.659914"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="5" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="1" fail="5" skip="0">mode:m17</stat>
+<stat pass="1" fail="5" skip="0">needs:emulator</stat>
+<stat pass="1" fail="5" skip="0">tx</stat>
+</tag>
+<suite>
+<stat name="Mic-Chain" id="s1" pass="1" fail="5" skip="0">Mic-Chain</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

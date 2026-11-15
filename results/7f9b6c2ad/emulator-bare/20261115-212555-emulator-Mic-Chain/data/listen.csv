@@ -1,0 +1,145 @@
+variant,profile,test,signal,level,noise_dbfs,take,listen_stoi,listen_estoi,listen_active_dbfs,listen_snr_db
+prime_dc,emulator-bare,listen,OSR_us_000_0010_8k,-40,-45,speech_OSR_us_000_0010_8k_-40dBFS,0.297201,0.148933,-49.2891,-4.28906
+prime_dc,emulator-bare,listen,OSR_us_000_0010_8k,-40,-35,speech_OSR_us_000_0010_8k_-40dBFS,0.218763,0.0430506,-49.2891,-14.2891
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0010_8k,-40,-45,speech_OSR_us_000_0010_8k_-40dBFS,0.299221,0.145724,-49.1072,-4.10717
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0010_8k,-40,-35,speech_OSR_us_000_0010_8k_-40dBFS,0.223746,0.044993,-49.1072,-14.1072
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0010_8k,-40,-45,speech_OSR_us_000_0010_8k_-40dBFS,0.6122,0.430832,-21.5085,23.4915
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0010_8k,-40,-35,speech_OSR_us_000_0010_8k_-40dBFS,0.508069,0.316838,-21.5085,13.4915
+prime_dc,emulator-bare,listen,OSR_us_000_0010_8k,-30,-45,speech_OSR_us_000_0010_8k_-30dBFS,0.404565,0.223446,-42.3296,2.67041
+prime_dc,emulator-bare,listen,OSR_us_000_0010_8k,-30,-35,speech_OSR_us_000_0010_8k_-30dBFS,0.291995,0.107983,-42.3296,-7.32959
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0010_8k,-30,-45,speech_OSR_us_000_0010_8k_-30dBFS,0.40673,0.220249,-42.2675,2.73249
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0010_8k,-30,-35,speech_OSR_us_000_0010_8k_-30dBFS,0.298929,0.112234,-42.2675,-7.26751
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0010_8k,-30,-45,speech_OSR_us_000_0010_8k_-30dBFS,0.641604,0.459042,-19.2852,25.7148
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0010_8k,-30,-35,speech_OSR_us_000_0010_8k_-30dBFS,0.539493,0.346668,-19.2852,15.7148
+prime_dc,emulator-bare,listen,OSR_us_000_0010_8k,-20,-45,speech_OSR_us_000_0010_8k_-20dBFS,0.508791,0.316309,-31.6856,13.3144
+prime_dc,emulator-bare,listen,OSR_us_000_0010_8k,-20,-35,speech_OSR_us_000_0010_8k_-20dBFS,0.399988,0.20672,-31.6856,3.31443
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0010_8k,-20,-45,speech_OSR_us_000_0010_8k_-20dBFS,0.514877,0.315251,-31.6493,13.3507
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0010_8k,-20,-35,speech_OSR_us_000_0010_8k_-20dBFS,0.408681,0.206716,-31.6493,3.35066
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0010_8k,-20,-45,speech_OSR_us_000_0010_8k_-20dBFS,0.657191,0.47912,-17.7189,27.2811
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0010_8k,-20,-35,speech_OSR_us_000_0010_8k_-20dBFS,0.557666,0.365823,-17.7189,17.2811
+prime_dc,emulator-bare,listen,OSR_us_000_0010_8k,-12,-45,speech_OSR_us_000_0010_8k_-12dBFS,0.596844,0.406979,-23.7524,21.2476
+prime_dc,emulator-bare,listen,OSR_us_000_0010_8k,-12,-35,speech_OSR_us_000_0010_8k_-12dBFS,0.4885,0.286337,-23.7524,11.2476
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0010_8k,-12,-45,speech_OSR_us_000_0010_8k_-12dBFS,0.603527,0.412282,-23.6502,21.3498
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0010_8k,-12,-35,speech_OSR_us_000_0010_8k_-12dBFS,0.494886,0.295167,-23.6502,11.3498
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0010_8k,-12,-45,speech_OSR_us_000_0010_8k_-12dBFS,0.657185,0.474449,-17.6775,27.3225
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0010_8k,-12,-35,speech_OSR_us_000_0010_8k_-12dBFS,0.556588,0.362195,-17.6775,17.3225
+prime_dc,emulator-bare,listen,OSR_us_000_0010_8k,-6,-45,speech_OSR_us_000_0010_8k_-6dBFS,0.653146,0.469814,-17.6979,27.3021
+prime_dc,emulator-bare,listen,OSR_us_000_0010_8k,-6,-35,speech_OSR_us_000_0010_8k_-6dBFS,0.555485,0.359659,-17.6979,17.3021
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0010_8k,-6,-45,speech_OSR_us_000_0010_8k_-6dBFS,0.658403,0.475967,-17.5921,27.4079
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0010_8k,-6,-35,speech_OSR_us_000_0010_8k_-6dBFS,0.560441,0.366473,-17.5921,17.4079
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0010_8k,-6,-45,speech_OSR_us_000_0010_8k_-6dBFS,0.652194,0.474195,-17.6874,27.3126
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0010_8k,-6,-35,speech_OSR_us_000_0010_8k_-6dBFS,0.557098,0.36525,-17.6874,17.3126
+prime_dc,emulator-bare,listen,OSR_us_000_0010_8k,-1,-45,speech_OSR_us_000_0010_8k_-1dBFS,0.68732,0.510422,-13.0832,31.9168
+prime_dc,emulator-bare,listen,OSR_us_000_0010_8k,-1,-35,speech_OSR_us_000_0010_8k_-1dBFS,0.604072,0.417969,-13.0832,21.9168
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0010_8k,-1,-45,speech_OSR_us_000_0010_8k_-1dBFS,0.697615,0.522253,-12.9424,32.0576
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0010_8k,-1,-35,speech_OSR_us_000_0010_8k_-1dBFS,0.611926,0.422897,-12.9424,22.0576
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0010_8k,-1,-45,speech_OSR_us_000_0010_8k_-1dBFS,0.653376,0.476386,-17.7001,27.2999
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0010_8k,-1,-35,speech_OSR_us_000_0010_8k_-1dBFS,0.556174,0.365198,-17.7001,17.2999
+prime_dc,emulator-bare,listen,OSR_us_000_0011_8k,-40,-45,speech_OSR_us_000_0011_8k_-40dBFS,0.294749,0.145673,-49.0021,-4.00209
+prime_dc,emulator-bare,listen,OSR_us_000_0011_8k,-40,-35,speech_OSR_us_000_0011_8k_-40dBFS,0.233431,0.0560817,-49.0021,-14.0021
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0011_8k,-40,-45,speech_OSR_us_000_0011_8k_-40dBFS,0.295602,0.150811,-48.7711,-3.77115
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0011_8k,-40,-35,speech_OSR_us_000_0011_8k_-40dBFS,0.235795,0.0582874,-48.7711,-13.7711
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0011_8k,-40,-45,speech_OSR_us_000_0011_8k_-40dBFS,0.607197,0.457879,-21.6378,23.3622
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0011_8k,-40,-35,speech_OSR_us_000_0011_8k_-40dBFS,0.513376,0.337981,-21.6378,13.3622
+prime_dc,emulator-bare,listen,OSR_us_000_0011_8k,-30,-45,speech_OSR_us_000_0011_8k_-30dBFS,0.390153,0.212848,-43.0556,1.9444
+prime_dc,emulator-bare,listen,OSR_us_000_0011_8k,-30,-35,speech_OSR_us_000_0011_8k_-30dBFS,0.297331,0.109515,-43.0556,-8.0556
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0011_8k,-30,-45,speech_OSR_us_000_0011_8k_-30dBFS,0.390045,0.215267,-43.0664,1.93359
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0011_8k,-30,-35,speech_OSR_us_000_0011_8k_-30dBFS,0.296585,0.109594,-43.0664,-8.06641
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0011_8k,-30,-45,speech_OSR_us_000_0011_8k_-30dBFS,0.614571,0.477923,-19.8007,25.1993
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0011_8k,-30,-35,speech_OSR_us_000_0011_8k_-30dBFS,0.531893,0.365178,-19.8007,15.1993
+prime_dc,emulator-bare,listen,OSR_us_000_0011_8k,-20,-45,speech_OSR_us_000_0011_8k_-20dBFS,0.489335,0.311568,-33.4899,11.5101
+prime_dc,emulator-bare,listen,OSR_us_000_0011_8k,-20,-35,speech_OSR_us_000_0011_8k_-20dBFS,0.390616,0.198355,-33.4899,1.51012
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0011_8k,-20,-45,speech_OSR_us_000_0011_8k_-20dBFS,0.489306,0.309268,-33.5357,11.4643
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0011_8k,-20,-35,speech_OSR_us_000_0011_8k_-20dBFS,0.391504,0.20031,-33.5357,1.46427
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0011_8k,-20,-45,speech_OSR_us_000_0011_8k_-20dBFS,0.623395,0.484007,-18.0143,26.9857
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0011_8k,-20,-35,speech_OSR_us_000_0011_8k_-20dBFS,0.546785,0.378375,-18.0143,16.9857
+prime_dc,emulator-bare,listen,OSR_us_000_0011_8k,-12,-45,speech_OSR_us_000_0011_8k_-12dBFS,0.554883,0.397812,-25.5643,19.4357
+prime_dc,emulator-bare,listen,OSR_us_000_0011_8k,-12,-35,speech_OSR_us_000_0011_8k_-12dBFS,0.459713,0.28332,-25.5643,9.4357
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0011_8k,-12,-45,speech_OSR_us_000_0011_8k_-12dBFS,0.571,0.413392,-25.4929,19.5071
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0011_8k,-12,-35,speech_OSR_us_000_0011_8k_-12dBFS,0.469264,0.288046,-25.4929,9.50707
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0011_8k,-12,-45,speech_OSR_us_000_0011_8k_-12dBFS,0.629251,0.495776,-18.0061,26.9939
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0011_8k,-12,-35,speech_OSR_us_000_0011_8k_-12dBFS,0.549391,0.389576,-18.0061,16.9939
+prime_dc,emulator-bare,listen,OSR_us_000_0011_8k,-6,-45,speech_OSR_us_000_0011_8k_-6dBFS,0.606183,0.465766,-19.5041,25.4959
+prime_dc,emulator-bare,listen,OSR_us_000_0011_8k,-6,-35,speech_OSR_us_000_0011_8k_-6dBFS,0.523764,0.354949,-19.5041,15.4959
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0011_8k,-6,-45,speech_OSR_us_000_0011_8k_-6dBFS,0.614691,0.474693,-19.5651,25.4349
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0011_8k,-6,-35,speech_OSR_us_000_0011_8k_-6dBFS,0.530428,0.361484,-19.5651,15.4349
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0011_8k,-6,-45,speech_OSR_us_000_0011_8k_-6dBFS,0.630981,0.492779,-18.0395,26.9605
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0011_8k,-6,-35,speech_OSR_us_000_0011_8k_-6dBFS,0.551542,0.387195,-18.0395,16.9605
+prime_dc,emulator-bare,listen,OSR_us_000_0011_8k,-1,-45,speech_OSR_us_000_0011_8k_-1dBFS,0.646454,0.505976,-14.5903,30.4097
+prime_dc,emulator-bare,listen,OSR_us_000_0011_8k,-1,-35,speech_OSR_us_000_0011_8k_-1dBFS,0.578008,0.419969,-14.5903,20.4097
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0011_8k,-1,-45,speech_OSR_us_000_0011_8k_-1dBFS,0.651053,0.51632,-14.6453,30.3547
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0011_8k,-1,-35,speech_OSR_us_000_0011_8k_-1dBFS,0.581604,0.430423,-14.6453,20.3547
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0011_8k,-1,-45,speech_OSR_us_000_0011_8k_-1dBFS,0.632967,0.493972,-18.0391,26.9609
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0011_8k,-1,-35,speech_OSR_us_000_0011_8k_-1dBFS,0.552039,0.38863,-18.0391,16.9609
+prime_dc,emulator-bare,listen,OSR_us_000_0030_8k,-40,-45,speech_OSR_us_000_0030_8k_-40dBFS,0.451216,0.170057,-51.2802,-6.28023
+prime_dc,emulator-bare,listen,OSR_us_000_0030_8k,-40,-35,speech_OSR_us_000_0030_8k_-40dBFS,0.378939,0.0443547,-51.2802,-16.2802
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0030_8k,-40,-45,speech_OSR_us_000_0030_8k_-40dBFS,0.453593,0.177495,-51.0113,-6.01135
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0030_8k,-40,-35,speech_OSR_us_000_0030_8k_-40dBFS,0.381519,0.0518141,-51.0113,-16.0113
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0030_8k,-40,-45,speech_OSR_us_000_0030_8k_-40dBFS,0.809481,0.609186,-22.5026,22.4974
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0030_8k,-40,-35,speech_OSR_us_000_0030_8k_-40dBFS,0.75967,0.508124,-22.5026,12.4974
+prime_dc,emulator-bare,listen,OSR_us_000_0030_8k,-30,-45,speech_OSR_us_000_0030_8k_-30dBFS,0.588559,0.291044,-45.5344,-0.534389
+prime_dc,emulator-bare,listen,OSR_us_000_0030_8k,-30,-35,speech_OSR_us_000_0030_8k_-30dBFS,0.448603,0.117272,-45.5344,-10.5344
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0030_8k,-30,-45,speech_OSR_us_000_0030_8k_-30dBFS,0.594965,0.306463,-45.575,-0.575033
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0030_8k,-30,-35,speech_OSR_us_000_0030_8k_-30dBFS,0.459933,0.135301,-45.575,-10.575
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0030_8k,-30,-45,speech_OSR_us_000_0030_8k_-30dBFS,0.822686,0.629821,-20.6845,24.3155
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0030_8k,-30,-35,speech_OSR_us_000_0030_8k_-30dBFS,0.778194,0.534871,-20.6845,14.3155
+prime_dc,emulator-bare,listen,OSR_us_000_0030_8k,-20,-45,speech_OSR_us_000_0030_8k_-20dBFS,0.724629,0.449898,-36.4866,8.51341
+prime_dc,emulator-bare,listen,OSR_us_000_0030_8k,-20,-35,speech_OSR_us_000_0030_8k_-20dBFS,0.602432,0.283036,-36.4866,-1.48659
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0030_8k,-20,-45,speech_OSR_us_000_0030_8k_-20dBFS,0.727171,0.450944,-36.5108,8.4892
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0030_8k,-20,-35,speech_OSR_us_000_0030_8k_-20dBFS,0.609497,0.286149,-36.5108,-1.5108
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0030_8k,-20,-45,speech_OSR_us_000_0030_8k_-20dBFS,0.822661,0.635994,-19.6238,25.3762
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0030_8k,-20,-35,speech_OSR_us_000_0030_8k_-20dBFS,0.781238,0.545694,-19.6238,15.3762
+prime_dc,emulator-bare,listen,OSR_us_000_0030_8k,-12,-45,speech_OSR_us_000_0030_8k_-12dBFS,0.773871,0.545517,-28.3166,16.6834
+prime_dc,emulator-bare,listen,OSR_us_000_0030_8k,-12,-35,speech_OSR_us_000_0030_8k_-12dBFS,0.695715,0.413538,-28.3166,6.68344
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0030_8k,-12,-45,speech_OSR_us_000_0030_8k_-12dBFS,0.774583,0.545146,-28.3522,16.6478
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0030_8k,-12,-35,speech_OSR_us_000_0030_8k_-12dBFS,0.699525,0.418242,-28.3522,6.64777
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0030_8k,-12,-45,speech_OSR_us_000_0030_8k_-12dBFS,0.80825,0.622236,-19.6451,25.3549
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0030_8k,-12,-35,speech_OSR_us_000_0030_8k_-12dBFS,0.768127,0.533795,-19.6451,15.3549
+prime_dc,emulator-bare,listen,OSR_us_000_0030_8k,-6,-45,speech_OSR_us_000_0030_8k_-6dBFS,0.812278,0.610283,-22.4035,22.5965
+prime_dc,emulator-bare,listen,OSR_us_000_0030_8k,-6,-35,speech_OSR_us_000_0030_8k_-6dBFS,0.758629,0.500608,-22.4035,12.5965
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0030_8k,-6,-45,speech_OSR_us_000_0030_8k_-6dBFS,0.811494,0.613779,-22.409,22.591
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0030_8k,-6,-35,speech_OSR_us_000_0030_8k_-6dBFS,0.758044,0.508289,-22.409,12.591
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0030_8k,-6,-45,speech_OSR_us_000_0030_8k_-6dBFS,0.821134,0.632686,-19.7114,25.2886
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0030_8k,-6,-35,speech_OSR_us_000_0030_8k_-6dBFS,0.777595,0.541601,-19.7114,15.2886
+prime_dc,emulator-bare,listen,OSR_us_000_0030_8k,-1,-45,speech_OSR_us_000_0030_8k_-1dBFS,0.815612,0.633273,-17.6772,27.3228
+prime_dc,emulator-bare,listen,OSR_us_000_0030_8k,-1,-35,speech_OSR_us_000_0030_8k_-1dBFS,0.781334,0.55724,-17.6772,17.3228
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0030_8k,-1,-45,speech_OSR_us_000_0030_8k_-1dBFS,0.819399,0.636942,-17.7861,27.2139
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0030_8k,-1,-35,speech_OSR_us_000_0030_8k_-1dBFS,0.784082,0.561207,-17.7861,17.2139
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0030_8k,-1,-45,speech_OSR_us_000_0030_8k_-1dBFS,0.817292,0.628399,-19.6348,25.3652
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0030_8k,-1,-35,speech_OSR_us_000_0030_8k_-1dBFS,0.775666,0.532517,-19.6348,15.3652
+prime_dc,emulator-bare,listen,OSR_us_000_0031_8k,-40,-45,speech_OSR_us_000_0031_8k_-40dBFS,0.424629,0.151998,-52.5604,-7.56036
+prime_dc,emulator-bare,listen,OSR_us_000_0031_8k,-40,-35,speech_OSR_us_000_0031_8k_-40dBFS,0.342135,0.0277069,-52.5604,-17.5604
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0031_8k,-40,-45,speech_OSR_us_000_0031_8k_-40dBFS,0.424904,0.149279,-52.1769,-7.17693
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0031_8k,-40,-35,speech_OSR_us_000_0031_8k_-40dBFS,0.343843,0.0258253,-52.1769,-17.1769
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0031_8k,-40,-45,speech_OSR_us_000_0031_8k_-40dBFS,0.825706,0.649257,-23.7479,21.2521
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0031_8k,-40,-35,speech_OSR_us_000_0031_8k_-40dBFS,0.752596,0.518627,-23.7479,11.2521
+prime_dc,emulator-bare,listen,OSR_us_000_0031_8k,-30,-45,speech_OSR_us_000_0031_8k_-30dBFS,0.557533,0.274548,-46.5312,-1.53118
+prime_dc,emulator-bare,listen,OSR_us_000_0031_8k,-30,-35,speech_OSR_us_000_0031_8k_-30dBFS,0.407796,0.0922662,-46.5312,-11.5312
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0031_8k,-30,-45,speech_OSR_us_000_0031_8k_-30dBFS,0.565695,0.283536,-46.4583,-1.45833
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0031_8k,-30,-35,speech_OSR_us_000_0031_8k_-30dBFS,0.415201,0.09303,-46.4583,-11.4583
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0031_8k,-30,-45,speech_OSR_us_000_0031_8k_-30dBFS,0.841823,0.674868,-20.8802,24.1198
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0031_8k,-30,-35,speech_OSR_us_000_0031_8k_-30dBFS,0.780158,0.563464,-20.8802,14.1198
+prime_dc,emulator-bare,listen,OSR_us_000_0031_8k,-20,-45,speech_OSR_us_000_0031_8k_-20dBFS,0.717616,0.454482,-37.4646,7.5354
+prime_dc,emulator-bare,listen,OSR_us_000_0031_8k,-20,-35,speech_OSR_us_000_0031_8k_-20dBFS,0.567192,0.250189,-37.4646,-2.4646
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0031_8k,-20,-45,speech_OSR_us_000_0031_8k_-20dBFS,0.71832,0.458075,-37.5953,7.40469
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0031_8k,-20,-35,speech_OSR_us_000_0031_8k_-20dBFS,0.567047,0.253239,-37.5953,-2.59531
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0031_8k,-20,-45,speech_OSR_us_000_0031_8k_-20dBFS,0.855219,0.692649,-19.6355,25.3645
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0031_8k,-20,-35,speech_OSR_us_000_0031_8k_-20dBFS,0.798956,0.583504,-19.6355,15.3645
+prime_dc,emulator-bare,listen,OSR_us_000_0031_8k,-12,-45,speech_OSR_us_000_0031_8k_-12dBFS,0.800202,0.578186,-29.4587,15.5413
+prime_dc,emulator-bare,listen,OSR_us_000_0031_8k,-12,-35,speech_OSR_us_000_0031_8k_-12dBFS,0.686936,0.410794,-29.4587,5.54131
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0031_8k,-12,-45,speech_OSR_us_000_0031_8k_-12dBFS,0.807598,0.590329,-29.5333,15.4667
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0031_8k,-12,-35,speech_OSR_us_000_0031_8k_-12dBFS,0.696685,0.422041,-29.5333,5.46671
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0031_8k,-12,-45,speech_OSR_us_000_0031_8k_-12dBFS,0.856066,0.691514,-19.6983,25.3017
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0031_8k,-12,-35,speech_OSR_us_000_0031_8k_-12dBFS,0.799163,0.580556,-19.6983,15.3017
+prime_dc,emulator-bare,listen,OSR_us_000_0031_8k,-6,-45,speech_OSR_us_000_0031_8k_-6dBFS,0.841657,0.654978,-23.4134,21.5866
+prime_dc,emulator-bare,listen,OSR_us_000_0031_8k,-6,-35,speech_OSR_us_000_0031_8k_-6dBFS,0.766827,0.522057,-23.4134,11.5866
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0031_8k,-6,-45,speech_OSR_us_000_0031_8k_-6dBFS,0.830059,0.65522,-23.4343,21.5657
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0031_8k,-6,-35,speech_OSR_us_000_0031_8k_-6dBFS,0.757309,0.52641,-23.4343,11.5657
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0031_8k,-6,-45,speech_OSR_us_000_0031_8k_-6dBFS,0.855658,0.694329,-19.6769,25.3231
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0031_8k,-6,-35,speech_OSR_us_000_0031_8k_-6dBFS,0.797715,0.585402,-19.6769,15.3231
+prime_dc,emulator-bare,listen,OSR_us_000_0031_8k,-1,-45,speech_OSR_us_000_0031_8k_-1dBFS,0.861794,0.697407,-18.5269,26.4731
+prime_dc,emulator-bare,listen,OSR_us_000_0031_8k,-1,-35,speech_OSR_us_000_0031_8k_-1dBFS,0.809503,0.59372,-18.5269,16.4731
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0031_8k,-1,-45,speech_OSR_us_000_0031_8k_-1dBFS,0.849038,0.697233,-18.4443,26.5557
+codec-only (nominal),emulator-bare,listen,OSR_us_000_0031_8k,-1,-35,speech_OSR_us_000_0031_8k_-1dBFS,0.797668,0.596489,-18.4443,16.5557
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0031_8k,-1,-45,speech_OSR_us_000_0031_8k_-1dBFS,0.855302,0.691673,-19.756,25.244
+codec-only (ideal),emulator-bare,listen,OSR_us_000_0031_8k,-1,-35,speech_OSR_us_000_0031_8k_-1dBFS,0.799466,0.582076,-19.756,15.244

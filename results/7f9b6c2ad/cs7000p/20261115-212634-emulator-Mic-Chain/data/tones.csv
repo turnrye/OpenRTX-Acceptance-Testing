@@ -1,0 +1,73 @@
+variant,profile,test,signal,level,take,over,rms_dbfs,post_clip_fraction,pre_rms_dbfs,pre_clip_fraction,model_clip_fraction,frames,lsf_crc_ok,precodec_blocks
+keep_sum,cs7000p,tones,tone 1000 Hz,-50,tone_1000Hz_-50dBFS,1,-52.9911,0,-47.0652,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-47,tone_1000Hz_-47dBFS,1,-51.5478,0,-44.13,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-44,tone_1000Hz_-44dBFS,1,-49.2617,0,-41.1633,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-41,tone_1000Hz_-41dBFS,1,-46.3837,0,-38.1718,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-38,tone_1000Hz_-38dBFS,1,-42.7387,0,-35.1825,0,0,60,True,120
+keep_sum,cs7000p,tones,tone 1000 Hz,-35,tone_1000Hz_-35dBFS,1,-38.7791,0,-32.1852,0,0,61,True,122
+keep_sum,cs7000p,tones,tone 1000 Hz,-32,tone_1000Hz_-32dBFS,1,-35.3556,0,-29.1867,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-29,tone_1000Hz_-29dBFS,1,-32.8654,0,-26.1875,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-26,tone_1000Hz_-26dBFS,1,-31.6171,0,-23.1876,0,0,61,True,123
+keep_sum,cs7000p,tones,tone 1000 Hz,-23,tone_1000Hz_-23dBFS,1,-31.0396,0,-20.1879,0,0,60,True,120
+keep_sum,cs7000p,tones,tone 1000 Hz,-20,tone_1000Hz_-20dBFS,1,-30.3162,0,-17.1865,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-17,tone_1000Hz_-17dBFS,1,-29.506,0,-14.1866,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-14,tone_1000Hz_-14dBFS,1,-27.9358,0,-11.1863,0,0,61,True,122
+keep_sum,cs7000p,tones,tone 1000 Hz,-11,tone_1000Hz_-11dBFS,1,-25.7384,0,-8.18665,0,0,61,True,123
+keep_sum,cs7000p,tones,tone 1000 Hz,-8,tone_1000Hz_-8dBFS,1,-23.6754,0,-5.18648,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-5,tone_1000Hz_-5dBFS,1,-21.1428,0,-2.33164,0.25,0.2,62,True,125
+keep_sum,cs7000p,tones,tone 1000 Hz,-2,tone_1000Hz_-2dBFS,1,-20.4431,0,-1.6774,0.5,0.4,61,True,123
+keep_sum,cs7000p,tones,tone 1000 Hz,0,tone_1000Hz_+0dBFS,1,-19.8915,0,-1.05308,0.5,0.4,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-50,tone_400Hz_-50dBFS,1,-51.8968,0,-46.8879,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-47,tone_400Hz_-47dBFS,1,-51.0553,0,-43.9453,0,0,62,True,125
+keep_sum,cs7000p,tones,tone 400 Hz,-44,tone_400Hz_-44dBFS,1,-49.0451,0,-40.9777,0,0,61,True,123
+keep_sum,cs7000p,tones,tone 400 Hz,-41,tone_400Hz_-41dBFS,1,-46.1918,0,-37.992,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-38,tone_400Hz_-38dBFS,1,-42.9268,0,-34.9993,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-35,tone_400Hz_-35dBFS,1,-39.5754,0,-32.0031,0,0,59,True,119
+keep_sum,cs7000p,tones,tone 400 Hz,-32,tone_400Hz_-32dBFS,1,-35.8411,0,-29.0038,0,0,61,True,123
+keep_sum,cs7000p,tones,tone 400 Hz,-29,tone_400Hz_-29dBFS,1,-31.9964,0,-26.0048,0,0,59,True,119
+keep_sum,cs7000p,tones,tone 400 Hz,-26,tone_400Hz_-26dBFS,1,-28.182,0,-23.0047,0,0,59,True,119
+keep_sum,cs7000p,tones,tone 400 Hz,-23,tone_400Hz_-23dBFS,1,-23.0399,0,-20.0046,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-20,tone_400Hz_-20dBFS,1,-20.8556,0,-17.0044,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-17,tone_400Hz_-17dBFS,1,-19.0016,0,-14.0039,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-14,tone_400Hz_-14dBFS,1,-18.1562,0,-11.0043,0,0,59,True,119
+keep_sum,cs7000p,tones,tone 400 Hz,-11,tone_400Hz_-11dBFS,1,-16.8266,0,-8.00391,0,0,61,True,122
+keep_sum,cs7000p,tones,tone 400 Hz,-8,tone_400Hz_-8dBFS,1,-15.8897,0,-5.00384,0,0,61,True,123
+keep_sum,cs7000p,tones,tone 400 Hz,-5,tone_400Hz_-5dBFS,1,-11.3598,0,-2.34124,0.3,0.24,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-2,tone_400Hz_-2dBFS,1,-9.81628,0,-1.45046,0.6,0.48,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,0,tone_400Hz_+0dBFS,1,-12.2267,0,-1.05705,0.6,0.48,61,True,123
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-50,tone_1000Hz_-50dBFS,1,-53.203,0,-46.8541,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-47,tone_1000Hz_-47dBFS,1,-51.7005,0,-43.9156,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-44,tone_1000Hz_-44dBFS,1,-49.3207,0,-40.9504,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-41,tone_1000Hz_-41dBFS,1,-46.2395,0,-37.9653,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-38,tone_1000Hz_-38dBFS,1,-42.2882,0,-34.9757,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-35,tone_1000Hz_-35dBFS,1,-39.0644,0,-31.9787,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-32,tone_1000Hz_-32dBFS,1,-34.942,0,-28.9806,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-29,tone_1000Hz_-29dBFS,1,-32.6244,0,-25.982,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-26,tone_1000Hz_-26dBFS,1,-31.7518,0,-22.9827,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-23,tone_1000Hz_-23dBFS,1,-31.1497,0,-19.9826,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-20,tone_1000Hz_-20dBFS,1,-29.8948,0,-16.9827,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-17,tone_1000Hz_-17dBFS,1,-29.194,0,-13.9827,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-14,tone_1000Hz_-14dBFS,1,-28.092,0,-10.9828,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-11,tone_1000Hz_-11dBFS,1,-26.3445,0,-7.98276,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-8,tone_1000Hz_-8dBFS,1,-23.4945,0,-4.98279,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-5,tone_1000Hz_-5dBFS,1,-21.4421,0,-2.46632,0.25,0.2,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-2,tone_1000Hz_-2dBFS,1,-18.5033,0,-1.24965,0.75,0.4,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,0,tone_1000Hz_+0dBFS,1,-18.4809,0,-1.24965,0.75,0.4,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-50,tone_400Hz_-50dBFS,1,-51.7409,0,-46.8489,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-47,tone_400Hz_-47dBFS,1,-50.8156,0,-43.9101,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-44,tone_400Hz_-44dBFS,1,-49.1706,0,-40.9439,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-41,tone_400Hz_-41dBFS,1,-46.0759,0,-37.9609,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-38,tone_400Hz_-38dBFS,1,-43.0406,0,-34.9695,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-35,tone_400Hz_-35dBFS,1,-39.6382,0,-31.9742,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-32,tone_400Hz_-32dBFS,1,-35.481,0,-28.9762,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-29,tone_400Hz_-29dBFS,1,-31.9506,0,-25.9776,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-26,tone_400Hz_-26dBFS,1,-28.2434,0,-22.9781,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-23,tone_400Hz_-23dBFS,1,-23.2351,0,-19.9783,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-20,tone_400Hz_-20dBFS,1,-20.9318,0,-16.9784,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-17,tone_400Hz_-17dBFS,1,-19.1193,0,-13.9784,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-14,tone_400Hz_-14dBFS,1,-17.8397,0,-10.9785,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-11,tone_400Hz_-11dBFS,1,-17.3331,0,-7.9785,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-8,tone_400Hz_-8dBFS,1,-16.1842,0,-4.97851,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-5,tone_400Hz_-5dBFS,1,-13.4882,0,-2.38196,0.3,0.24,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-2,tone_400Hz_-2dBFS,1,-7.51954,0,-1.40785,0.5,0.48,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,0,tone_400Hz_+0dBFS,1,-12.0395,0,-1.09834,0.7,0.48,,,

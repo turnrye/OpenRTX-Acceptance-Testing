@@ -23,8 +23,8 @@ from robot.api import ResultVisitor
 
 REPO = Path(__file__).resolve().parents[2]
 # Absolute paths: POSIX ones of two or more components, home-relative ones
-# and Windows drive paths
-ABSOLUTE_PATH = re.compile(r"(?<![\w.])(?:~/|[A-Za-z]:\\|/(?=[\w.-]+/))[^\s\"'<>]*")
+# and Windows drive paths; not the path of a web address (http://host/...)
+ABSOLUTE_PATH = re.compile(r"(?<![\w.])(?<!http:)(?<!https:)(?<!http:/)(?<!https:/)(?:~/|[A-Za-z]:\\|/(?=[\w.-]+/))[^\s\"'<>]*")
 
 
 def relative(path: str) -> str:

@@ -1,0 +1,145 @@
+variant,profile,test,signal,level,noise_dbfs,take,listen_stoi,listen_estoi,listen_active_dbfs,listen_snr_db
+prime_dc,mduv3x0,listen,OSR_us_000_0010_8k,-40,-45,speech_OSR_us_000_0010_8k_-40dBFS,0.343648,0.157686,-45.0026,-0.00257512
+prime_dc,mduv3x0,listen,OSR_us_000_0010_8k,-40,-35,speech_OSR_us_000_0010_8k_-40dBFS,0.251058,0.0604902,-45.0026,-10.0026
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0010_8k,-40,-45,speech_OSR_us_000_0010_8k_-40dBFS,0.35611,0.166039,-44.714,0.285953
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0010_8k,-40,-35,speech_OSR_us_000_0010_8k_-40dBFS,0.259623,0.0703391,-44.714,-9.71405
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0010_8k,-40,-45,speech_OSR_us_000_0010_8k_-40dBFS,0.492558,0.341396,-21.9467,23.0533
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0010_8k,-40,-35,speech_OSR_us_000_0010_8k_-40dBFS,0.473797,0.308502,-21.9467,13.0533
+prime_dc,mduv3x0,listen,OSR_us_000_0010_8k,-30,-45,speech_OSR_us_000_0010_8k_-30dBFS,0.450409,0.251934,-36.1694,8.83063
+prime_dc,mduv3x0,listen,OSR_us_000_0010_8k,-30,-35,speech_OSR_us_000_0010_8k_-30dBFS,0.345668,0.153685,-36.1694,-1.16937
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0010_8k,-30,-45,speech_OSR_us_000_0010_8k_-30dBFS,0.464363,0.271517,-35.9919,9.00807
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0010_8k,-30,-35,speech_OSR_us_000_0010_8k_-30dBFS,0.355619,0.164045,-35.9919,-0.991929
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0010_8k,-30,-45,speech_OSR_us_000_0010_8k_-30dBFS,0.60758,0.431937,-17.731,27.269
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0010_8k,-30,-35,speech_OSR_us_000_0010_8k_-30dBFS,0.548438,0.365817,-17.731,17.269
+prime_dc,mduv3x0,listen,OSR_us_000_0010_8k,-20,-45,speech_OSR_us_000_0010_8k_-20dBFS,0.552335,0.357216,-26.1645,18.8355
+prime_dc,mduv3x0,listen,OSR_us_000_0010_8k,-20,-35,speech_OSR_us_000_0010_8k_-20dBFS,0.447735,0.249242,-26.1645,8.83548
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0010_8k,-20,-45,speech_OSR_us_000_0010_8k_-20dBFS,0.574391,0.389913,-25.8963,19.1037
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0010_8k,-20,-35,speech_OSR_us_000_0010_8k_-20dBFS,0.464092,0.27421,-25.8963,9.10372
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0010_8k,-20,-45,speech_OSR_us_000_0010_8k_-20dBFS,0.645606,0.466527,-17.7931,27.2069
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0010_8k,-20,-35,speech_OSR_us_000_0010_8k_-20dBFS,0.551529,0.361575,-17.7931,17.2069
+prime_dc,mduv3x0,listen,OSR_us_000_0010_8k,-12,-45,speech_OSR_us_000_0010_8k_-12dBFS,0.625926,0.444031,-17.9211,27.0789
+prime_dc,mduv3x0,listen,OSR_us_000_0010_8k,-12,-35,speech_OSR_us_000_0010_8k_-12dBFS,0.530953,0.338719,-17.9211,17.0789
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0010_8k,-12,-45,speech_OSR_us_000_0010_8k_-12dBFS,0.6451,0.461301,-17.8272,27.1728
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0010_8k,-12,-35,speech_OSR_us_000_0010_8k_-12dBFS,0.547873,0.354882,-17.8272,17.1728
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0010_8k,-12,-45,speech_OSR_us_000_0010_8k_-12dBFS,0.647202,0.469167,-18.0151,26.9849
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0010_8k,-12,-35,speech_OSR_us_000_0010_8k_-12dBFS,0.550638,0.364313,-18.0151,16.9849
+prime_dc,mduv3x0,listen,OSR_us_000_0010_8k,-6,-45,speech_OSR_us_000_0010_8k_-6dBFS,0.678349,0.495628,-12.6714,32.3286
+prime_dc,mduv3x0,listen,OSR_us_000_0010_8k,-6,-35,speech_OSR_us_000_0010_8k_-6dBFS,0.591708,0.400439,-12.6714,22.3286
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0010_8k,-6,-45,speech_OSR_us_000_0010_8k_-6dBFS,0.690979,0.514461,-12.5149,32.4851
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0010_8k,-6,-35,speech_OSR_us_000_0010_8k_-6dBFS,0.611895,0.427931,-12.5149,22.4851
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0010_8k,-6,-45,speech_OSR_us_000_0010_8k_-6dBFS,0.654169,0.472877,-17.9324,27.0676
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0010_8k,-6,-35,speech_OSR_us_000_0010_8k_-6dBFS,0.55435,0.363183,-17.9324,17.0676
+prime_dc,mduv3x0,listen,OSR_us_000_0010_8k,-1,-45,speech_OSR_us_000_0010_8k_-1dBFS,0.652717,0.480491,-12.5923,32.4077
+prime_dc,mduv3x0,listen,OSR_us_000_0010_8k,-1,-35,speech_OSR_us_000_0010_8k_-1dBFS,0.587833,0.409413,-12.5923,22.4077
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0010_8k,-1,-45,speech_OSR_us_000_0010_8k_-1dBFS,0.663367,0.501516,-12.356,32.644
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0010_8k,-1,-35,speech_OSR_us_000_0010_8k_-1dBFS,0.60092,0.437433,-12.356,22.644
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0010_8k,-1,-45,speech_OSR_us_000_0010_8k_-1dBFS,0.650794,0.467122,-17.9094,27.0906
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0010_8k,-1,-35,speech_OSR_us_000_0010_8k_-1dBFS,0.55471,0.361492,-17.9094,17.0906
+prime_dc,mduv3x0,listen,OSR_us_000_0011_8k,-40,-45,speech_OSR_us_000_0011_8k_-40dBFS,0.339251,0.149598,-46.6967,-1.69675
+prime_dc,mduv3x0,listen,OSR_us_000_0011_8k,-40,-35,speech_OSR_us_000_0011_8k_-40dBFS,0.256068,0.0618684,-46.6967,-11.6967
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0011_8k,-40,-45,speech_OSR_us_000_0011_8k_-40dBFS,0.341605,0.148899,-46.6737,-1.67372
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0011_8k,-40,-35,speech_OSR_us_000_0011_8k_-40dBFS,0.254027,0.059744,-46.6737,-11.6737
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0011_8k,-40,-45,speech_OSR_us_000_0011_8k_-40dBFS,0.470127,0.322307,-22.6256,22.3744
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0011_8k,-40,-35,speech_OSR_us_000_0011_8k_-40dBFS,0.45821,0.300263,-22.6256,12.3744
+prime_dc,mduv3x0,listen,OSR_us_000_0011_8k,-30,-45,speech_OSR_us_000_0011_8k_-30dBFS,0.433408,0.250198,-37.7784,7.22156
+prime_dc,mduv3x0,listen,OSR_us_000_0011_8k,-30,-35,speech_OSR_us_000_0011_8k_-30dBFS,0.346067,0.153775,-37.7784,-2.77844
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0011_8k,-30,-45,speech_OSR_us_000_0011_8k_-30dBFS,0.444756,0.260304,-37.7966,7.20344
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0011_8k,-30,-35,speech_OSR_us_000_0011_8k_-30dBFS,0.34751,0.152891,-37.7966,-2.79656
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0011_8k,-30,-45,speech_OSR_us_000_0011_8k_-30dBFS,0.586833,0.432417,-17.8289,27.1711
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0011_8k,-30,-35,speech_OSR_us_000_0011_8k_-30dBFS,0.5413,0.378838,-17.8289,17.1711
+prime_dc,mduv3x0,listen,OSR_us_000_0011_8k,-20,-45,speech_OSR_us_000_0011_8k_-20dBFS,0.527627,0.350503,-27.6063,17.3937
+prime_dc,mduv3x0,listen,OSR_us_000_0011_8k,-20,-35,speech_OSR_us_000_0011_8k_-20dBFS,0.432366,0.242869,-27.6063,7.39365
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0011_8k,-20,-45,speech_OSR_us_000_0011_8k_-20dBFS,0.549078,0.382421,-27.672,17.328
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0011_8k,-20,-35,speech_OSR_us_000_0011_8k_-20dBFS,0.447585,0.261458,-27.672,7.32795
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0011_8k,-20,-45,speech_OSR_us_000_0011_8k_-20dBFS,0.623789,0.478386,-17.9681,27.0319
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0011_8k,-20,-35,speech_OSR_us_000_0011_8k_-20dBFS,0.546985,0.379519,-17.9681,17.0319
+prime_dc,mduv3x0,listen,OSR_us_000_0011_8k,-12,-45,speech_OSR_us_000_0011_8k_-12dBFS,0.592128,0.43608,-19.6915,25.3085
+prime_dc,mduv3x0,listen,OSR_us_000_0011_8k,-12,-35,speech_OSR_us_000_0011_8k_-12dBFS,0.508023,0.331972,-19.6915,15.3085
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0011_8k,-12,-45,speech_OSR_us_000_0011_8k_-12dBFS,0.613871,0.473871,-19.7974,25.2026
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0011_8k,-12,-35,speech_OSR_us_000_0011_8k_-12dBFS,0.531848,0.362547,-19.7974,15.2026
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0011_8k,-12,-45,speech_OSR_us_000_0011_8k_-12dBFS,0.62044,0.485794,-18.104,26.896
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0011_8k,-12,-35,speech_OSR_us_000_0011_8k_-12dBFS,0.544943,0.381422,-18.104,16.896
+prime_dc,mduv3x0,listen,OSR_us_000_0011_8k,-6,-45,speech_OSR_us_000_0011_8k_-6dBFS,0.633755,0.491753,-13.7435,31.2565
+prime_dc,mduv3x0,listen,OSR_us_000_0011_8k,-6,-35,speech_OSR_us_000_0011_8k_-6dBFS,0.564701,0.400552,-13.7435,21.2565
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0011_8k,-6,-45,speech_OSR_us_000_0011_8k_-6dBFS,0.643394,0.513409,-13.8681,31.1319
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0011_8k,-6,-35,speech_OSR_us_000_0011_8k_-6dBFS,0.577186,0.425921,-13.8681,21.1319
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0011_8k,-6,-45,speech_OSR_us_000_0011_8k_-6dBFS,0.62275,0.486269,-17.967,27.033
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0011_8k,-6,-35,speech_OSR_us_000_0011_8k_-6dBFS,0.543012,0.380537,-17.967,17.033
+prime_dc,mduv3x0,listen,OSR_us_000_0011_8k,-1,-45,speech_OSR_us_000_0011_8k_-1dBFS,0.62136,0.48622,-12.0811,32.9189
+prime_dc,mduv3x0,listen,OSR_us_000_0011_8k,-1,-35,speech_OSR_us_000_0011_8k_-1dBFS,0.559635,0.422583,-12.0811,22.9189
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0011_8k,-1,-45,speech_OSR_us_000_0011_8k_-1dBFS,0.630585,0.506934,-12.0442,32.9558
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0011_8k,-1,-35,speech_OSR_us_000_0011_8k_-1dBFS,0.571374,0.449493,-12.0442,22.9558
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0011_8k,-1,-45,speech_OSR_us_000_0011_8k_-1dBFS,0.625709,0.484972,-17.9559,27.0441
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0011_8k,-1,-35,speech_OSR_us_000_0011_8k_-1dBFS,0.547158,0.380127,-17.9559,17.0441
+prime_dc,mduv3x0,listen,OSR_us_000_0030_8k,-40,-45,speech_OSR_us_000_0030_8k_-40dBFS,0.528085,0.214756,-49.5529,-4.55291
+prime_dc,mduv3x0,listen,OSR_us_000_0030_8k,-40,-35,speech_OSR_us_000_0030_8k_-40dBFS,0.402295,0.0628979,-49.5529,-14.5529
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0030_8k,-40,-45,speech_OSR_us_000_0030_8k_-40dBFS,0.530106,0.2041,-49.4483,-4.44832
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0030_8k,-40,-35,speech_OSR_us_000_0030_8k_-40dBFS,0.407702,0.0629008,-49.4483,-14.4483
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0030_8k,-40,-45,speech_OSR_us_000_0030_8k_-40dBFS,0.699646,0.465167,-23.9938,21.0062
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0030_8k,-40,-35,speech_OSR_us_000_0030_8k_-40dBFS,0.700074,0.455041,-23.9938,11.0062
+prime_dc,mduv3x0,listen,OSR_us_000_0030_8k,-30,-45,speech_OSR_us_000_0030_8k_-30dBFS,0.664386,0.363287,-40.6967,4.30334
+prime_dc,mduv3x0,listen,OSR_us_000_0030_8k,-30,-35,speech_OSR_us_000_0030_8k_-30dBFS,0.526979,0.191827,-40.6967,-5.69666
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0030_8k,-30,-45,speech_OSR_us_000_0030_8k_-30dBFS,0.676528,0.381438,-40.6362,4.3638
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0030_8k,-30,-35,speech_OSR_us_000_0030_8k_-30dBFS,0.538693,0.205593,-40.6362,-5.6362
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0030_8k,-30,-45,speech_OSR_us_000_0030_8k_-30dBFS,0.780866,0.576596,-20.1374,24.8626
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0030_8k,-30,-35,speech_OSR_us_000_0030_8k_-30dBFS,0.76104,0.530467,-20.1374,14.8626
+prime_dc,mduv3x0,listen,OSR_us_000_0030_8k,-20,-45,speech_OSR_us_000_0030_8k_-20dBFS,0.760474,0.509935,-30.6448,14.3552
+prime_dc,mduv3x0,listen,OSR_us_000_0030_8k,-20,-35,speech_OSR_us_000_0030_8k_-20dBFS,0.672267,0.368434,-30.6448,4.35523
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0030_8k,-20,-45,speech_OSR_us_000_0030_8k_-20dBFS,0.771313,0.530443,-30.6925,14.3075
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0030_8k,-20,-35,speech_OSR_us_000_0030_8k_-20dBFS,0.683708,0.389142,-30.6925,4.30749
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0030_8k,-20,-45,speech_OSR_us_000_0030_8k_-20dBFS,0.80857,0.618133,-19.8109,25.1891
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0030_8k,-20,-35,speech_OSR_us_000_0030_8k_-20dBFS,0.767254,0.530532,-19.8109,15.1891
+prime_dc,mduv3x0,listen,OSR_us_000_0030_8k,-12,-45,speech_OSR_us_000_0030_8k_-12dBFS,0.796973,0.586071,-22.5607,22.4393
+prime_dc,mduv3x0,listen,OSR_us_000_0030_8k,-12,-35,speech_OSR_us_000_0030_8k_-12dBFS,0.739982,0.476449,-22.5607,12.4393
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0030_8k,-12,-45,speech_OSR_us_000_0030_8k_-12dBFS,0.806892,0.599459,-22.5259,22.4741
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0030_8k,-12,-35,speech_OSR_us_000_0030_8k_-12dBFS,0.752426,0.489974,-22.5259,12.4741
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0030_8k,-12,-45,speech_OSR_us_000_0030_8k_-12dBFS,0.822276,0.633411,-19.751,25.249
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0030_8k,-12,-35,speech_OSR_us_000_0030_8k_-12dBFS,0.776689,0.538538,-19.751,15.249
+prime_dc,mduv3x0,listen,OSR_us_000_0030_8k,-6,-45,speech_OSR_us_000_0030_8k_-6dBFS,0.81761,0.630878,-17.2667,27.7333
+prime_dc,mduv3x0,listen,OSR_us_000_0030_8k,-6,-35,speech_OSR_us_000_0030_8k_-6dBFS,0.781073,0.550497,-17.2667,17.7333
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0030_8k,-6,-45,speech_OSR_us_000_0030_8k_-6dBFS,0.817175,0.63356,-17.2494,27.7506
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0030_8k,-6,-35,speech_OSR_us_000_0030_8k_-6dBFS,0.781964,0.554806,-17.2494,17.7506
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0030_8k,-6,-45,speech_OSR_us_000_0030_8k_-6dBFS,0.817018,0.621368,-19.6367,25.3633
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0030_8k,-6,-35,speech_OSR_us_000_0030_8k_-6dBFS,0.773296,0.524209,-19.6367,15.3633
+prime_dc,mduv3x0,listen,OSR_us_000_0030_8k,-1,-45,speech_OSR_us_000_0030_8k_-1dBFS,0.786858,0.615008,-14.687,30.313
+prime_dc,mduv3x0,listen,OSR_us_000_0030_8k,-1,-35,speech_OSR_us_000_0030_8k_-1dBFS,0.767055,0.570634,-14.687,20.313
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0030_8k,-1,-45,speech_OSR_us_000_0030_8k_-1dBFS,0.789412,0.624778,-14.7925,30.2075
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0030_8k,-1,-35,speech_OSR_us_000_0030_8k_-1dBFS,0.770454,0.582441,-14.7925,20.2075
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0030_8k,-1,-45,speech_OSR_us_000_0030_8k_-1dBFS,0.81633,0.628316,-19.7003,25.2997
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0030_8k,-1,-35,speech_OSR_us_000_0030_8k_-1dBFS,0.774526,0.53942,-19.7003,15.2997
+prime_dc,mduv3x0,listen,OSR_us_000_0031_8k,-40,-45,speech_OSR_us_000_0031_8k_-40dBFS,0.498456,0.184228,-49.5537,-4.55371
+prime_dc,mduv3x0,listen,OSR_us_000_0031_8k,-40,-35,speech_OSR_us_000_0031_8k_-40dBFS,0.371998,0.0443535,-49.5537,-14.5537
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0031_8k,-40,-45,speech_OSR_us_000_0031_8k_-40dBFS,0.50277,0.177574,-49.55,-4.55004
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0031_8k,-40,-35,speech_OSR_us_000_0031_8k_-40dBFS,0.372926,0.0401863,-49.55,-14.55
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0031_8k,-40,-45,speech_OSR_us_000_0031_8k_-40dBFS,0.692561,0.468469,-23.5766,21.4234
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0031_8k,-40,-35,speech_OSR_us_000_0031_8k_-40dBFS,0.689179,0.455359,-23.5766,11.4234
+prime_dc,mduv3x0,listen,OSR_us_000_0031_8k,-30,-45,speech_OSR_us_000_0031_8k_-30dBFS,0.645912,0.361436,-41.3864,3.61365
+prime_dc,mduv3x0,listen,OSR_us_000_0031_8k,-30,-35,speech_OSR_us_000_0031_8k_-30dBFS,0.490382,0.166517,-41.3864,-6.38635
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0031_8k,-30,-45,speech_OSR_us_000_0031_8k_-30dBFS,0.655378,0.383215,-41.3053,3.69473
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0031_8k,-30,-35,speech_OSR_us_000_0031_8k_-30dBFS,0.501185,0.180001,-41.3053,-6.30527
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0031_8k,-30,-45,speech_OSR_us_000_0031_8k_-30dBFS,0.798339,0.621787,-19.4666,25.5334
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0031_8k,-30,-35,speech_OSR_us_000_0031_8k_-30dBFS,0.772465,0.580784,-19.4666,15.5334
+prime_dc,mduv3x0,listen,OSR_us_000_0031_8k,-20,-45,speech_OSR_us_000_0031_8k_-20dBFS,0.76837,0.533732,-31.3879,13.6121
+prime_dc,mduv3x0,listen,OSR_us_000_0031_8k,-20,-35,speech_OSR_us_000_0031_8k_-20dBFS,0.644722,0.350434,-31.3879,3.61215
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0031_8k,-20,-45,speech_OSR_us_000_0031_8k_-20dBFS,0.750346,0.535003,-31.4406,13.5594
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0031_8k,-20,-35,speech_OSR_us_000_0031_8k_-20dBFS,0.640934,0.362201,-31.4406,3.55937
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0031_8k,-20,-45,speech_OSR_us_000_0031_8k_-20dBFS,0.840327,0.671149,-19.7426,25.2574
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0031_8k,-20,-35,speech_OSR_us_000_0031_8k_-20dBFS,0.788137,0.574726,-19.7426,15.2574
+prime_dc,mduv3x0,listen,OSR_us_000_0031_8k,-12,-45,speech_OSR_us_000_0031_8k_-12dBFS,0.824114,0.628011,-23.391,21.609
+prime_dc,mduv3x0,listen,OSR_us_000_0031_8k,-12,-35,speech_OSR_us_000_0031_8k_-12dBFS,0.744337,0.49138,-23.391,11.609
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0031_8k,-12,-45,speech_OSR_us_000_0031_8k_-12dBFS,0.838221,0.654264,-23.3982,21.6018
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0031_8k,-12,-35,speech_OSR_us_000_0031_8k_-12dBFS,0.762873,0.520409,-23.3982,11.6018
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0031_8k,-12,-45,speech_OSR_us_000_0031_8k_-12dBFS,0.854962,0.687012,-19.9875,25.0125
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0031_8k,-12,-35,speech_OSR_us_000_0031_8k_-12dBFS,0.795226,0.579012,-19.9875,15.0125
+prime_dc,mduv3x0,listen,OSR_us_000_0031_8k,-6,-45,speech_OSR_us_000_0031_8k_-6dBFS,0.852406,0.68545,-17.3318,27.6682
+prime_dc,mduv3x0,listen,OSR_us_000_0031_8k,-6,-35,speech_OSR_us_000_0031_8k_-6dBFS,0.798362,0.581544,-17.3318,17.6682
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0031_8k,-6,-45,speech_OSR_us_000_0031_8k_-6dBFS,0.858272,0.697716,-17.6059,27.3941
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0031_8k,-6,-35,speech_OSR_us_000_0031_8k_-6dBFS,0.808493,0.600574,-17.6059,17.3941
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0031_8k,-6,-45,speech_OSR_us_000_0031_8k_-6dBFS,0.856288,0.687959,-19.8644,25.1356
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0031_8k,-6,-35,speech_OSR_us_000_0031_8k_-6dBFS,0.796954,0.577995,-19.8644,15.1356
+prime_dc,mduv3x0,listen,OSR_us_000_0031_8k,-1,-45,speech_OSR_us_000_0031_8k_-1dBFS,0.844768,0.694103,-14.8158,30.1842
+prime_dc,mduv3x0,listen,OSR_us_000_0031_8k,-1,-35,speech_OSR_us_000_0031_8k_-1dBFS,0.813805,0.625694,-14.8158,20.1842
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0031_8k,-1,-45,speech_OSR_us_000_0031_8k_-1dBFS,0.849105,0.699627,-15.1695,29.8305
+codec-only (nominal),mduv3x0,listen,OSR_us_000_0031_8k,-1,-35,speech_OSR_us_000_0031_8k_-1dBFS,0.821656,0.63473,-15.1695,19.8305
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0031_8k,-1,-45,speech_OSR_us_000_0031_8k_-1dBFS,0.858078,0.689366,-19.746,25.254
+codec-only (ideal),mduv3x0,listen,OSR_us_000_0031_8k,-1,-35,speech_OSR_us_000_0031_8k_-1dBFS,0.798858,0.580166,-19.746,15.254

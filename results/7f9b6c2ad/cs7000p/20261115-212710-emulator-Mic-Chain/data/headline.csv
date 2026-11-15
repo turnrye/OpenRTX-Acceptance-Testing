@@ -1,0 +1,2 @@
+variant,speech_spread_db,stoi_mean,stoi_deficit,pre_spread_db,onset_median_dbfs,pre_onset_median_dbfs,pre_clip_max,attack_s,release_s,release_rate_db_s,rise_db,listen_stoi_mean,listen_stoi_worst,listen_worst_level_dbfs,listen_worst_noise_dbfs,listen_deficit_worst,listen_deficit_worst_level_dbfs,listen_deficit_worst_noise_dbfs,speech_to_pause_db,pause_drift_db
+hpf,34.371,0.713593,0.0215768,38.4057,-10.9875,-0.000265076,0.016656,0,0,,19.9647,0.59362,0.32121,-40,-35,0.24844,-40,-35,28.8813,0.0816907
