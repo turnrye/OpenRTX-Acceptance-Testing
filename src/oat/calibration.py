@@ -20,7 +20,7 @@ from pathlib import Path
 import numpy as np
 import yaml
 
-METHODS = ("vna", "power-meter", "assumed")
+METHODS = ("vna", "power-meter", "assumed", "model")
 # Entries under paths: that are audio levels, not RF losses
 AUDIO_PATHS = ("audio_out", "audio_in")
 # Receiver settings a level table must match, with the backends' defaults

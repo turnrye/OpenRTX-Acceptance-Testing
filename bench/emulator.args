@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Robot Framework argument file for the emulator bench. Choose the radio
+# (whose mic_chain model goes in front of the emulator) with -v RADIO, the
+# firmware variant with -v VARIANT and -v FIRMWARE:<variant>@<OpenRTX sha>:
+#
+#   uv run robot -A bench/emulator.args -v RADIO:radios/cs7000p.yaml \
+#       -v VARIANT:baseline -v FIRMWARE:baseline@62e065ae5 \
+#       -v OPENRTX:~/OpenRTX -v SPEECH_DIR:~/speech-osr \
+#       -d runs/mic-chain-cs7000p-baseline acceptance/m17/mic-chain.robot
+#
+# Put the local paths in bench/emulator.local.yaml instead (and point BENCH at
+# it) to leave them off the command line.
+
+--include needs:emulator
+--variable BENCH:bench/emulator.yaml
+--variable CALIBRATION:calibration/emulator.yaml

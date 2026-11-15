@@ -40,20 +40,35 @@ FRAMES_OUTSIDE_STREAM = 3     # preamble, LSF and EOT around the stream frames
 
 @dataclass
 class Profile:
-    """The microphone chain settings of one radio, as its hwconfig.h has them."""
+    """
+    The microphone chain of one radio: its hwconfig.h settings (oversampling
+    and gain) and a model of its ADC (bits, a bias at mid-scale or none, and
+    white noise in LSB RMS).
+    """
     name: str
     oversample: int = 1
     gain: int = 1
     adc_bits: int = 12
     noise_lsb: float = 0.5
+    bias: bool = True
 
     def c_args(self) -> str:
         return (f"-DCONFIG_MIC_GAIN={self.gain} "
                 f"-DCONFIG_MIC_OVERSAMPLE={self.oversample}")
 
+    @classmethod
+    def from_radio(cls, name: str, mic: dict) -> "Profile":
+        """A profile from a radio file's mic_chain section."""
+        bias = mic.get("bias", "mid-scale")
+        if bias not in ("mid-scale", "none"):
+            raise ValueError(f"{name}: mic_chain bias must be mid-scale or none")
+        return cls(name, int(mic["oversample"]), int(mic["gain"]),
+                   int(mic["adc_bits"]), float(mic["noise_lsb"]),
+                   bias == "mid-scale")
+
 
 PROFILES = {
-    "linux": Profile("linux", 1, 1, 16, 0.0),
+    "linux": Profile("linux", 1, 1, 16, 0.0, False),
     "cs7000p": Profile("cs7000p", 6, 32),
     "cs7000": Profile("cs7000", 8, 32),
     "mduv3x0": Profile("mduv3x0", 8, 32),
@@ -138,14 +153,15 @@ def adc_quantize(x: np.ndarray, profile: Profile, seed: int = 17) -> np.ndarray:
     """
     Float samples at the ADC's rate, 1.0 meaning its half range, as the ADC
     delivers them: white noise of noise_lsb RMS added, rounded, biased to
-    mid-scale and clipped to the converter's range, as int16.
+    mid-scale and clipped to the converter's range, as int16. Without a bias
+    (or at 16 bits) the codes are signed around zero.
     """
     half = 2 ** (profile.adc_bits - 1)
     x = np.asarray(x, dtype=float) * half
     rng = np.random.default_rng(seed)
     x = x + rng.normal(0, profile.noise_lsb, len(x))
-    if profile.adc_bits >= 16:
-        return np.clip(np.round(x), -32768, 32767).astype(np.int16)
+    if not profile.bias or profile.adc_bits >= 16:
+        return np.clip(np.round(x), -half, half - 1).astype(np.int16)
     return np.clip(np.round(x + half), 0, 2 * half - 1).astype(np.int16)
 
 

@@ -1,0 +1,37 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# The emulator bench: no instruments. The "radio" is an OpenRTX Linux
+# emulator build (openrtx_linux) of the firmware under test, with the chosen
+# radio file's mic_chain model (its CONFIG_MIC_* values and ADC) in front of
+# its microphone input; radios/emulator-bare.yaml leaves the model out. Only
+# suites tagged needs:emulator run here (acceptance/m17/mic-chain.robot), and
+# every run is published under station "emulator", so it can't be taken for a
+# measurement of a radio.
+#
+# The paths below are the tester's own. Copy this file to
+# bench/emulator.local.yaml (ignored by git) and fill them in, or pass them as
+# -v OPENRTX:... -v BUILD_ROOT:... -v SPEECH_DIR:... -v TAKES:...; they never
+# reach the results.
+
+type: emulator
+station: emulator
+
+operator:
+  type: scripted
+  default: "yes"
+
+emulator:
+  # OpenRTX checkout to build (its HEAD must match FIRMWARE's commit)
+  openrtx:
+  # Where build_emu_<radio file>_<variant> directories go (default: the checkout)
+  build_root:
+  # Directory holding the Open Speech Repository Harvard-sentence files
+  speech_dir:
+  # Take cache, <takes>/<variant>/<take> (default runs/emulator-takes/<radio file>)
+  takes:
+  # Further take caches to reuse, comma separated, such as a campaign's takes/
+  reuse_takes:
+  # Emulators run at once; each runs in real time
+  jobs: 6

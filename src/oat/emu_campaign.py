@@ -331,7 +331,7 @@ def step_response(env: np.ndarray, hop_s: float, t_up: float, t_down: float,
         hi = int(tail[0]) if len(tail) else int(np.flatnonzero(t < t_end - 0.1)[-1])
         if hi - lo >= 2:
             rate = float(np.polyfit(t[lo:hi + 1], env[lo:hi + 1], 1)[0])
-    return {"pre_dbfs": pre, "loud_dbfs": up, "after_dbfs": down,
+    return {"before_dbfs": pre, "loud_dbfs": up, "after_dbfs": down,
             "rise_db": up - pre, "fall_db": up - down,
             "attack_s": attack, "release_s": release,
             "overshoot_db": overshoot, "dip_db": dip, "release_rate_db_s": rate}
@@ -379,7 +379,8 @@ def _metrics(r: dict, x: np.ndarray, mic: np.ndarray, profile: emu.Profile,
     if k == "speech":
         out = x[: lag + n - int(END_GUARD_S * RATE)]
         lv = emu.levels(out, skip_s=0.1)
-        lv["clip_fraction"] = float(np.mean(np.abs(out) >= clip_at))
+        # The key-up onset has its own figures: clipping counts after it
+        lv["clip_fraction"] = float(np.mean(np.abs(out[int(0.1 * RATE):]) >= clip_at))
         m = {**lv, "lag_ms": 1000 * lag / RATE}
         if clean is not None:
             m["stoi"] = emu.stoi(clean, out)
@@ -472,7 +473,7 @@ def run_take(binary: Path, binary_sha: str, r: dict, mic: np.ndarray,
         meta["precodec"] = tx.precodec is not None
         if tx.precodec is not None:
             tap = np.fromfile(tx.precodec, dtype="<i2")
-            parts = emu.split_overs(tap, [o["frames"] for o in meta["overs"]])
+            parts = split_tap(tap, ideal_chain(mic, profile), overs)
             for i, part in enumerate(parts):
                 wavfile.write(workdir / voice_name(i, "precodec"), RATE, part)
                 meta["overs"][i]["precodec_blocks"] = len(part) // 160
@@ -486,6 +487,61 @@ def run_take(binary: Path, binary_sha: str, r: dict, mic: np.ndarray,
         shutil.rmtree(workdir / "state", ignore_errors=True)
     meta["cached"] = False
     return meta
+
+
+def _block_env(x: np.ndarray, block: int = 160) -> np.ndarray:
+    """Log energy of consecutive codec2 blocks, floored 40 dB under the top."""
+    n = len(x) // block
+    e = 10 * np.log10(np.mean(np.asarray(x[: n * block], float).reshape(n, block) ** 2,
+                              axis=1) + 1e-12)
+    return np.maximum(e, e.max() - 40) if n else e
+
+
+def split_tap(tap: np.ndarray, ref: np.ndarray, overs: int,
+              block: int = 160) -> list[np.ndarray]:
+    """
+    A session's pre-codec tap (every over's codec2 blocks, back to back) cut
+    into overs. The encoder runs for as long as each key-up lasts, which is
+    not the number of M17 frames sent, so each over after the first starts
+    where the input's level pattern (ref, the ideal chain's 8 kHz signal)
+    best matches the tap's, within 20% of an over's length of where it is
+    expected: the 20 ms block energies, mean removed, cross-correlated.
+    """
+    if overs <= 1:
+        return [tap]
+    e = _block_env(tap, block)
+    r = _block_env(ref, block)
+    r = r - r.mean()
+    n_ref = len(r)
+    starts = [0]
+    for _ in range(1, overs):
+        lo = starts[-1] + int(0.8 * n_ref)
+        hi = min(starts[-1] + int(1.2 * n_ref), len(e) - n_ref // 4)
+        best, at = -np.inf, None
+        for k in range(lo, max(lo, hi) + 1):
+            seg = e[k: k + n_ref]
+            m = len(seg)
+            if m < n_ref // 4:
+                break
+            c = float(np.dot(seg - seg.mean(), r[:m]) / m)
+            if c > best:
+                best, at = c, k
+        starts.append(at if at is not None else min(lo, len(e)))
+    bounds = [s * block for s in starts] + [len(tap) // block * block]
+    return [tap[a:b] for a, b in zip(bounds, bounds[1:])]
+
+
+def read_taps(workdir: Path, overs: int, ref: np.ndarray) -> list[np.ndarray | None]:
+    """
+    Each over's pre-codec tap as 8 kHz float: the parts saved with the take,
+    joined and cut again by split_tap, so takes saved by an older split
+    read the same as new ones.
+    """
+    parts = [read_voice(workdir, i, "precodec") for i in range(overs)]
+    if overs <= 1 or any(p is None for p in parts):
+        return parts
+    pcm = np.round(np.concatenate(parts) * 32768).astype(np.int16)
+    return [x.astype(float) / 32768 for x in split_tap(pcm, ref, overs)]
 
 
 def voice_name(i: int, stem: str = "voice") -> str:
@@ -509,3 +565,194 @@ def float_chain(defines: tuple[str, ...] | list[str]) -> bool:
     its model_clip_fraction cross-check is left out.
     """
     return any(d in ("-DMIC_EXP_HPF", "-DMIC_EXP_AGC") for d in defines)
+
+
+# --- one variant through the tests ---------------------------------------------
+
+def level_of(r: dict):
+    """The level a take is filed under: peak for tones and speech, noise for gate."""
+    if r["kind"] in ("tone", "speech"):
+        return r["peak_dbfs"]
+    if r["kind"] == "gate":
+        return r["noise_dbfs"]
+    return None
+
+
+def default_recipes(tests, speech_dir: Path | None, speech: list[str],
+                    seconds: float = 12.0,
+                    speech_levels=(-40, -30, -20, -12, -6, -1),
+                    tone_freqs=(1000, 400), tone_levels=None,
+                    tone_seconds: float = 2.0,
+                    step=((3, -30), (3, -10), (6, -30)),
+                    gate_noise=(-55, -40), gate_peak: float = -12.0) -> dict:
+    """The campaign's signals per test, by default as METHODS describes them."""
+    if tone_levels is None:
+        tone_levels = [float(x) for x in range(-50, 1, 3)] + [0.0]
+    out: dict[str, list[dict]] = {}
+    files = [Path(speech_dir) / s for s in speech] if speech_dir else []
+    if "tones" in tests:
+        out["tones"] = [tone_recipe(float(f), lv, float(tone_seconds)) for f in tone_freqs
+                        for lv in sorted(set(float(x) for x in tone_levels))]
+    if "speech" in tests:
+        out["speech"] = [speech_recipe(f, float(lv), float(seconds)) for f in files
+                         for lv in speech_levels]
+    if "step" in tests:
+        out["step"] = [step_recipe([(float(s), float(p)) for s, p in step])]
+    if "gate" in tests:
+        out["gate"] = [gate_recipe(files[0], float(nl), float(gate_peak))
+                       for nl in gate_noise]
+    return out
+
+
+def cached_take(dirs: list[Path], binary_sha: str, mic_sha: str,
+                overs: int) -> Path | None:
+    """The first directory holding a finished take of this binary and input."""
+    for d in dirs:
+        meta_path = Path(d) / "take.json"
+        if not meta_path.exists():
+            continue
+        meta = json.loads(meta_path.read_text())
+        if (meta.get("binary_sha256") == binary_sha and meta.get("mic_sha256") == mic_sha
+                and meta.get("overs_keyed", 1) == overs and "error" not in meta
+                and all((Path(d) / voice_name(i)).exists() for i in range(overs))
+                and (not meta.get("precodec") or all(
+                    (Path(d) / voice_name(i, "precodec")).exists()
+                    for i in range(overs)))):
+            return Path(d)
+    return None
+
+
+def run_variant(variant: str, binary: Path, binary_sha: str, float_chain_: bool,
+                recipes_by_test: dict, profile: emu.Profile, takes: Path,
+                speech_dir: Path | None, jobs: int = 6, step_overs: int = 2,
+                also_look_in=(), keep_raw: bool = False,
+                progress=print) -> tuple[list[dict], list[dict], dict]:
+    """
+    One variant through every recipe: emulator takes (cached under
+    takes/<variant>/<take>, or reused from <dir>/<variant>/<take> for each
+    dir in also_look_in), the codec-only references, and the scores of both.
+    Returns rows, envelopes and {take id: take directory}.
+    """
+    import threading
+    from concurrent.futures import ThreadPoolExecutor
+
+    lock = threading.Lock()
+    done = [0]
+    work = [(t, r) for t, rs in recipes_by_test.items() for r in rs]
+    total = len(work)
+    where: dict[str, Path] = {}
+
+    def emu_job(job):
+        t, r = job
+        mic = mic_input(r, profile, speech_dir)
+        tid = take_id(r)
+        overs = step_overs if t == "step" else 1
+        home = Path(takes) / variant / tid
+        found = cached_take([home, *[Path(d) / variant / tid for d in also_look_in]],
+                            binary_sha, mic_sha256(mic), overs)
+        if found is not None:
+            meta = {**json.loads((found / "take.json").read_text()), "cached": True}
+        else:
+            found = home
+            meta = run_take(binary, binary_sha, r, mic, profile, home, overs=overs,
+                            keep_raw=keep_raw)
+        with lock:
+            done[0] += 1
+            where[tid] = found
+            progress(f"[{done[0]}/{total}] {variant} {tid}"
+                     f"{' (cached)' if meta['cached'] else ''}"
+                     f"{' ERROR ' + meta['error'] if 'error' in meta else ''}")
+        return job, meta
+
+    with ThreadPoolExecutor(jobs) as pool:
+        results = list(pool.map(emu_job, work))
+
+    def env_row(v, name, sig, over, hop, e):
+        return {"variant": v, "test": name, "signal": sig, "over": over,
+                "t_s": (np.arange(len(e)) + 0.5) * hop, "level_dbfs": e}
+
+    def score_job(item):
+        (t, r), meta = item
+        tid = take_id(r)
+        base = {"variant": variant, "profile": profile.name, "test": t,
+                "signal": signal_name(r), "level": level_of(r), "take": tid}
+        if "error" in meta:
+            return [{**base, "error": meta["error"]}], []
+        mic = mic_input(r, profile, speech_dir)
+        clean = clean_source(r, speech_dir)
+        rows, envs = [], []
+        taps = read_taps(where[tid], meta["overs_keyed"], ideal_chain(mic, profile))
+        for i in range(meta["overs_keyed"]):
+            vo = read_voice(where[tid], i)
+            pre = taps[i]
+            m, env = score(r, vo, pre, mic, profile, clean)
+            if float_chain_:
+                m["model_clip_fraction"] = None
+            rows.append({**base, "over": i + 1, **m, **meta["overs"][i]})
+            envs += [env_row(variant, n, base["signal"], i + 1, hop, e)
+                     for n, (hop, e) in env.items()]
+        return rows, envs
+
+    def ref_job(item):
+        t, r = item
+        mic = mic_input(r, profile, speech_dir)
+        clean = clean_source(r, speech_dir)
+        rows, envs = [], []
+        for name, (pre, x) in references(r, mic, profile, clean).items():
+            v = f"codec-only ({name})"
+            m, env = score(r, x, pre, mic, profile, clean)
+            if name != "nominal":
+                m["model_clip_fraction"] = None
+            rows.append({"variant": v, "profile": profile.name, "test": t,
+                         "signal": signal_name(r), "level": level_of(r),
+                         "take": take_id(r), "over": 1, **m})
+            envs += [env_row(v, n, signal_name(r), 1, hop, e)
+                     for n, (hop, e) in env.items()]
+        return rows, envs
+
+    with ThreadPoolExecutor(jobs) as pool:
+        scored = list(pool.map(score_job, results)) + list(pool.map(ref_job, work))
+    rows = [x for rs, _ in scored for x in rs]
+    envs = [x for _, es in scored for x in es]
+    return rows, envs, where
+
+
+def write_tables(data: Path, rows: list[dict], envs: list[dict]) -> None:
+    """A run's tidy tables: one CSV per test, the envelopes, and rows.json."""
+    from oat import emu_report
+    data = Path(data)
+    data.mkdir(parents=True, exist_ok=True)
+    for t in dict.fromkeys(r["test"] for r in rows):
+        emu_report.write_csv(data / f"{t}.csv", [r for r in rows if r["test"] == t])
+    if envs:
+        emu_report.write_csv(data / "envelopes.csv", [
+            {"variant": e["variant"], "test": e["test"], "signal": e["signal"],
+             "over": e["over"], "t_s": float(t), "level_dbfs": float(lv)}
+            for e in envs for t, lv in zip(e["t_s"], e["level_dbfs"])])
+    (data / "rows.json").write_text(json.dumps(rows, indent=1, default=_plain) + "\n")
+
+
+def _plain(v):
+    if isinstance(v, np.generic):
+        return v.item()
+    raise TypeError(type(v))
+
+
+def read_tables(data: Path) -> tuple[list[dict], list[dict]]:
+    """Rows and envelopes as write_tables left them."""
+    import csv
+    data = Path(data)
+    rows = json.loads((data / "rows.json").read_text())
+    envs: dict = {}
+    path = data / "envelopes.csv"
+    if path.exists():
+        with open(path) as f:
+            for r in csv.DictReader(f):
+                key = (r["variant"], r["test"], r["signal"], int(r["over"]))
+                e = envs.setdefault(key, {"variant": key[0], "test": key[1],
+                                          "signal": key[2], "over": key[3],
+                                          "t_s": [], "level_dbfs": []})
+                e["t_s"].append(float(r["t_s"]))
+                e["level_dbfs"].append(float(r["level_dbfs"]))
+    return rows, [{**e, "t_s": np.array(e["t_s"]),
+                   "level_dbfs": np.array(e["level_dbfs"])} for e in envs.values()]

@@ -86,7 +86,7 @@ def rows(run: dict, everything: bool = False) -> dict[tuple, object]:
             for k in (r if everything else AUDIO_FIELDS):
                 if k in r and k not in SKIP and _shown(r[k]):
                     out[(test, f"{tag} {k}")] = r[k]
-        elif kind in ("operator", "assertion", "transmit", "inject") \
+        elif kind in ("operator", "assertion", "transmit", "inject", "mic-take") \
                 and not everything:
             continue
         else:

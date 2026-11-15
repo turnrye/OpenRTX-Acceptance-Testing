@@ -126,6 +126,7 @@ audio tests were left out on purpose.
 | `m17/rx.robot` | M17 receive of a generated stream: callsign, Codec2 tone, sensitivity, carrier offset, speaker images, receive right after a transmission, key presses during receive |
 | `aprs/rx.robot` | APRS receive (OpenRTX#559): messages to the radio's APRS callsign reach the inbox, matched as an address, stored once, not pushed out by other traffic; full-size frames; deviation and pre-emphasis. The operator reads the inbox; message tags end in the run's tag, so reruns aren't copies |
 | `aprs/performance.robot` | APRS receive performance read from the radio's KISS TNC (needs:tnc): every frame at the bench's level, full-size and escaped frames through the TNC, a sensitivity sweep (90% and 50% points), twist, deviation, short TXDELAY, off-frequency and clock error, back-to-back frames, and a soak (tag `long`). No operator after setup |
+| `m17/mic-chain.robot` | The M17 microphone chain on the emulator bench (`needs:emulator`): level against input for tones and speech, clipping and intelligibility before and after codec2, the key-up transient, AGC step response and noise pumping in pauses, per firmware variant and radio mic chain model |
 
 On `bench/sim.yaml` the simulated radio transmits what the audio interface plays into its mic,
 plays at its speaker what the simulated transmitter sends, and the transmitter loops back into
@@ -232,14 +233,27 @@ uv run python -m oat.analysis capture.cu8 --rate 250000 --offset 75000 --audio-d
 lists each transmission's carrier offset, peak and RMS deviation, dominant tone, 99% occupied
 bandwidth, and CTCSS tone and deviation. `oat.m17.phy.measure_m17_capture` does the same for M17.
 
-### The M17 microphone chain on the emulator
+### The emulator bench
 
-`scripts/emu-mic-campaign.py` sends test signals (tones, speech at a range of levels, a level
-step, speech over a noise bed) through the OpenRTX Linux emulator's M17 transmit chain, for
-firmware variants that differ in C defines, decodes them with the M17 decoder here and Codec2, and
-writes tables, charts and a report comparing each variant with the baseline. It needs no bench
-and is not a suite: it is evidence for firmware changes to the microphone chain, to be confirmed
-on a radio. Method, signals, metrics and limits:
+`bench/emulator.yaml` is a bench without instruments: the "radio" is an OpenRTX Linux emulator
+build (`openrtx_linux`) of the firmware under test, with the chosen radio file's `mic_chain`
+model (its `CONFIG_MIC_*` values and ADC) in front of its microphone input, or none with
+`radios/emulator-bare.yaml`. `acceptance/m17/mic-chain.robot` (tagged `needs:emulator`, which
+other benches exclude) sends tones, speech at a range of levels, a level step and speech over a
+noise bed through the firmware's M17 transmit chain, measures what codec2 was given and what
+decodes, and checks it against the radio file's `mic_chain.limits`:
+
+```sh
+uv run robot -A bench/emulator.args -v RADIO:radios/cs7000p.yaml \
+    -v VARIANT:baseline -v FIRMWARE:baseline@<OpenRTX sha> \
+    -v OPENRTX:<OpenRTX checkout> -v SPEECH_DIR:<speech files> \
+    -d runs/mic-cs7000p-baseline acceptance/m17/mic-chain.robot
+```
+
+The firmware is a variant (a set of C defines) of an OpenRTX checkout;
+`scripts/emu-mic-campaign.py --radio ... --variants ...` runs the suite once per variant and
+writes a report comparing them with the baseline. Runs are published like any other, under
+station `emulator`, with their tables and charts. Method, signals, metrics and limits:
 [docs/emulator-mic-campaign.md](docs/emulator-mic-campaign.md).
 
 ## Sharing results
@@ -276,7 +290,7 @@ links to the suite on `main` instead, so push before you run.
 | `radios/` | Radio files: bands, modes, limits |
 | `results/` | Published evidence runs, append-only |
 | `scripts/export-run.sh` | Adds a run to `results/` |
-| `scripts/emu-mic-campaign.py` | The M17 microphone chain campaign on the OpenRTX emulator |
+| `scripts/emu-mic-campaign.py` | Runs `m17/mic-chain.robot` on the emulator bench per firmware variant and compares them |
 | `scripts/m17-reference-vectors.py` | Writes the M17 test vectors from a libm17 build |
 | `src/oat/` | The Robot library: SDR and VNA backends, signals, FM and M17 analysis, audio, operator, keywords, modifiers, calibration and comparison tools |
 | `tests/` | Unit tests of the library (`uv run pytest`) |

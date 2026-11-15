@@ -1,0 +1,48 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Module17 (OpenRTX target mod17). A minimal radio file for the
+# emulator bench; add its bands, modes and limits before running
+# real-bench suites with it.
+name: Module17
+max_tx_power_dbm: 37
+dsp_image: false
+# Module17 is a baseband modem in front of an external radio: the band is that
+# radio's, nominal here
+bands:
+  70cm:
+    frequency_hz: 433475000
+    modes: [m17]
+modes: [m17]
+
+# The microphone chain as the emulator bench models it in front of
+# openrtx_linux (bench/emulator.yaml, acceptance/m17/mic-chain.robot):
+# the firmware's CONFIG_MIC_* values and a model of the ADC, each with
+# where it comes from. Paths are in the OpenRTX tree.
+mic_chain:
+  oversample: 1
+  gain: 12
+  adc_bits: 12
+  bias: mid-scale
+  noise_lsb: 2.0
+  sources:
+    oversample: "openrtx/src/core/audio_codec.c (CONFIG_MIC_OVERSAMPLE default 1)"
+    gain: "platform/targets/Module17/hwconfig.h (CONFIG_MIC_GAIN)"
+    adc_bits: "the STM32's 12-bit ADC"
+    bias: "assumed until bench-measured"
+    noise_lsb: "assumed until bench-measured"
+  # Limits for acceptance/m17/mic-chain.robot, checked before codec2 (the
+  # firmware's pre-codec tap) except the STOI deficit. Source: acceptance
+  # criteria proposed with the OpenRTX microphone-chain change (AGC, high-pass,
+  # DC-block priming; docs/emulator-mic-campaign.md), not a standard. They
+  # document the target: today's fixed-gain chain is expected to fail some.
+  limits:
+    max_pre_onset_peak_dbfs: -30      # key-up transient, first 100 ms
+    max_pre_speech_spread_db: 6       # active level over the speech sweep
+    max_pre_clip_percent: 0           # samples at int16 full scale
+    max_stoi_deficit: 0.02            # against the ideal codec-only reference
+    max_pre_step_rise_db: 6           # output step for a +20 dB input step
+    max_pre_attack_s: 1.0             # to within 2 dB after the step up
+    max_pre_overshoot_db: 6           # above the settled level after it
+    max_pre_pause_drift_db: 3         # noise pumped up within a pause

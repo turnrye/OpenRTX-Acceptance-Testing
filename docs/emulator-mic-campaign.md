@@ -6,11 +6,18 @@ SPDX-License-Identifier: GPL-3.0-or-later
 
 # M17 microphone chain on the emulator: methods
 
-`scripts/emu-mic-campaign.py` measures what OpenRTX's M17 transmit audio chain does to a
-microphone signal, for a set of firmware variants that differ only in C defines, against the same
-test signals. It runs on the OpenRTX Linux emulator, not on a radio: it is evidence for a change
-to the firmware's signal processing, to be confirmed on a bench (`acceptance/m17/tx.robot`) for
-everything the emulator cannot model.
+`acceptance/m17/mic-chain.robot` measures what OpenRTX's M17 transmit audio chain does to a
+microphone signal, on the **emulator bench** (`bench/emulator.yaml`): instead of a radio and SDRs,
+an OpenRTX Linux emulator build of the firmware under test, with a chosen radio's microphone chain
+modelled in front of it. Each run is one firmware variant (a set of C defines) for one radio
+model; `scripts/emu-mic-campaign.py` runs the suite once per variant and compares them. It is
+evidence for a change to the firmware's signal processing, to be confirmed on a real bench
+(`acceptance/m17/tx.robot`) for everything the emulator cannot model.
+
+The emulator bench is a bench like `bench/sim.yaml`: it stands in for hardware, and its runs are
+ordinary Robot runs with `measurements.json`, published under `results/` like any other. They
+are told apart from radio measurements by their station, `emulator`, their hardware, which always
+starts "emulated", and their calibration method, `model`.
 
 ## The bench
 
@@ -26,17 +33,17 @@ openrtx_linux: encodeFunc ─► samples codec2 encodes ─► precodec.raw (tap
 
 1. **Signal.** Each test signal is a recipe (a JSON object in `run.json`): a tone, a speech file at
    a peak level, a level step or a gate pattern. `oat.emu_campaign.synth` turns it into floats at
-   the ADC's sample rate (8 kHz times the profile's oversampling: 48 kHz for the CS7000-PLUS),
+   the ADC's sample rate (8 kHz times the radio's oversampling: 48 kHz for the CS7000-PLUS),
    where 1.0 is the ADC's half range, and appends 0.5 s of silence.
 2. **ADC model** (`oat.emu.adc_quantize`). The floats are multiplied by the half range (2048 codes
-   for a 12-bit converter), white Gaussian noise of the profile's RMS in LSB is added (2 LSB by
-   default, seeded), and the result is rounded, offset to mid-scale (2048) and clipped to the
-   converter's range (0 to 4095). These are the int16 samples the firmware's `encodeFunc` would
+   for a 12-bit converter), white Gaussian noise of the radio's RMS in LSB is added (seeded), and
+   the result is rounded, offset to mid-scale (2048) and clipped to the converter's range (0 to
+   4095); without a bias, as for 16-bit signed sources, it is clipped around zero. These are the int16 samples the firmware's `encodeFunc` would
    read from the ADC's DMA buffer.
 3. **Firmware.** `openrtx_linux` is built per variant with meson (`-Dsystem_codec2=false`, so the
-   firmware's own codec2), with `-Dc_args=` set to the profile's `CONFIG_MIC_GAIN` and
+   firmware's own codec2), with `-Dc_args=` set to the radio's `CONFIG_MIC_GAIN` and
    `CONFIG_MIC_OVERSAMPLE` plus the variant's defines, each in its own build directory
-   (`build_emu_<profile>_<variant>`). The emulator reads the microphone from `OPENRTX_MIC_FILE`
+   (`build_emu_<radio file>_<variant>`). The emulator reads the microphone from `OPENRTX_MIC_FILE`
    (raw s16le at the stream's rate, from the start of the file at every key-up, silence after it
    ends) and writes the M17 modulator's output to `OPENRTX_M17_TX_BASEBAND`. A fresh emulator,
    with its own state directory and no display or audio device, is driven from its shell: switch
@@ -70,6 +77,19 @@ step test therefore keys its signal twice in one session (`--step-overs 2`) and 
 the first is the cold start, the second the steady-state case, starting from the gain the first
 left behind.
 
+### The radio's mic chain model
+
+Each radio file that can be emulated has a `mic_chain` section: the firmware's `CONFIG_MIC_*`
+values (oversampling, gain), the ADC (bits, a bias at mid-scale or none, noise in LSB RMS), each
+with its `sources` (the `hwconfig.h` in the OpenRTX tree for the firmware values; "assumed until
+bench-measured" for noise and bias), and the suite's `limits`. Files: `cs7000p` (6, 32),
+`cs7000` (8, 32), `mduv3x0` (8, 32), `md3x0` (8, 32), `mod17` (1, 12), `c62` (1, 13; its CSK6
+codec decimates before the firmware sees the audio, so the model is approximate), and
+`emulator-bare`: no model at all, the Linux build's defaults (oversampling 1, gain 1) fed clean
+signed 16-bit samples with no bias or noise, to measure the firmware's DSP on clean input.
+`calibration/emulator.yaml` (method `model`) stands for the calibration: the emulator has no RF
+or audio paths, and the model it relies on is the radio file's.
+
 ### What the ADC model assumes
 
 - No analog front end: no microphone, preamp, filter or ADC frequency response. The ADC sees the
@@ -86,7 +106,7 @@ left behind.
 ## Variants
 
 A variant is a name and a list of C defines (`VARIANTS` in `src/oat/emu_campaign.py`), added to
-the profile's c_args. The firmware branch defines what each does:
+the radio's c_args. The firmware branch defines what each does:
 
 | Variant | Defines | Change |
 |---|---|---|
@@ -135,7 +155,7 @@ The key-up onset is read from the speech takes.
 - **Pink noise** (`emu_campaign.colored_noise`): seeded Gaussian noise shaped to 1/f power.
 
 The microphone inputs are not stored. Each is regenerated bit for bit from its recipe in
-`run.json`, the ADC noise seed (17), the seeds in the recipe, the profile and, for speech, the
+`run.json`, the ADC noise seed (17), the seeds in the recipe, the radio's model and, for speech, the
 source file (`emu_campaign.mic_input`). Each take's `take.json` records the SHA-256 of the exact
 samples sent, so a regenerated input can be checked against it. `--keep-raw` keeps each take's
 `mic.raw` and the emulator's `tx.raw`.
@@ -147,7 +167,7 @@ ceiling of its own. Every firmware result is therefore read against the same inp
 through codec2 (the system's `c2enc` and `c2dec`, 3200 mode), so that the firmware's own effect is
 the difference:
 
-- **codec-only (nominal)**: the same ADC samples through an ideal linear chain at the profile's
+- **codec-only (nominal)**: the same ADC samples through an ideal linear chain at the radio's
   fixed gain (bias removed, decimated with a proper anti-alias filter, multiplied by the gain,
   clipped at full scale), then codec2. What a perfect implementation of today's fixed-gain chain
   would give. Every test has it.
@@ -179,7 +199,7 @@ codec-only references, the pre-codec stream is the int16 signal handed to `c2enc
 - **Floor**: the 10th percentile of the 20 ms frame levels.
 - **Pre-codec clip** (`pre_clip_fraction`): the fraction of the samples codec2 receives that sit
   at int16 full scale (|x| ≥ 32767), measured at the tap, over the measured span (speech: the
-  whole over including the onset; tones: the steady window; step and gate: the aligned signal).
+  over after its first 100 ms, which the onset figures cover; tones: the steady window; step and gate: the aligned signal).
   `model_clip_fraction` is the earlier model of the integer chain applied to the input
   (`emu.chain_clip_fraction`: average each block of oversampled codes, remove the mean, multiply
   by the gain, count the magnitudes at full scale), kept as a cross-check for baseline, prime_dc
@@ -213,71 +233,105 @@ codec-only references, the pre-codec stream is the int16 signal handed to `c2enc
   pause goes on), averaged over the pauses, with the worst one; **trend** is the last pause's level
   minus the first's.
 
+## Limits of the suite
+
+The suite checks each test against the radio file's `mic_chain.limits`, all before codec2 except
+the STOI deficit. They are the target of the microphone-chain change, not a standard, and
+today's fixed-gain chain is expected to miss some:
+
+| Test | Figure | Limit |
+|---|---|---|
+| Static Level Curve | pre-codec clip, worst tone | 0 % |
+| Speech Level Sweep | pre-codec active level spread over the sweep | 6 dB |
+| | pre-codec clip after the first 100 ms, worst take | 0 % |
+| | STOI deficit against the ideal reference | 0.02 |
+| Key-up Onset | pre-codec peak in the first 100 ms, worst take | -30 dBFS |
+| AGC Step Response | pre-codec rise for the +20 dB step (second over) | 6 dB |
+| | attack | 1 s |
+| | overshoot | 6 dB |
+| Silence Gate | pre-codec pause drift, worst pause | 3 dB |
+
+Each test also records every take (`mic-take`, shown by `python -m oat.compare --all`) and its
+figures (`mic-chain`).
+
 ## Running it
 
 Once, the speech files:
 
 ```sh
 uv sync
-mkdir -p ~/speech-osr && cd ~/speech-osr
+mkdir -p "$SPEECH_DIR" && cd "$SPEECH_DIR"
 for n in 0010 0011 0030 0031; do
   curl -O "https://www.voiptroubleshooter.com/open_speech/american/OSR_us_000_${n}_8k.wav"
 done
 ```
 
 `c2enc` and `c2dec` (the `codec2` package), meson, ninja and OpenRTX's Linux build dependencies
-must be installed.
+must be installed. The tester's paths (the OpenRTX checkout, a build root, the speech directory,
+the take cache) go in a local copy of the bench, `bench/emulator.local.yaml`, or on the command
+line; they never reach the results.
 
-The campaign, from this repository:
+One variant on one radio model, from this repository (`FIRMWARE` is `<variant>@<OpenRTX
+commit>`, and must match the checkout):
 
 ```sh
-uv run python scripts/emu-mic-campaign.py --openrtx ~/OpenRTX --profile cs7000p \
-    --variants baseline prime_dc keep_sum hpf agc full agc_slow agc_mid \
-    --speech-dir ~/speech-osr --out runs/mic-campaign
+uv run robot -A bench/emulator.args -v RADIO:radios/cs7000p.yaml \
+    -v VARIANT:baseline -v FIRMWARE:baseline@$(git -C "$OPENRTX" rev-parse --short=9 HEAD) \
+    -v OPENRTX:"$OPENRTX" -v SPEECH_DIR:"$SPEECH_DIR" \
+    -d runs/mic-cs7000p-baseline acceptance/m17/mic-chain.robot
 ```
 
-- `--tests tones speech step gate` selects tests; `--speech-levels`, `--tone-levels`,
-  `--tone-freqs`, `--step SECONDS:DBFS ...`, `--step-overs`, `--gate-noise`, `--gate-peak` and
-  `--seconds` change the signals, `--noise-lsb` the ADC noise.
-- `--build-root DIR` puts the build directories somewhere other than the OpenRTX checkout;
-  `--binary VARIANT=PATH` uses a prebuilt `openrtx_linux` for a variant (its SHA-256 is still
-  recorded, but not its source).
-- `--jobs` sets how many emulators run at once (default 6). Each runs in real time, so a campaign
-  takes the sum of the signals' lengths plus about 4 s per take, divided by the jobs: roughly
-  2 minutes per variant at 6 jobs.
-- A take is skipped when its directory already holds a decoded take for the same binary SHA-256,
-  input SHA-256 and number of overs (and its tap, when the firmware wrote one), so an interrupted campaign resumes, and adding a variant or a
-  level runs only the new takes. Rebuilt firmware changes the binary and reruns its takes.
+- `-v RADIO:radios/emulator-bare.yaml` runs the bare emulator instead.
+- Suite variables make smaller runs: `TONE_FREQS`, `TONE_LEVELS`, `SPEECH_FILES`,
+  `SPEECH_LEVELS`, `SPEECH_SECONDS`, `STEP`, `STEP_OVERS`, `GATE_NOISE`; `-t` picks tests.
+- `BUILD_ROOT` puts the build directories somewhere other than the checkout; `TAKES` sets the
+  take cache (default `runs/emulator-takes/<radio file>`), `REUSE_TAKES` lists other caches to
+  reuse (comma separated); `JOBS` sets how many emulators run at once (default 6). Each runs in
+  real time: a full run is about 2 minutes of emulator time per job slot per variant.
+- A take is reused when a cache holds a decoded take for the same binary SHA-256, input SHA-256
+  and number of overs (and its tap, when the firmware wrote one), so an interrupted run resumes
+  and a rerun costs nothing. Rebuilt firmware changes the binary and reruns its takes.
+
+Every variant, then a report comparing them (each variant is an ordinary run in
+`runs/<variant>/` under `--out`):
+
+```sh
+uv run python scripts/emu-mic-campaign.py --radio radios/cs7000p.yaml --openrtx "$OPENRTX" \
+    --speech-dir "$SPEECH_DIR" --variants baseline prime_dc keep_sum hpf agc full \
+    --out runs/mic-cs7000p
+uv run python -m oat.compare runs/mic-cs7000p/runs/baseline runs/mic-cs7000p/runs/agc
+scripts/export-run.sh runs/mic-cs7000p/runs/agc
+```
+
+`--var NAME:VALUE` passes suite variables, `--test` picks tests, `--reuse-takes` adds caches and
+`--report-only` rebuilds the comparison from runs already made.
 
 ## Output
 
+Each run writes, next to Robot's `output.xml` and in its `bench-Mic-Chain/` folder:
+
 ```
+measurements.json  every take (mic-take), each test's figures (mic-chain) and limit checks,
+                   with the emulator's provenance: variant, defines, OpenRTX commit, build,
+                   binary SHA-256, the radio's mic chain model and its sources
 run.json        provenance: OpenRTX sha, describe, branch; this repository's describe;
-                tool versions; profile; variants with their defines and binary SHA-256;
-                every signal recipe; speech file SHA-256; dates; the command
+                tool versions; the model; the variant with its defines and binary SHA-256;
+                every signal recipe; speech file SHA-256; dates
 openrtx.patch   the uncommitted OpenRTX changes, when the checkout was dirty
-REPORT.md       headline metrics and tables per test, each variant against baseline
-METHODS.md      this document, and the run's command
+REPORT.md       headline figures and tables per test
+METHODS.md      this document
 data/           tones.csv, speech.csv, step.csv, gate.csv: one row per take and over
-                (variant, profile, test, signal, level, metrics); envelopes.csv; headline.csv
+                (variant, profile, test, signal, level, metrics), envelopes.csv,
+                headline.csv, rows.json (the same rows, for the campaign's comparison)
 charts/         PNG and SVG: level-tones(-precodec), level-speech(-precodec), stoi,
                 envelope-step(-precodec), envelope-gate(-precodec), onset, gate
-takes/<variant>/<take>/
-                take.json (recipe, binary and input SHA-256, frames, LSF CRC),
-                voice.wav (decoded first over), voice-2.wav (second over, step test),
-                precodec.wav, precodec-2.wav (the tap, 8 kHz int16, per over)
 ```
 
-`run.json` names files without their directories, and the command has the home directory as `~`.
-
-## Why a script and not a Robot suite
-
-The suites in `acceptance/` are procedures for a radio on a bench: each run names the unit, the
-bench and its calibration, and its results go to `results/` as evidence about that radio. A
-campaign on the emulator has none of those: it compares firmware variants on a model, needs
-builds, many parallel takes and charts, and its evidence is the campaign directory, attached to the
-change it supports. The bench measurements it cannot replace (the Codec2 input level, the key-up
-transient, speech deviation) stay in `m17/tx.robot`.
+`scripts/export-run.sh` publishes all of it under `results/<OpenRTX sha>/<radio file>/
+<time>-emulator-Mic-Chain/`. The takes stay in the tester's cache, `<cache>/<variant>/<take>/`:
+`take.json` (recipe, binary and input SHA-256, frames, LSF CRC), `voice.wav` and `voice-2.wav`
+(decoded overs), `precodec.wav` and `precodec-2.wav` (the tap). They are regenerated exactly from
+the recipes, seeds and firmware recorded in the run, so they are not published.
 
 ## Limits
 
@@ -289,7 +343,9 @@ transient, speech deviation) stay in `m17/tx.robot`.
   user is), and for the analog response.
 - Every take is the first transmission after boot, except the step test's second over.
 - The pre-codec tap needs the experiment branch's Linux tap; on firmware without it the `pre_`
-  metrics are simply absent. The split between overs is by frame count, exact to a block or so.
+  metrics are simply absent. The encoder runs for as long as each key-up and a few hundred
+  milliseconds less than the input, so a session's tap is cut into overs where the input's level
+  pattern matches (block energies cross-correlated), not by frame count.
 - STOI models intelligibility under noise and distortion; it is not tuned to vocoders. Read small
   differences (under about 0.01) as no difference, and listen to the `voice.wav` files.
 - Each take is one boot and one realisation of the noise; differences smaller than the spread

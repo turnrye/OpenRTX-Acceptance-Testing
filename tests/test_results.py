@@ -212,3 +212,40 @@ def test_a_rerun_of_another_suite_is_refused(two_suite_run, tmp_path):
 def test_checked_in_results_are_clean():
     for output in sorted((ROOT / "results").rglob("output.xml")):
         check_run(output.parent)
+
+
+def test_export_takes_an_emulator_runs_artifacts(selftest_run, tmp_path):
+    run = tmp_path / "emulated"
+    shutil.copytree(selftest_run, run)
+    path, = run.glob("bench-*/measurements.json")
+    m = json.loads(path.read_text())
+    path.write_text(json.dumps({**m, "firmware": "agc@7f9b6c2ad",
+                                "station": "emulator"}))
+    bench = path.parent
+    (bench / "data").mkdir()
+    (bench / "data" / "speech.csv").write_text("variant,level\nagc,-20\n")
+    (bench / "charts").mkdir()
+    (bench / "charts" / "stoi.svg").write_text(
+        '<svg xmlns:xlink="http://www.w3.org/1999/xlink"></svg>')
+    (bench / "METHODS.md").write_text("# Methods\n")
+    done = subprocess.run(["bash", str(EXPORT), str(run), str(tmp_path / "results")],
+                          capture_output=True, text=True, cwd=ROOT)
+    assert done.returncode == 0, done.stderr
+    folder = Path(done.stdout.strip())
+    assert folder.parts[-3] == "7f9b6c2ad"
+    assert "-emulator-" in folder.name
+    assert (folder / "data" / "speech.csv").exists()
+    assert (folder / "charts" / "stoi.svg").exists()
+    assert (folder / "METHODS.md").exists()
+
+
+def test_export_refuses_a_private_path_in_an_artifact(selftest_run, tmp_path):
+    run = tmp_path / "leaky"
+    shutil.copytree(selftest_run, run)
+    bench, = run.glob("bench-*")
+    (bench / "data").mkdir()
+    (bench / "data" / "x.csv").write_text("path\n/home/someone/speech.wav\n")
+    done = subprocess.run(["bash", str(EXPORT), str(run), str(tmp_path / "results")],
+                          capture_output=True, text=True, cwd=ROOT)
+    assert done.returncode != 0
+    assert "absolute paths" in done.stderr

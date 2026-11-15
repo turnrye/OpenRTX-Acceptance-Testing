@@ -26,6 +26,11 @@ grow into a compliance report: measurements against the regulatory limits, per r
   simulated receiver and transmitter share a clock, so a loopback through the bench can be timed
   as on real hardware. A LibreVNA, through LibreVNA-GUI's SCPI server, measures the bench itself
   (`oat.calibrate`).
+- **The emulator bench** (`emu.py`, `emu_campaign.py`, `emu_bench.py`) stands in for a radio
+  with an OpenRTX Linux emulator build of the firmware under test, a radio file's model of its
+  microphone chain in front of it, for suites tagged `needs:emulator`
+  (`acceptance/m17/mic-chain.robot`). Its runs are published like a bench's, under station
+  `emulator`.
 - **Audio** (`audio.py`) drives a USB sound interface on the radio's accessory connector through
   ALSA's tools, and measures level, SINAD, THD+N, response and dropouts, on the speaker or on the
   audio demodulated from a transmission. A simulated interface and radio stand in for it.
@@ -81,7 +86,8 @@ grow into a compliance report: measurements against the regulatory limits, per r
   calibration, not an assumed one; relative tests such as deviation, bandwidth and the power
   steps do not.
 - Tests that need the audio interface are tagged `needs:audio`, and those that need absolute
-  levels `needs:abs-level`, so a bench without them excludes them.
+  levels `needs:abs-level`, so a bench without them excludes them; those that run only on the
+  emulator bench are tagged `needs:emulator`.
 - Every run names the firmware, the unit and, for radios with a separately flashed DSP, the DSP
   image, so runs of different firmware states can't be confused.
 - Suites tag their tests `tx`, `rx` and `manual`, so a run can pick what the bench can do, and

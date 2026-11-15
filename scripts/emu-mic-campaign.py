@@ -3,284 +3,141 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 """
-Run an M17 microphone-chain campaign on the OpenRTX emulator: build each
-firmware variant, send every test signal through it, score the decoded audio
-and write data, charts, REPORT.md and METHODS.md into one directory.
+Run the M17 microphone-chain campaign: acceptance/m17/mic-chain.robot on the
+emulator bench once per firmware variant, for one radio's mic chain model,
+then a report comparing every variant with the baseline.
 
-    uv run python scripts/emu-mic-campaign.py --openrtx ~/workspace/OpenRTX \\
-        --profile cs7000p --variants baseline prime_dc keep_sum hpf agc full \\
-        --speech-dir speech-osr --out runs/mic-campaign
+    uv run python scripts/emu-mic-campaign.py --radio radios/cs7000p.yaml \\
+        --openrtx "$OPENRTX" --speech-dir "$SPEECH_DIR" \\
+        --variants baseline prime_dc keep_sum hpf agc full --out runs/mic-cs7000p
 
-Takes already in --out for the same binary and input are reused, so an
-interrupted or extended campaign reruns only what is missing. The method is
+Each variant is an ordinary Robot run in <out>/runs/<variant>/ (output.xml,
+bench-Mic-Chain/ with measurements.json, tables, charts), to compare with
+python -m oat.compare and publish with scripts/export-run.sh. Takes already
+in the take cache for the same binary and input are reused. The method is
 docs/emulator-mic-campaign.md.
 """
 
 import argparse
-import dataclasses
-import datetime as dt
-import importlib.metadata
 import json
-import platform
-import shlex
-import shutil
 import subprocess
 import sys
-import threading
-from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-import numpy as np
-
-from oat import emu
 from oat import emu_campaign as camp
 from oat import emu_report
+from oat.sanitize import scrub
 
 REPO = Path(__file__).resolve().parents[1]
-SPEECH = ["OSR_us_000_0010_8k.wav", "OSR_us_000_0011_8k.wav",
-          "OSR_us_000_0030_8k.wav", "OSR_us_000_0031_8k.wav"]
+SUITE = REPO / "acceptance" / "m17" / "mic-chain.robot"
 
 
-def parse_segments(text: list[str]) -> list[tuple[float, float]]:
-    """'3:-30 3:-10 6:-30' -> [(3, -30), (3, -10), (6, -30)]."""
-    return [(float(s.split(":")[0]), float(s.split(":")[1])) for s in text]
+def short_sha(repo: Path) -> str:
+    return subprocess.run(["git", "-C", str(repo), "rev-parse", "--short=9", "HEAD"],
+                          check=True, capture_output=True, text=True).stdout.strip()
 
 
-def recipes(a, speech_dir: Path) -> dict[str, list[dict]]:
-    out: dict[str, list[dict]] = {}
-    if "tones" in a.tests:
-        out["tones"] = [camp.tone_recipe(f, lv, a.tone_seconds)
-                        for f in a.tone_freqs for lv in a.tone_levels]
-    files = [speech_dir / s for s in a.speech]
-    if "speech" in a.tests:
-        out["speech"] = [camp.speech_recipe(f, lv, a.seconds)
-                         for f in files for lv in a.speech_levels]
-    if "step" in a.tests:
-        out["step"] = [camp.step_recipe(parse_segments(a.step))]
-    if "gate" in a.tests:
-        out["gate"] = [camp.gate_recipe(files[0], nl, a.gate_peak)
-                       for nl in a.gate_noise]
-    return out
+def robot_command(a, variant: str, firmware: str, out: Path) -> list[str]:
+    cmd = [sys.executable, "-m", "robot", "-A", str(REPO / "bench" / "emulator.args"),
+           "-v", f"BENCH:{a.bench}", "-v", f"RADIO:{a.radio}",
+           "-v", f"VARIANT:{variant}", "-v", f"FIRMWARE:{firmware}",
+           "-v", f"OPENRTX:{a.openrtx}", "-d", str(out)]
+    for name, value in (("BUILD_ROOT", a.build_root), ("SPEECH_DIR", a.speech_dir),
+                        ("TAKES", a.takes),
+                        ("REUSE_TAKES", ",".join(map(str, a.reuse_takes))),
+                        ("JOBS", a.jobs)):
+        if value:
+            cmd += ["-v", f"{name}:{value}"]
+    for v in a.var:
+        cmd += ["-v", v]
+    for t in a.test:
+        cmd += ["-t", t]
+    return [*cmd, str(SUITE)]
 
 
-def level_of(r: dict):
-    if r["kind"] in ("tone", "speech"):
-        return r["peak_dbfs"]
-    if r["kind"] == "gate":
-        return r["noise_dbfs"]
-    return None
-
-
-def tool_versions() -> dict:
-    v = {"python": platform.python_version()}
-    for p in ("numpy", "scipy", "pystoi", "matplotlib"):
-        try:
-            v[p] = importlib.metadata.version(p)
-        except importlib.metadata.PackageNotFoundError:
-            pass
-    for tool in ("c2enc", "c2dec", "meson", "cc"):
-        path = shutil.which(tool)
-        if not path:
+def cross_report(out: Path, variants: list[str]) -> Path:
+    """REPORT.md, tables and charts of every variant's run, side by side."""
+    rows, envs, runs = [], [], {}
+    for v in variants:
+        bench = next((out / "runs" / v).glob("bench-*"), None)
+        if bench is None or not (bench / "data" / "rows.json").exists():
+            print(f"{v}: no tables, left out of the report", file=sys.stderr)
             continue
-        v[tool] = Path(path).name
-        if tool in ("meson", "cc"):
-            r = subprocess.run([path, "--version"], capture_output=True, text=True)
-            v[tool] = r.stdout.splitlines()[0] if r.stdout else ""
-    q = subprocess.run(["dpkg-query", "-W", "-f=${Version}", "codec2"],
-                       capture_output=True, text=True) if shutil.which("dpkg-query") else None
-    if q is not None and q.returncode == 0:
-        v["codec2_package"] = q.stdout.strip()
-    return v
-
-
-def oat_provenance() -> dict:
-    def git(*args):
-        return subprocess.run(["git", "-C", str(REPO), *args], capture_output=True,
-                              text=True).stdout.strip()
-    return {"commit": git("rev-parse", "HEAD"),
-            "describe": git("describe", "--always", "--dirty", "--tags")}
-
-
-def home_relative(text: str) -> str:
-    return text.replace(str(Path.home()), "~")
+        r, e = camp.read_tables(bench / "data")
+        seen = {x["variant"] for x in rows}
+        rows += [x for x in r if x["variant"] == v or x["variant"] not in seen]
+        envs += [x for x in e if x["variant"] == v or x["variant"] not in seen]
+        runs[v] = json.loads((bench / "run.json").read_text())
+    done = [v for v in variants if v in runs]
+    if not done:
+        raise SystemExit("no variant produced tables")
+    meta = {**runs[done[0]],
+            "variants": {v: {"defines": runs[v]["defines"],
+                             "binary_sha256": runs[v]["binary_sha256"],
+                             "firmware": runs[v]["firmware"]} for v in done},
+            "started": min(runs[v]["started"] for v in done),
+            "finished": max(runs[v]["finished"] for v in done),
+            "runs": {v: f"runs/{v}" for v in done}}
+    for k in ("variant", "defines", "c_args", "float_chain", "binary_sha256",
+              "build_dir", "firmware"):
+        meta.pop(k, None)
+    camp.write_tables(out / "data", rows, envs)
+    emu_report.write_csv(out / "data" / "headline.csv", emu_report.headline(rows, done))
+    (out / "run.json").write_text(scrub(json.dumps(meta, indent=2)) + "\n")
+    ch = emu_report.charts(rows, envs, done, out / "charts")
+    (out / "REPORT.md").write_text(scrub(emu_report.report(meta, rows, done, ch)) + "\n")
+    (out / "METHODS.md").write_text(scrub((REPO / "docs" / "emulator-mic-campaign.md")
+                                          .read_text()))
+    return out / "REPORT.md"
 
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("--radio", type=Path, required=True,
+                    help="radio file whose mic_chain model goes in front of the "
+                         "emulator (radios/emulator-bare.yaml for none)")
     ap.add_argument("--openrtx", type=Path, required=True, help="OpenRTX checkout")
-    ap.add_argument("--profile", default="cs7000p", choices=emu.PROFILES)
-    ap.add_argument("--noise-lsb", type=float, default=2.0,
-                    help="ADC noise, LSB RMS (default 2)")
     ap.add_argument("--variants", nargs="+", default=list(camp.VARIANTS),
                     choices=camp.VARIANTS)
-    ap.add_argument("--tests", nargs="+", default=list(camp.TESTS), choices=camp.TESTS)
-    ap.add_argument("--build-root", type=Path, default=None,
-                    help="where build_emu_<profile>_<variant> go (default: --openrtx)")
-    ap.add_argument("--binary", action="append", default=[], metavar="VARIANT=PATH",
-                    help="use a prebuilt openrtx_linux for a variant instead of building")
-    ap.add_argument("--speech-dir", type=Path, default=None,
-                    help="directory holding the Open Speech Repository files")
-    ap.add_argument("--speech", nargs="+", default=SPEECH)
-    ap.add_argument("--seconds", type=float, default=12.0, help="speech length")
-    ap.add_argument("--speech-levels", type=float, nargs="+",
-                    default=[-40, -30, -20, -12, -6, -1])
-    ap.add_argument("--tone-freqs", type=float, nargs="+", default=[1000, 400])
-    ap.add_argument("--tone-levels", type=float, nargs="+",
-                    default=[float(x) for x in range(-50, 1, 3)] + [0.0])
-    ap.add_argument("--tone-seconds", type=float, default=2.0)
-    ap.add_argument("--step", nargs="+", default=["3:-30", "3:-10", "6:-30"],
-                    metavar="SECONDS:DBFS")
-    ap.add_argument("--step-overs", type=int, default=2,
-                    help="key-ups of the step signal in one emulator session")
-    ap.add_argument("--gate-noise", type=float, nargs="+", default=[-55, -40],
-                    help="noise bed RMS levels, dBFS of ADC range")
-    ap.add_argument("--gate-peak", type=float, default=-12.0)
-    ap.add_argument("--jobs", type=int, default=6)
-    ap.add_argument("--keep-raw", action="store_true",
-                    help="keep each take's mic.raw and tx.raw")
     ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("--bench", type=Path, default=Path("bench/emulator.yaml"),
+                    help="the emulator bench file, or a local copy holding the paths")
+    ap.add_argument("--build-root", type=Path, default=None)
+    ap.add_argument("--speech-dir", type=Path, default=None)
+    ap.add_argument("--takes", type=Path, default=None,
+                    help="take cache (default <out>/takes)")
+    ap.add_argument("--reuse-takes", type=Path, nargs="*", default=[],
+                    help="other take caches to reuse, such as an earlier campaign's takes/")
+    ap.add_argument("--jobs", type=int, default=None)
+    ap.add_argument("--var", action="append", default=[], metavar="NAME:VALUE",
+                    help="a suite variable, such as 'SPEECH_LEVELS:-20 -6'")
+    ap.add_argument("--test", action="append", default=[],
+                    help="run only this test (Robot -t), repeatable")
+    ap.add_argument("--report-only", action="store_true",
+                    help="only rebuild the cross-variant report from the runs in --out")
     a = ap.parse_args()
-    a.tone_levels = sorted(set(a.tone_levels))
-    if {"speech", "gate"} & set(a.tests) and a.speech_dir is None:
-        ap.error("--speech-dir is needed for the speech and gate tests")
+    a.openrtx = a.openrtx.expanduser().resolve()
+    a.out = a.out.expanduser().resolve()
+    a.takes = (a.takes or a.out / "takes").expanduser().resolve()
+    a.radio = a.radio.resolve()
+    a.bench = a.bench if a.bench.is_absolute() else (REPO / a.bench).resolve()
+    for k in ("build_root", "speech_dir"):
+        if getattr(a, k):
+            setattr(a, k, getattr(a, k).expanduser().resolve())
+    a.reuse_takes = [p.expanduser().resolve() for p in a.reuse_takes]
 
-    started = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
-    profile = dataclasses.replace(emu.PROFILES[a.profile], noise_lsb=a.noise_lsb)
-    out = a.out
-    (out / "data").mkdir(parents=True, exist_ok=True)
-    openrtx = a.openrtx.resolve()
-    prov = emu.provenance(openrtx)
-    diff = prov.pop("diff")
-    if diff:
-        (out / "openrtx.patch").write_text(diff + "\n")
-    prov["patch"] = "openrtx.patch" if diff else None
-
-    # Build (or adopt) one binary per variant.
-    prebuilt = dict(b.split("=", 1) for b in a.binary)
-    build_root = (a.build_root or openrtx).resolve()
-    binaries, vmeta = {}, {}
-    for v in a.variants:
-        defines = camp.VARIANTS[v]
-        if v in prebuilt:
-            binary = Path(prebuilt[v]).resolve()
-            src = {"prebuilt": binary.parent.name}
-        else:
-            bdir = build_root / f"build_emu_{profile.name}_{v}"
-            print(f"building {v} in {bdir.name} ...", flush=True)
-            binary = emu.build(openrtx, bdir, profile, defines)
-            src = {"build_dir": bdir.name}
-        binaries[v] = (binary, emu.sha256(binary))
-        vmeta[v] = {"defines": list(defines), "c_args": " ".join([profile.c_args(), *defines]),
-                    **src, "binary_sha256": binaries[v][1],
-                    "float_chain": camp.float_chain(defines)}
-
-    speech_dir = a.speech_dir.resolve() if a.speech_dir else None
-    sig = recipes(a, speech_dir) if speech_dir else recipes(a, Path("."))
-
-    # Every emulator take, then every reference, in a thread pool.
-    lock = threading.Lock()
-    done = [0]
-    jobs = [(t, v, r) for t, rs in sig.items() for r in rs for v in a.variants]
-    total = len(jobs)
-
-    def emu_job(job):
-        t, v, r = job
-        mic = camp.mic_input(r, profile, speech_dir)
-        tid = camp.take_id(r)
-        overs = a.step_overs if t == "step" else 1
-        meta = camp.run_take(binaries[v][0], binaries[v][1], r, mic, profile,
-                             out / "takes" / v / tid, overs=overs, keep_raw=a.keep_raw)
-        with lock:
-            done[0] += 1
-            print(f"[{done[0]}/{total}] {v} {tid}"
-                  f"{' (cached)' if meta['cached'] else ''}"
-                  f"{' ERROR ' + meta['error'] if 'error' in meta else ''}", flush=True)
-        return job, meta
-
-    with ThreadPoolExecutor(a.jobs) as pool:
-        results = list(pool.map(emu_job, jobs))
-
-    def score_job(item):
-        (t, v, r), meta = item
-        tid = camp.take_id(r)
-        base = {"variant": v, "profile": profile.name, "test": t,
-                "signal": camp.signal_name(r), "level": level_of(r), "take": tid}
-        if "error" in meta:
-            return [{**base, "error": meta["error"]}], []
-        mic = camp.mic_input(r, profile, speech_dir)
-        clean = camp.clean_source(r, speech_dir)
-        rows, envs = [], []
-        for i in range(meta["overs_keyed"]):
-            vo = camp.read_voice(out / "takes" / v / tid, i)
-            pre = camp.read_voice(out / "takes" / v / tid, i, "precodec")
-            m, env = camp.score(r, vo, pre, mic, profile, clean)
-            if vmeta[v]["float_chain"]:
-                m["model_clip_fraction"] = None
-            rows.append({**base, "over": i + 1, **m, **meta["overs"][i]})
-            for name, (hop, e) in env.items():
-                envs.append({"variant": v, "test": name, "signal": base["signal"],
-                             "over": i + 1, "t_s": (np.arange(len(e)) + 0.5) * hop,
-                             "level_dbfs": e})
-        return rows, envs
-
-    def ref_job(item):
-        t, r = item
-        mic = camp.mic_input(r, profile, speech_dir)
-        clean = camp.clean_source(r, speech_dir)
-        rows, envs = [], []
-        for name, (pre, x) in camp.references(r, mic, profile, clean).items():
-            v = f"codec-only ({name})"
-            m, env = camp.score(r, x, pre, mic, profile, clean)
-            if name != "nominal":
-                m["model_clip_fraction"] = None
-            rows.append({"variant": v, "profile": profile.name, "test": t,
-                         "signal": camp.signal_name(r), "level": level_of(r),
-                         "take": camp.take_id(r), "over": 1, **m})
-            for en, (hop, e) in env.items():
-                envs.append({"variant": v, "test": en, "signal": camp.signal_name(r),
-                             "over": 1, "t_s": (np.arange(len(e)) + 0.5) * hop,
-                             "level_dbfs": e})
-        return rows, envs
-
-    print("scoring ...", flush=True)
-    with ThreadPoolExecutor(a.jobs) as pool:
-        scored = list(pool.map(score_job, results))
-        scored += list(pool.map(ref_job, [(t, r) for t, rs in sig.items() for r in rs]))
-    rows = [x for rs, _ in scored for x in rs]
-    envs = [x for _, es in scored for x in es]
-
-    for t in sig:
-        emu_report.write_csv(out / "data" / f"{t}.csv", [r for r in rows if r["test"] == t])
-    if envs:
-        emu_report.write_csv(out / "data" / "envelopes.csv", [
-            {"variant": e["variant"], "test": e["test"], "signal": e["signal"],
-             "over": e["over"], "t_s": float(t), "level_dbfs": float(l)}
-            for e in envs for t, l in zip(e["t_s"], e["level_dbfs"])])
-    hl = emu_report.headline(rows, a.variants)
-    emu_report.write_csv(out / "data" / "headline.csv", hl)
-
-    finished = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
-    meta = {
-        "started": started, "finished": finished,
-        "command": home_relative(shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]])),
-        "openrtx": prov, "oat": oat_provenance(), "tools": tool_versions(),
-        "profile": vars(profile), "variants": vmeta, "tests": list(sig),
-        "adc_seed": camp.ADC_SEED, "tail_s": camp.TAIL_S,
-        "speech_files": {s: emu.sha256(speech_dir / s) for s in a.speech} if speech_dir else {},
-        "signals": {t: [{"take": camp.take_id(r), **r} for r in rs] for t, rs in sig.items()},
-        "step_overs": a.step_overs,
-    }
-    (out / "run.json").write_text(json.dumps(meta, indent=2))
-
-    print("charts and report ...", flush=True)
-    ch = emu_report.charts(rows, envs, a.variants, out / "charts")
-    (out / "REPORT.md").write_text(emu_report.report(meta, rows, a.variants, ch) + "\n")
-    methods = (REPO / "docs" / "emulator-mic-campaign.md").read_text()
-    (out / "METHODS.md").write_text(
-        methods + f"\n## This run\n\n```sh\n{meta['command']}\n```\n\n"
-        f"OpenRTX `{prov['describe']}`, suite `{meta['oat']['describe']}`, "
-        f"started {started}.\n")
-    print(f"done: {out / 'REPORT.md'}")
+    if not a.report_only:
+        sha = short_sha(a.openrtx)
+        for v in a.variants:
+            cmd = robot_command(a, v, f"{v}@{sha}", a.out / "runs" / v)
+            print(f"=== {v}", flush=True)
+            rc = subprocess.run(cmd, cwd=REPO).returncode
+            # Robot exits with the number of failed tests: limits may fail
+            if rc > 250:
+                raise SystemExit(f"{v}: robot failed ({rc})")
+    report = cross_report(a.out, a.variants)
+    runs = " ".join(str(a.out / "runs" / v) for v in a.variants)
+    print(f"done: {report}\ncompare: uv run python -m oat.compare {runs}")
 
 
 if __name__ == "__main__":

@@ -26,6 +26,19 @@ number, `-v "HARDWARE:Retevis C62 2501R0621100413"`. The bench stays private: re
 instruments' serial numbers, its calibration values, absolute paths or raw captures. The script and
 CI check for absolute paths. The results website shows the rest (see the README).
 
+## Emulator runs
+
+Runs on the emulator bench (`acceptance/m17/mic-chain.robot`, docs/emulator-mic-campaign.md)
+are published the same way, as
+`results/<OpenRTX sha>/<radio file>/<yyyymmdd-hhmmss>-emulator-Mic-Chain/`. Their firmware is
+`<variant>@<OpenRTX sha>`, their station `emulator`, their hardware starts "emulated" and their
+calibration method is `model`, so an emulated CS7000-PLUS run sits beside, and is never taken
+for, a measurement of a CS7000-PLUS on a bench. Next to `output.xml` and `measurements.json`
+they keep the run's `REPORT.md`, `METHODS.md`, `run.json` (provenance, signal recipes and seeds),
+`openrtx.patch` when the checkout was dirty, `data/` (tidy CSV tables) and `charts/` (PNG and
+SVG), about 2 MB a run. The decoded audio of each take stays in the tester's take cache: it is
+regenerated exactly from the recipes, seeds and firmware the run records.
+
 ## Rules
 
 - **Append only.** A wrong result is superseded by a new run, never edited.

@@ -20,6 +20,7 @@ from scipy.io import wavfile
 
 from oat import aprs
 from oat import audio as audio_mod
+from oat import emu_bench
 from oat.analysis import demodulated_audio, measure_capture, to_analysis_rate
 from oat.calibration import load_calibration
 from oat.config import check_receiver_safe, load_yaml
@@ -165,6 +166,8 @@ class OpenRTXAcceptance:
         self.run_id = secrets.token_hex(2)
         self._aprs_sends = 0
         self._aprs_batches = 0
+        # The emulator bench's firmware build, when the bench is one
+        self.emulator = None
 
     # Bench --------------------------------------------------------------
 
@@ -193,6 +196,9 @@ class OpenRTXAcceptance:
                 "Pass " + " ".join(f"-v {m}:..." for m in missing)
                 + "; see bench/example.yaml and calibration/example.yaml")
         self.bench = load_yaml(Path(bench))
+        if emu_bench.is_emulator(self.bench):
+            raise ValueError(f"{bench} is the emulator bench: only suites tagged "
+                             "needs:emulator run on it (Open Emulator Bench)")
         self.dsp = str(dsp) if dsp else None
         self.calibration = load_calibration(Path(calibration))
         self.radio = load_yaml(Path(radio))
@@ -264,6 +270,8 @@ class OpenRTXAcceptance:
         Listener: when the tests change direction on a bench with separate
         instruments, ask for the attenuator chain to move first.
         """
+        if self.emulator is not None or emu_bench.is_emulator(self.bench or {}):
+            return
         need = chain_direction(data.tags)
         if need is None or self.operator is None or self._one_instrument():
             return
@@ -435,12 +443,204 @@ class OpenRTXAcceptance:
             "calibration": self.calibration.summary(),
             **({"audio_mixer": self.audio_mixer}
                if getattr(self, "audio_mixer", None) else {}),
+            **({"emulator": self.emulator.describe()}
+               if self.emulator is not None else {}),
             "records": self.records,
             **({"tnc_junk": self.tnc.junk} if self.tnc is not None else {}),
             "operator": self.operator.exchanges(),
         }
         text = scrub(json.dumps(report, indent=2, default=plain))
         (self.run_dir / "measurements.json").write_text(text + "\n")
+        if self.emulator is not None:
+            self.emulator.write_artifacts(self.run_dir, {
+                "suite": self.suite, "station": report["station"],
+                "radio_file": report["radio_file"], "firmware": self.firmware,
+                "hardware": self.hardware, "oat": {"describe": report["suite_commit"]}})
+
+    # Emulator bench -----------------------------------------------------
+
+    @keyword
+    def open_emulator_bench(self, bench: str, calibration: str, radio: str,
+                            firmware: str, variant: str, hardware: str = "",
+                            openrtx: str = "", build_root: str = "",
+                            speech_dir: str = "", takes: str = "",
+                            reuse_takes: str = "", jobs: str = ""):
+        """
+        Open the emulator bench: build the OpenRTX Linux emulator for the
+        radio file's mic_chain model (its CONFIG_MIC_* values) and the
+        variant's defines, ready to send test signals through its M17
+        microphone chain. `firmware` is <variant>@<OpenRTX commit>, checked
+        against the checkout. The paths are the tester's (a local bench
+        file's emulator section, or these arguments) and never reach the
+        results. `hardware` is optional and only appended: the unit is
+        always named as emulated.
+        """
+        missing = [n for n, v in (("BENCH", bench), ("CALIBRATION", calibration),
+                                  ("RADIO", radio), ("FIRMWARE", firmware),
+                                  ("VARIANT", variant)) if not v]
+        if missing:
+            raise ValueError("Pass " + " ".join(f"-v {m}:..." for m in missing)
+                             + "; see bench/emulator.yaml")
+        self.bench = load_yaml(Path(bench))
+        if not emu_bench.is_emulator(self.bench):
+            raise ValueError(f"{bench} is not an emulator bench (type: emulator)")
+        self.calibration = load_calibration(Path(calibration))
+        self.radio = load_yaml(Path(radio))
+        self.radio_file = Path(radio)
+        self.firmware = str(firmware)
+        self.hardware = ("emulated: OpenRTX Linux emulator (openrtx_linux) with "
+                         f"the {self.radio['name']} mic chain model"
+                         + (f", {hardware}" if hardware else ""))
+        self.operator = make_operator(self.bench.get("operator")
+                                      or {"type": "scripted"})
+        out = Path(BuiltIn().get_variable_value("${OUTPUT DIR}", "."))
+        self.suite = BuiltIn().get_variable_value("${SUITE NAME}", "suite")
+        self.output_dir = out
+        self.run_dir = out / f"bench-{self.suite.replace(' ', '_')}"
+        if self.run_dir.exists():
+            shutil.rmtree(self.run_dir)
+        self.run_dir.mkdir(parents=True)
+        self.started = datetime.datetime.now(datetime.timezone.utc)
+        self.emulator = emu_bench.EmulatorSession(
+            self.bench, self.radio, self.radio_file, self.firmware, variant,
+            openrtx=openrtx, build_root=build_root, speech_dir=speech_dir,
+            takes=takes, reuse_takes=reuse_takes, jobs=jobs)
+        e = self.emulator.describe()
+        cal = self.calibration.summary()
+        p = e["profile"]
+        for name, value in (
+                ("Firmware", self.firmware),
+                ("Radio", f"{self.radio['name']} ({self.radio_file.stem}), emulated"),
+                ("Hardware", self.hardware),
+                ("Station", self.bench.get("station", "emulator")),
+                ("Variant", f"{variant}: {' '.join(e['defines']) or 'no extra defines'}"),
+                ("OpenRTX", f"{e['openrtx']['describe']} ({e['openrtx']['branch']})"),
+                ("Mic chain model", f"oversample {p['oversample']}, gain {p['gain']}, "
+                                    f"{p['adc_bits']}-bit ADC, "
+                                    f"{'mid-scale bias' if p['bias'] else 'no bias'}, "
+                                    f"noise {p['noise_lsb']:g} LSB"),
+                ("Calibration", f"{cal['method']}, measured "
+                                f"{cal['measured']} ({cal['sha256']})"),
+                ("Suite commit", suite_commit())):
+            BuiltIn().set_suite_metadata(name, value, top=True)
+        if self.emulator.patch:
+            logger.warn("The OpenRTX checkout has uncommitted changes: the run "
+                        "keeps them as openrtx.patch")
+        logger.info(f"Built {e['build_dir']} ({e['c_args']}), results in "
+                    f"{self.run_dir}")
+
+    def _need_emulator(self) -> emu_bench.EmulatorSession:
+        if self.emulator is None:
+            raise RuntimeError("Open Emulator Bench first")
+        return self.emulator
+
+    @staticmethod
+    def _floats(values) -> list[float]:
+        if isinstance(values, str):
+            values = values.replace(",", " ").split()
+        return [float(v) for v in values]
+
+    def _mic_chain(self, test: str, recipes: list[dict], step_overs: int = 2) -> dict:
+        em = self._need_emulator()
+        em.measure(test, recipes, step_overs, progress=logger.console)
+        summary = em.summary(test)
+        mine = [r for r in em.rows if r["test"] == test]
+        for r in mine:
+            self._record("mic-take", **r)
+        self._record("mic-chain", what=test, **summary)
+        return summary
+
+    @keyword
+    def measure_static_level_curve(self, freqs="1000 400", levels="",
+                                   seconds: float = 2.0) -> dict:
+        """
+        Tones at each frequency and ADC peak level (dBFS of the ADC range;
+        default -50 to -2 in 3 dB steps and 0) through the emulator: output
+        and pre-codec RMS and clipping per take. Returns the worst clipping.
+        """
+        lv = self._floats(levels) if str(levels).strip() else None
+        recipes = emu_bench.camp.default_recipes(
+            ["tones"], None, [], tone_freqs=self._floats(freqs), tone_levels=lv,
+            tone_seconds=float(seconds))["tones"]
+        return self._mic_chain("tones", recipes)
+
+    @keyword
+    def measure_speech_level_sweep(self, files="", levels="-40 -30 -20 -12 -6 -1",
+                                   seconds: float = 12.0) -> dict:
+        """
+        Speech files (default the four Harvard-sentence recordings in
+        SPEECH_DIR) at each ADC peak level: active level, peak, onset,
+        clipping and STOI, before and after codec2, with the codec-only
+        references. Returns the level spread over the input range, the STOI
+        deficit against the ideal reference and the worst clipping.
+        """
+        em = self._need_emulator()
+        names = str(files).replace(",", " ").split() or emu_bench.SPEECH
+        recipes = emu_bench.camp.default_recipes(
+            ["speech"], em.speech_dir, names, seconds=float(seconds),
+            speech_levels=self._floats(levels))["speech"]
+        return self._mic_chain("speech", recipes)
+
+    @keyword("Measure Key-up Onset")
+    def measure_key_up_onset(self, files="", levels="-40 -30 -20 -12 -6 -1",
+                             seconds: float = 12.0) -> dict:
+        """
+        The key-up transient: the peak of the first 100 ms of every speech
+        take, before and after codec2. Uses the speech sweep's takes, running
+        them first when this run hasn't.
+        """
+        em = self._need_emulator()
+        if not em.measured("speech"):
+            self.measure_speech_level_sweep(files, levels, seconds)
+        summary = em.summary("onset")
+        self._record("mic-chain", what="onset", **summary)
+        return summary
+
+    @keyword
+    def measure_agc_step_response(self, segments="3:-30 3:-10 6:-30",
+                                  overs: int = 2) -> dict:
+        """
+        A sustained vowel stepping in level (seconds:dBFS segments), keyed
+        `overs` times in one emulator session: attack, overshoot, release
+        and the size of the output step, from the envelope before and after
+        codec2. Returns the figures of the last over (steady state).
+        """
+        segs = [tuple(float(x) for x in s.split(":"))
+                for s in str(segments).replace(",", " ").split()]
+        recipes = emu_bench.camp.default_recipes(["step"], None, [], step=segs)["step"]
+        return self._mic_chain("step", recipes, step_overs=int(overs))
+
+    @keyword
+    def measure_silence_gate(self, noise_levels="-55 -40", peak: float = -12.0) -> dict:
+        """
+        Speech bursts and pauses over a pink noise bed at each level (dBFS
+        RMS of the ADC range): the level in the pauses, its drift within a
+        pause (noise pumping) and the speech-to-pause ratio.
+        """
+        em = self._need_emulator()
+        recipes = emu_bench.camp.default_recipes(
+            ["gate"], em.speech_dir, emu_bench.SPEECH[:1],
+            gate_noise=self._floats(noise_levels), gate_peak=float(peak))["gate"]
+        return self._mic_chain("gate", recipes)
+
+    @keyword
+    def mic_chain_should_meet_limit(self, summary: dict, field: str, limit: str):
+        """
+        Fail unless summary[field] is at most the radio file's
+        mic_chain.limits[limit]. A figure that couldn't be measured (a
+        release that never settled) fails.
+        """
+        limits = self._need_emulator().limits
+        if limit not in limits:
+            raise ValueError(f"{self.radio_file}: no mic_chain.limits.{limit}")
+        value, bound = summary.get(field), float(limits[limit])
+        ok = value is not None and np.isfinite(float(value)) and float(value) <= bound
+        self._record("limit", field=field, value=None if value is None else float(value),
+                     limit=f"<= {bound:g}", passed=bool(ok))
+        if not ok:
+            shown = "not measured (did not settle)" if value is None else f"{float(value):.4g}"
+            raise AssertionError(f"{field} {shown}, limit {bound:g} ({limit})")
+        return float(value)
 
     def _record(self, kind: str, **data):
         test = BuiltIn().get_variable_value("${TEST NAME}", "")

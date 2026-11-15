@@ -7,6 +7,9 @@
 #   <results>/<firmware sha>/<radio>/<yyyymmdd-hhmmss>-<station>-<suite>/
 #     output.xml         Robot's output, through rebot with oat.sanitize
 #     measurements.json  the run's measurements and operator answers
+#     and, from the emulator bench, the run's artifacts: REPORT.md, METHODS.md,
+#     run.json, openrtx.patch, data/ (tidy tables) and charts/ (PNG and SVG).
+#     The emulator's per-take audio stays in the tester's take cache.
 # With -r, a rerun of some of the run's tests (robot -d <rerun> --include ...,
 # same firmware, radio and bench) replaces those tests in both files, as
 # rebot --merge does. Refuses to overwrite a run, and removes the export again
@@ -54,8 +57,9 @@ print(rerun_root(Path(sys.argv[1]), Path(sys.argv[2])) or "")' "$run" "$r")
     merge=(--merge)
 done
 
-# The git sha in the firmware name (v0.4.5-88-g1ceed9f8 -> 1ceed9f8), or the
-# name made path-safe when it has none (stock-1.2). A run of several suites
+# The git sha in the firmware name (v0.4.5-88-g1ceed9f8 -> 1ceed9f8, and on
+# the emulator bench agc@7f9b6c2ad -> 7f9b6c2ad), or the name made path-safe
+# when it has none (stock-1.2). A run of several suites
 # is published as one, named after its top suite.
 dest=$(uv run python - "$run" "$results" <<'PY'
 import re, sys
@@ -63,7 +67,7 @@ from pathlib import Path
 from oat.results import run_measurements
 m = run_measurements(Path(sys.argv[1]))
 safe = lambda s: re.sub(r"[^A-Za-z0-9._-]", "_", s)
-sha = re.search(r"(?:^|-g)([0-9a-f]{7,40})$", m["firmware"])
+sha = re.search(r"(?:^|-g|@)([0-9a-f]{7,40})$", m["firmware"])
 firmware = sha.group(1) if sha else safe(m["firmware"])
 start = m["started"][:19].replace("-", "").replace(":", "").replace("T", "-")
 run = safe(f"{start}-{m['station']}-{m['suite']}")
@@ -95,11 +99,27 @@ merged = merge_reruns(Path(sys.argv[2]), [Path(p) for p in sys.argv[3:]])
 Path(sys.argv[1]).write_text(scrub(json.dumps(merged, indent=2)) + "\n")
 PY
 
+# The emulator bench's artifacts, from the run's own bench folder
+uv run python - "$run" "$dest" <<'PY'
+import shutil, sys
+from pathlib import Path
+benches = sorted(Path(sys.argv[1]).glob("bench-*"))
+if len(benches) == 1:
+    for name in ("REPORT.md", "METHODS.md", "run.json", "openrtx.patch"):
+        if (benches[0] / name).exists():
+            shutil.copy(benches[0] / name, Path(sys.argv[2]) / name)
+    for name in ("data", "charts"):
+        if (benches[0] / name).is_dir():
+            shutil.copytree(benches[0] / name, Path(sys.argv[2]) / name)
+PY
+
 uv run python - "$dest" <<'PY'
 import sys
 from pathlib import Path
 from oat.sanitize import private_paths
-left = [(p.name, x) for p in Path(sys.argv[1]).iterdir()
+TEXT = {".xml", ".json", ".md", ".csv", ".svg", ".patch"}
+left = [(p.name, x) for p in Path(sys.argv[1]).rglob("*")
+        if p.is_file() and p.suffix in TEXT
         for x in private_paths(p.read_text())]
 if left:
     sys.exit(f"absolute paths left, export removed: {left[:3]}")

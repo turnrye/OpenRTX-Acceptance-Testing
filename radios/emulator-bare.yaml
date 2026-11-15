@@ -1,0 +1,48 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# The OpenRTX Linux emulator with nothing in front of its microphone input:
+# the Linux build's defaults (no oversampling, unity gain) and clean signed
+# 16-bit samples, no ADC bias or noise. It measures the firmware's own DSP on
+# clean input, apart from any radio. Emulator bench only.
+name: OpenRTX Linux emulator, bare microphone input
+max_tx_power_dbm: 0
+dsp_image: false
+# Nominal: the emulator transmits nowhere, it writes its baseband to a file
+bands:
+  70cm:
+    frequency_hz: 433475000
+    modes: [m17]
+modes: [m17]
+
+# The microphone chain as the emulator bench models it in front of
+# openrtx_linux (bench/emulator.yaml, acceptance/m17/mic-chain.robot):
+# the firmware's CONFIG_MIC_* values and a model of the ADC, each with
+# where it comes from. Paths are in the OpenRTX tree.
+mic_chain:
+  oversample: 1
+  gain: 1
+  adc_bits: 16
+  bias: none
+  noise_lsb: 0.0
+  sources:
+    oversample: "openrtx/src/core/audio_codec.c (CONFIG_MIC_OVERSAMPLE default 1)"
+    gain: "openrtx/src/core/audio_codec.c (CONFIG_MIC_GAIN default 1)"
+    adc_bits: "the emulator's microphone file: signed 16-bit samples"
+    bias: "none: signed samples"
+    noise_lsb: "none: clean input"
+  # Limits for acceptance/m17/mic-chain.robot, checked before codec2 (the
+  # firmware's pre-codec tap) except the STOI deficit. Source: acceptance
+  # criteria proposed with the OpenRTX microphone-chain change (AGC, high-pass,
+  # DC-block priming; docs/emulator-mic-campaign.md), not a standard. They
+  # document the target: today's fixed-gain chain is expected to fail some.
+  limits:
+    max_pre_onset_peak_dbfs: -30      # key-up transient, first 100 ms
+    max_pre_speech_spread_db: 6       # active level over the speech sweep
+    max_pre_clip_percent: 0           # samples at int16 full scale
+    max_stoi_deficit: 0.02            # against the ideal codec-only reference
+    max_pre_step_rise_db: 6           # output step for a +20 dB input step
+    max_pre_attack_s: 1.0             # to within 2 dB after the step up
+    max_pre_overshoot_db: 6           # above the settled level after it
+    max_pre_pause_drift_db: 3         # noise pumped up within a pause

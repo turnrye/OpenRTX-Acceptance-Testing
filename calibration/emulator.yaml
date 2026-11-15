@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Calibration of the emulator bench. It has no RF or audio paths to measure:
+# what stands in for a calibration is the model of the radio's microphone
+# chain and ADC in the radio file's mic_chain section (oversampling, gain,
+# ADC bits, bias, noise), each with its source. "model" says so in every
+# result; the fingerprint of this file and the run's mic chain model are
+# recorded with it.
+
+method: model
+measured: 2026-11-15
+expires: 2099-12-31

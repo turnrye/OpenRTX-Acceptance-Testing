@@ -88,3 +88,34 @@ m17:
   # an ideal signal at nominal deviation measures about 9.3 kHz
   max_occupied_bandwidth_hz: 11000
   min_preamble_s: 0.04                # the specification's "shall"
+
+# The microphone chain as the emulator bench models it in front of
+# openrtx_linux (bench/emulator.yaml, acceptance/m17/mic-chain.robot):
+# the firmware's CONFIG_MIC_* values and a model of the ADC, each with
+# where it comes from. Paths are in the OpenRTX tree.
+mic_chain:
+  oversample: 6
+  gain: 32
+  adc_bits: 12
+  bias: mid-scale
+  noise_lsb: 2.0
+  sources:
+    oversample: "platform/targets/CS7000-PLUS/hwconfig.h (CONFIG_MIC_OVERSAMPLE)"
+    gain: "platform/targets/CS7000-PLUS/hwconfig.h (CONFIG_MIC_GAIN)"
+    adc_bits: "the STM32's 12-bit ADC"
+    bias: "assumed until bench-measured"
+    noise_lsb: "assumed until bench-measured"
+  # Limits for acceptance/m17/mic-chain.robot, checked before codec2 (the
+  # firmware's pre-codec tap) except the STOI deficit. Source: acceptance
+  # criteria proposed with the OpenRTX microphone-chain change (AGC, high-pass,
+  # DC-block priming; docs/emulator-mic-campaign.md), not a standard. They
+  # document the target: today's fixed-gain chain is expected to fail some.
+  limits:
+    max_pre_onset_peak_dbfs: -30      # key-up transient, first 100 ms
+    max_pre_speech_spread_db: 6       # active level over the speech sweep
+    max_pre_clip_percent: 0           # samples at int16 full scale
+    max_stoi_deficit: 0.02            # against the ideal codec-only reference
+    max_pre_step_rise_db: 6           # output step for a +20 dB input step
+    max_pre_attack_s: 1.0             # to within 2 dB after the step up
+    max_pre_overshoot_db: 6           # above the settled level after it
+    max_pre_pause_drift_db: 3         # noise pumped up within a pause

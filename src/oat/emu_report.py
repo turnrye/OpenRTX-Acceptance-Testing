@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import csv
 import math
+import re
 from pathlib import Path
 
 import numpy as np
@@ -188,6 +189,9 @@ def _save(fig, out: Path, name: str) -> str:
     fig.tight_layout()
     for ext in ("png", "svg"):
         fig.savefig(out / f"{name}.{ext}", bbox_inches="tight")
+    # The DOCTYPE's public identifier reads like a path to the export's check
+    svg = out / f"{name}.svg"
+    svg.write_text(re.sub(r"<!DOCTYPE[^>]*>\s*", "", svg.read_text()))
     import matplotlib.pyplot as plt
     plt.close(fig)
     return f"charts/{name}.png"
@@ -528,7 +532,7 @@ def report(meta: dict, rows: list[dict], variants: list[str], charts_: dict) -> 
                 if p + "rise_db" not in r:
                     continue
                 body.append([r["variant"], str(r.get("over", 1)), where,
-                             _f(r[p + "pre_dbfs"]), _f(r[p + "loud_dbfs"]),
+                             _f(r[p + "before_dbfs"]), _f(r[p + "loud_dbfs"]),
                              _f(r[p + "after_dbfs"]), _f(r[p + "rise_db"]),
                              _f(r[p + "attack_s"], "{:.2f}", "did not settle"),
                              _f(r[p + "overshoot_db"]),
