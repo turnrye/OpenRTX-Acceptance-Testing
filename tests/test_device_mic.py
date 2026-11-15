@@ -138,8 +138,8 @@ card 2: Gen [Scarlett 4i4 4th Gen], device 0: USB Audio [USB Audio]
 
 
 @pytest.fixture(scope="module")
-def pair_run(tmp_path_factory):
-    """The two-radio suite on a replayed synthetic recording of both radios."""
+def pair_recording(tmp_path_factory):
+    """A synthetic recording of both radios, a bench replaying it, a speech file."""
     tmp = tmp_path_factory.mktemp("pair")
     clean = _speech(4.0)
     wavfile.write(tmp / "speech.wav", 8000, np.round(clean * 20000).astype(np.int16))
@@ -154,16 +154,25 @@ def pair_run(tmp_path_factory):
              "operator": {"type": "scripted", "default": "knob at 3 o'clock"},
              "audio": {"type": "sim"}}
     (tmp / "bench.yaml").write_text(yaml.safe_dump(bench))
-    out = tmp / "run"
+    return tmp
+
+
+def _run_suite(tmp, out, firmware, radio_b="mduv3x0.yaml"):
     robot.run(str(ROOT / "acceptance" / "m17" / "mic-chain-device.robot"),
               outputdir=str(out), console="none", report="NONE", log="NONE",
               variable=[f"BENCH:{tmp / 'bench.yaml'}",
                         f"CALIBRATION:{ROOT / 'calibration' / 'sim.yaml'}",
-                        "FIRMWARE:baseline@7f9b6c2ad", "HARDWARE_A:CS7000-PLUS sim",
+                        f"FIRMWARE:{firmware}", "HARDWARE_A:CS7000-PLUS sim",
                         "HARDWARE_B:MD-UV380 sim, M17 mod", f"SPEECH_FILE:{tmp / 'speech.wav'}",
                         "SPEECH_SECONDS:4", f"RADIO_A:{ROOT / 'radios' / 'cs7000p.yaml'}",
-                        f"RADIO_B:{ROOT / 'radios' / 'mduv3x0.yaml'}"])
+                        "RADIO_B:" + (str(ROOT / "radios" / radio_b) if radio_b else "none")])
     return out
+
+
+@pytest.fixture(scope="module")
+def pair_run(pair_recording):
+    """The two-radio suite on the replayed recording."""
+    return _run_suite(pair_recording, pair_recording / "run", "baseline@7f9b6c2ad")
 
 
 def test_suite_writes_a_folder_per_radio(pair_run):
@@ -215,3 +224,35 @@ def test_comparison_report(pair_run, tmp_path):
     for stem in ("cs7000p", "mduv3x0"):
         text = (tmp_path / "report" / stem / "REPORT.md").read_text()
         assert "## Played speech" in text and "baseline" in text
+
+
+def test_single_radio_run_and_three_way_report(pair_recording, pair_run, tmp_path):
+    one = _run_suite(pair_recording, tmp_path / "h7ovs", "h7ovs@f50482756", radio_b=None)
+    assert [p.parent.name for p in one.glob("bench-*/measurements.json")] == \
+        ["bench-Mic-Chain-Device-cs7000p"]
+    m = json.loads((one / "bench-Mic-Chain-Device-cs7000p" / "measurements.json").read_text())
+    assert m["pair"]["other"] is None
+    assert {r["test"] for r in m["records"] if r["kind"] == "mic-take"} == \
+        {"silence", "speech", "live"}
+    full = _run_suite(pair_recording, tmp_path / "full", "full@7f9b6c2ad")
+    done = subprocess.run(["uv", "run", "python", str(ROOT / "scripts" / "device-mic-report.py"),
+                           str(pair_run), str(full), str(one), "--out", str(tmp_path / "rep")],
+                          capture_output=True, text=True, cwd=ROOT)
+    assert done.returncode == 0, done.stderr
+    text = (tmp_path / "rep" / "cs7000p" / "REPORT.md").read_text()
+    assert "| h7ovs |" in text and "| full |" in text and "within 1 dB" in text
+    assert "| h7ovs |" not in (tmp_path / "rep" / "mduv3x0" / "REPORT.md").read_text()
+
+
+def test_h7ovs_model_keeps_the_overall_gain():
+    mic = {"gain": 32, "adc_bits": 12, "oversample": 6}
+    h7 = device_mic.variant_mic(mic, "h7ovs")
+    assert (h7["gain"], h7["adc_bits"]) == (4, 15)
+    assert device_mic.adc_level(-20.0, h7) == pytest.approx(device_mic.adc_level(-20.0, mic))
+    assert device_mic.variant_defines("h7ovs") == ("-DMIC_EXP_H7_OVS",)
+    assert device_mic.variant_defines("agc") == ("-DMIC_EXP_AGC",)
+
+
+def test_single_radio_tuning():
+    t = device_mic.pair_tuning(445.925e6, None, RATE)
+    assert t.center_hz == pytest.approx(445.895e6) and t.offsets_hz == (30e3,)

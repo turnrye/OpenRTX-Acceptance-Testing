@@ -95,7 +95,12 @@ ADC dBFS = decoded dBFS − 20·log10(CONFIG_MIC_GAIN) − 20·log10(2^(bits−1
 ```
 
 that is, minus the gain and plus 24.1 dB for a 12-bit ADC (its half range of 2048 codes against
-int16's 32768), from the radio file's `mic_chain`. Decimation by averaging keeps the level. The
+int16's 32768), from the radio file's `mic_chain`. A firmware variant that changes the chain
+changes the model it is worked out with (`device_mic.DEVICE_VARIANTS`): `h7ovs`
+(`MIC_EXP_H7_OVS`, the CS7000-PLUS's ADC at 16 bits with ×16 hardware oversampling) delivers
+15-bit samples with the firmware gain divided by 8, so it uses 15-bit scaling and gain 4; the
+overall gain, and so the result, is the same as the baseline's, which the report checks (the
+level within 1 dB of the baseline's). Decimation by averaging keeps the level. The
 assumption is that codec2 keeps the active level: in the emulator campaign it read +0.6 to
 +3.3 dB above codec2's input, about +2 dB, below clipping, so the ADC level is probably about
 2 dB under the figure. This answers where on the emulator's sweeps (dBFS of the ADC range) a real

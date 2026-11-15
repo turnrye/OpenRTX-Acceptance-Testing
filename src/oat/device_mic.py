@@ -37,6 +37,34 @@ MAX_LAG_S = 6.0
 ONSET_S = 0.1
 LISTEN_NOISE_DBFS = camp.LISTEN_NOISE_DBFS
 
+# Firmware variants built for radios only, beside the emulator's
+# (emu_campaign.VARIANTS): their defines, and how they change the mic chain
+# model the ADC level is worked out with.
+DEVICE_VARIANTS = {
+    # STM32H7 ADC at 16 bits with x16 hardware oversampling: 15-bit samples,
+    # the firmware gain divided by 8, so the overall gain is unchanged
+    "h7ovs": {"defines": ("-DMIC_EXP_H7_OVS",), "mic": {"adc_bits": 15, "gain_div": 8}},
+}
+
+
+def variant_defines(variant: str) -> tuple:
+    if variant in DEVICE_VARIANTS:
+        return DEVICE_VARIANTS[variant]["defines"]
+    return camp.VARIANTS.get(variant, ())
+
+
+def variant_mic(mic: dict, variant: str) -> dict:
+    """A radio's mic chain model as a variant runs it (h7ovs: 15 bits, gain / 8)."""
+    change = DEVICE_VARIANTS.get(variant, {}).get("mic")
+    if not change:
+        return mic
+    out = dict(mic)
+    if "adc_bits" in change:
+        out["adc_bits"] = change["adc_bits"]
+    if "gain_div" in change:
+        out["gain"] = mic["gain"] / change["gain_div"]
+    return out
+
 
 @dataclass
 class PairTuning:
@@ -44,7 +72,7 @@ class PairTuning:
     offsets_hz: tuple[float, float]
 
 
-def pair_tuning(freq_a_hz: float, freq_b_hz: float, rate: float,
+def pair_tuning(freq_a_hz: float, freq_b_hz: float | None, rate: float,
                 low_offset_hz: float = LOW_OFFSET_HZ,
                 channel_hz: float = CHANNEL_CUTOFF_HZ) -> PairTuning:
     """
@@ -53,6 +81,8 @@ def pair_tuning(freq_a_hz: float, freq_b_hz: float, rate: float,
     IQ image lands on the negative side, away from both, and both channels
     stay inside 80% of the capture's Nyquist band.
     """
+    if freq_b_hz is None:                     # one radio alone
+        return PairTuning(freq_a_hz - low_offset_hz, (low_offset_hz,))
     low = min(freq_a_hz, freq_b_hz)
     center = low - low_offset_hz
     offs = (freq_a_hz - center, freq_b_hz - center)
@@ -268,6 +298,31 @@ def report(rows: list[dict], radio: str, radio_name: str, meta: dict,
                      _f(r.get("adc_active_dbfs"))])
     L += ["Per take:", "", *_table(["variant", "playback dB", "active dBFS", "peak dBFS", "STOI",
                                     "listening -45", "listening -35", "at the ADC dBFS"], body)]
+    sp = [r for r in rows if r["radio"] == radio and r["test"] == "speech" and "error" not in r]
+    if sp and len(variants) > 1:
+        quiet = min(r["level"] for r in sp)
+
+        def mean(v, k, level=None):
+            x = [r[k] for r in sp if r["variant"] == v and r.get(k) is not None
+                 and (level is None or r["level"] == level)]
+            return float(np.mean(x)) if x else None
+
+        body = []
+        for v in variants:
+            fixed = "-DMIC_EXP_AGC" not in variant_defines(v)
+            d = (None if v == base else
+                 (mean(v, "active_dbfs") or 0) - (mean(base, "active_dbfs") or 0))
+            check = ("" if v == base or not fixed else
+                     ("yes" if d is not None and abs(d) <= 1.0 else "**no**"))
+            body.append([v, _f(mean(v, "stoi", quiet), "{:.3f}"),
+                         _f(mean(v, "listen_stoi_45", quiet), "{:.3f}"),
+                         _f(mean(v, "listen_stoi_35", quiet), "{:.3f}"),
+                         "" if d is None else f"{d:+.1f}", check])
+        L += [f"Quietest playback ({quiet:+.0f} dB) and the level check: a variant that "
+              "doesn't change the chain's gain (no AGC; h7ovs divides the firmware gain by "
+              "the 8 its oversampling gains) should keep the baseline's level within 1 dB.",
+              "", *_table(["variant", "STOI", "listening -45", "listening -35",
+                           "level Δ vs baseline dB", "within 1 dB"], body)]
     L += ["## Live voice", "",
           "The operator reading one sentence quietly, normally and loudly: decoded active "
           "level and its spread.", "",
@@ -283,7 +338,8 @@ def report(rows: list[dict], radio: str, radio_name: str, meta: dict,
     if body:
         L += ["## Real speech level at the ADC", "",
               "From the fixed-gain chain only (no AGC): decoded level minus the chain's gain "
-              "(`CONFIG_MIC_GAIN`, and +24.1 dB from the 12-bit ADC's range to int16). Codec2 "
+              "(`CONFIG_MIC_GAIN`, and +24.1 dB from the 12-bit ADC's range to int16; h7ovs "
+              "has 15-bit samples and gain 4, the same overall). Codec2 "
               "is assumed to keep the active level: in the emulator it read +0.6 to +3.3 dB "
               "above codec2's input (about +2 dB) below clipping, so the level at the ADC is "
               "likely about 2 dB under these figures. Peaks are of the decoded audio, and "

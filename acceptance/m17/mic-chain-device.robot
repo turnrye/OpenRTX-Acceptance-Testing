@@ -34,6 +34,7 @@ ${CALIBRATION}    ${EMPTY}
 ${FIRMWARE}       ${EMPTY}
 ${RADIO_A}        radios/cs7000p.yaml
 ${HARDWARE_A}     ${EMPTY}
+# none: radio A alone (the operator keys only it)
 ${RADIO_B}        radios/mduv3x0.yaml
 ${HARDWARE_B}     ${EMPTY}
 # Empty: each radio file's 70cm band (445.925 and 445.975 MHz)

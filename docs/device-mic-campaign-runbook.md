@@ -7,7 +7,8 @@ SPDX-License-Identifier: GPL-3.0-or-later
 # M17 microphone chain on two radios: 20-minute runbook
 
 Two radios measured together, baseline firmware then full (all four `MIC_EXP` flags), from
-OpenRTX `7f9b6c2ad` (`private/mic-exp`). How it works and what it measures:
+OpenRTX `7f9b6c2ad` (`private/mic-exp`), and optionally a third image on the CS7000-PLUS
+(phase 3). How it works and what it measures:
 [device-mic-campaign.md](device-mic-campaign.md).
 
 | Radio | Radio file | Frequency | Flash |
@@ -124,12 +125,42 @@ uv run robot -A bench/k0ret-pair.local.args -v FIRMWARE:full@7f9b6c2ad \
 The same prompts. At the speaker-volume prompt leave the knob where it is and type the same
 setting.
 
+## Optional phase 3, about 4 minutes: CS7000-PLUS with hardware oversampling
+
+Only if there is time; radio A only. The image is OpenRTX `f50482756` (`private/mic-exp`) with
+`MIC_EXP_H7_OVS`: the mic channel converted at 16 bits with ×16 hardware oversampling (15-bit
+samples) and the firmware gain divided by 8, so the overall gain is unchanged; otherwise it is
+the baseline (no priming, sum, high-pass or AGC). Leave the UV3x0 on the full image: it is not
+measured in this phase, but it serves for the listen check.
+
+1. **Flash A** (DFU mode as before):
+   ```sh
+   dfu-util -d 0483:df11 -a 0 -s 0x08100000 -D $I/cs7000p_h7ovs_f50482756.bin
+   ```
+   Power-cycle; check its settings.
+2. **Listen check, 10 s.** Set the UV3x0 to receive M17 on A's frequency, 445.925 MHz, volume
+   up. Key A and talk for 10 s. If the audio is garbled, robotic or pitch-shifted, the ADC's
+   timing overran with this configuration: **abort phase 3** and reflash A with the baseline
+   image (no hardware risk). If it sounds normal, set the UV3x0 back to 445.975 MHz.
+3. **Run**, keying only A (the prompts say "the radio"):
+   ```sh
+   uv run robot -A bench/k0ret-pair.local.args -v FIRMWARE:h7ovs@f50482756 \
+       -v "HARDWARE_A:Connect Systems CS7000-PLUS <A serial>" -v RADIO_B:none \
+       -v IMAGE_A:$I/cs7000p_h7ovs_f50482756.bin \
+       -d $R/h7ovs acceptance/m17/mic-chain-device.robot
+   ```
+   Leave the speaker volume where it is and type the same setting.
+
+What to look for in the CS7000-PLUS report: the floor in silence, STOI and listening STOI at the
+quietest playback, and the level within about 1 dB of the baseline's (a check that dividing the
+gain by 8 balances the oversampling).
+
 ## 17:00 to 20:00, tear down and report
 
-Radios off, then:
+Radios off (reflash A with baseline or full if it should stay in use), then:
 
 ```sh
-uv run python scripts/device-mic-report.py $R/baseline $R/full --out $R/report
+uv run python scripts/device-mic-report.py $R/baseline $R/full $R/h7ovs --out $R/report
 uv run python -m oat.compare $R/baseline/bench-Mic-Chain-Device-cs7000p $R/full/bench-Mic-Chain-Device-cs7000p
 uv run python -m oat.compare $R/baseline/bench-Mic-Chain-Device-mduv3x0 $R/full/bench-Mic-Chain-Device-mduv3x0
 ```
@@ -142,7 +173,10 @@ folder per radio per run:
 for run in baseline full; do for radio in cs7000p mduv3x0; do
   scripts/export-run.sh -b bench-Mic-Chain-Device-$radio $R/$run
 done; done
+scripts/export-run.sh -b bench-Mic-Chain-Device-cs7000p $R/h7ovs     # if phase 3 ran
 ```
+
+Leave `$R/h7ovs` out of the report command if phase 3 didn't run.
 
 ## If a take fails
 

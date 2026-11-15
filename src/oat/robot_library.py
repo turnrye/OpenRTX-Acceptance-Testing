@@ -478,17 +478,21 @@ class OpenRTXAcceptance:
         the flashed files, are recorded by their SHA-256. Each radio's
         transmissions are channelised out of the capture and measured on
         their own; close_bench writes a folder per radio
-        (bench-<suite>-<radio file>), each exported on its own.
+        (bench-<suite>-<radio file>), each exported on its own. radio_b
+        "none" measures radio A alone, keyed by itself.
         """
+        single = str(radio_b).strip().lower() in ("none", "-")
         missing = [n for n, v in (("RADIO_A", radio_a), ("HARDWARE_A", hardware_a),
-                                  ("RADIO_B", radio_b), ("HARDWARE_B", hardware_b))
+                                  ("RADIO_B", radio_b),
+                                  *((("HARDWARE_B", hardware_b),) if not single else ()))
                    if not v]
         if missing:
             raise ValueError("Pass " + " ".join(f"-v {m}:..." for m in missing))
         self.open_bench(bench, calibration, radio_a, firmware, hardware_a, dsp)
         radios = []
-        for which, path, hw, freq, image in (("A", radio_a, hardware_a, frequency_a_hz, image_a),
-                                             ("B", radio_b, hardware_b, frequency_b_hz, image_b)):
+        units = [("A", radio_a, hardware_a, frequency_a_hz, image_a),
+                 ("B", radio_b, hardware_b, frequency_b_hz, image_b)]
+        for which, path, hw, freq, image in units[: 1 if single else 2]:
             data = load_yaml(Path(path))
             if "mic_chain" not in data:
                 raise ValueError(f"{path}: no mic_chain section")
@@ -499,15 +503,16 @@ class OpenRTXAcceptance:
                            "radio": data, "hardware": str(hw), "frequency_hz": f,
                            "image_sha256": emu_bench.emu.sha256(Path(image))
                            if str(image).strip() else None})
-        if radios[0]["stem"] == radios[1]["stem"]:
+        if not single and radios[0]["stem"] == radios[1]["stem"]:
             raise ValueError("the two radios need different radio files")
         rate = float(self.bench["receiver"]["rate"])
         tuning = device_mic.pair_tuning(radios[0]["frequency_hz"],
-                                        radios[1]["frequency_hz"], rate)
+                                        None if single else radios[1]["frequency_hz"], rate)
         for r, off in zip(radios, tuning.offsets_hz):
             r["offset_hz"] = off
         self.pair = {"radios": radios, "center_hz": tuning.center_hz, "rows": [],
-                     "playback": None, "clips": {}}
+                     "playback": None, "clips": {},
+                     "key": "the radio" if single else "BOTH radios"}
         for name, value in (
                 ("Radio", "; ".join(f"{r['which']}: {r['radio']['name']} ({r['stem']}) at "
                                     f"{r['frequency_hz'] / 1e6:.4f} MHz" for r in radios)),
@@ -515,11 +520,13 @@ class OpenRTXAcceptance:
                 ("Receiver", f"tuned to {tuning.center_hz / 1e6:.4f} MHz")):
             BuiltIn().set_suite_metadata(name, value, top=True)
         self.operator.instruct(
-            "Two radios, keyed together for every take:\n" + "\n".join(
+            ("One radio:\n" if single else "Two radios, keyed together for every take:\n")
+            + "\n".join(
                 f"  {r['which']}: {r['hardware']}, M17, {r['frequency_hz'] / 1e6:.4f} MHz, "
                 "low power" for r in radios)
-            + f"\n  Receiver at {tuning.center_hz / 1e6:.4f} MHz. Both mics about 10 cm "
-            "from the speaker. Continue when set.")
+            + f"\n  Receiver at {tuning.center_hz / 1e6:.4f} MHz. "
+            + ("Its mic" if single else "Both mics")
+            + " about 10 cm from the speaker. Continue when set.")
 
     def _need_pair(self) -> dict:
         if self.pair is None:
@@ -607,7 +614,7 @@ class OpenRTXAcceptance:
         """Score each radio's takes in order against the expected levels."""
         pair = self._need_pair()
         variant = device_mic.variant_of(self.firmware)
-        fixed_gain = "-DMIC_EXP_AGC" not in emu_bench.camp.VARIANTS.get(variant, ())
+        fixed_gain = "-DMIC_EXP_AGC" not in device_mic.variant_defines(variant)
         problems, summaries = [], {}
         for r in pair["radios"]:
             got = takes[r["stem"]]
@@ -625,7 +632,7 @@ class OpenRTXAcceptance:
                 else:
                     row.update(device_mic.score_take(test, voice, clean))
                     if fixed_gain:
-                        mic = r["radio"]["mic_chain"]
+                        mic = device_mic.variant_mic(r["radio"]["mic_chain"], variant)
                         row["adc_active_dbfs"] = device_mic.adc_level(row["active_dbfs"], mic)
                         row["adc_peak_dbfs"] = device_mic.adc_level(row["peak_dbfs"], mic)
                 pair["rows"].append(row)
@@ -647,7 +654,7 @@ class OpenRTXAcceptance:
 
         def steps():
             self.operator.instruct(
-                f"Quiet room. Key BOTH radios together for {seconds:g} s, release, wait 2 s; "
+                f"Quiet room. Key {self.pair['key']} for {seconds:g} s, release, wait 2 s; "
                 f"{overs} times. Then continue.")
         _, takes = self._pair_capture(steps)
         return self._score_pair("silence", takes, [None] * overs)
@@ -668,12 +675,13 @@ class OpenRTXAcceptance:
         def steps():
             for g, f in zip(gains, files):
                 self.operator.instruct(
-                    f"Continue, then at once key BOTH radios and hold them: the clip plays "
+                    f"Continue, then at once key {self.pair['key']} and hold: the clip plays "
                     f"at {g:+.0f} dB {float(lead_s):g} s later, for {float(seconds):g} s.")
                 self.wait_seconds(lead_s)
                 interface.play(f)
                 interface.wait_playing()
-                self.operator.instruct("Clip done: release both radios, then continue.")
+                self.operator.instruct(f"Clip done: release {self.pair['key']}, then "
+                                       "continue.")
                 self.wait_seconds(1)
         _, takes = self._pair_capture(steps)
         return self._score_pair("speech", takes, gains, clean=self._clip(speech_file, seconds))
@@ -688,7 +696,7 @@ class OpenRTXAcceptance:
 
         def steps():
             for lab in labels:
-                self.operator.instruct(f"Key BOTH radios, read {lab.upper()} at your usual "
+                self.operator.instruct(f"Key {self.pair['key']}, read {lab.upper()} at your usual "
                                        f"distance: \"{sentence}\", release; then continue.")
         _, takes = self._pair_capture(steps)
         return self._score_pair("live", takes, list(range(1, len(labels) + 1)), labels)
@@ -706,7 +714,8 @@ class OpenRTXAcceptance:
             mine = {**report, "radio": r["radio"]["name"], "radio_file": r["stem"],
                     "hardware": r["hardware"],
                     "bands": {"pair": r["frequency_hz"]},
-                    "pair": {"other": next(o["stem"] for o in pair["radios"] if o is not r),
+                    "pair": {"other": next((o["stem"] for o in pair["radios"] if o is not r),
+                                           None),
                              "receiver_center_hz": pair["center_hz"],
                              "offset_hz": r["offset_hz"],
                              "image_sha256": r["image_sha256"],
