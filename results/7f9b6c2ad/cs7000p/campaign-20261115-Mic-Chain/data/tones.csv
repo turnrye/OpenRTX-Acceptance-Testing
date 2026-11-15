@@ -1,0 +1,325 @@
+variant,profile,test,signal,level,take,over,rms_dbfs,post_clip_fraction,pre_rms_dbfs,pre_clip_fraction,model_clip_fraction,frames,lsf_crc_ok,precodec_blocks
+baseline,cs7000p,tones,tone 1000 Hz,-50,tone_1000Hz_-50dBFS,1,-52.4607,0,-46.7873,0,0,60,True,121
+baseline,cs7000p,tones,tone 1000 Hz,-47,tone_1000Hz_-47dBFS,1,-51.1688,0,-43.9229,0,0,60,True,121
+baseline,cs7000p,tones,tone 1000 Hz,-44,tone_1000Hz_-44dBFS,1,-49.264,0,-41.0148,0,0,60,True,121
+baseline,cs7000p,tones,tone 1000 Hz,-41,tone_1000Hz_-41dBFS,1,-46.3956,0,-38.0722,0,0,61,True,123
+baseline,cs7000p,tones,tone 1000 Hz,-38,tone_1000Hz_-38dBFS,1,-42.4399,0,-35.1135,0,0,60,True,121
+baseline,cs7000p,tones,tone 1000 Hz,-35,tone_1000Hz_-35dBFS,1,-39.1978,0,-32.1419,0,0,61,True,123
+baseline,cs7000p,tones,tone 1000 Hz,-32,tone_1000Hz_-32dBFS,1,-35.6793,0,-29.1579,0,0,60,True,121
+baseline,cs7000p,tones,tone 1000 Hz,-29,tone_1000Hz_-29dBFS,1,-33.1262,0,-26.1744,0,0,60,True,121
+baseline,cs7000p,tones,tone 1000 Hz,-26,tone_1000Hz_-26dBFS,1,-31.9867,0,-23.1838,0,0,60,True,121
+baseline,cs7000p,tones,tone 1000 Hz,-23,tone_1000Hz_-23dBFS,1,-31.1711,0,-20.1875,0,0,60,True,121
+baseline,cs7000p,tones,tone 1000 Hz,-20,tone_1000Hz_-20dBFS,1,-30.2617,0,-17.1762,0,0,60,True,121
+baseline,cs7000p,tones,tone 1000 Hz,-17,tone_1000Hz_-17dBFS,1,-29.7153,0,-14.1863,0,0,60,True,121
+baseline,cs7000p,tones,tone 1000 Hz,-14,tone_1000Hz_-14dBFS,1,-27.5694,0,-11.1835,0,0,60,True,121
+baseline,cs7000p,tones,tone 1000 Hz,-11,tone_1000Hz_-11dBFS,1,-26.2472,0,-8.18782,0,0,60,True,121
+baseline,cs7000p,tones,tone 1000 Hz,-8,tone_1000Hz_-8dBFS,1,-24.255,0,-5.18537,0,0,60,True,120
+baseline,cs7000p,tones,tone 1000 Hz,-5,tone_1000Hz_-5dBFS,1,-20.8557,0,-2.33125,0.25,0.2,60,True,121
+baseline,cs7000p,tones,tone 1000 Hz,-2,tone_1000Hz_-2dBFS,1,-20.9152,0,-1.67693,0.5,0.4,60,True,121
+baseline,cs7000p,tones,tone 1000 Hz,0,tone_1000Hz_+0dBFS,1,-19.9482,0,-1.05235,0.5,0.4,60,True,121
+baseline,cs7000p,tones,tone 400 Hz,-50,tone_400Hz_-50dBFS,1,-51.156,0,-46.7935,0,0,60,True,121
+baseline,cs7000p,tones,tone 400 Hz,-47,tone_400Hz_-47dBFS,1,-49.8676,0,-43.8772,0,0,60,True,120
+baseline,cs7000p,tones,tone 400 Hz,-44,tone_400Hz_-44dBFS,1,-48.4499,0,-40.9298,0,0,60,True,120
+baseline,cs7000p,tones,tone 400 Hz,-41,tone_400Hz_-41dBFS,1,-46.4352,0,-37.9642,0,0,61,True,123
+baseline,cs7000p,tones,tone 400 Hz,-38,tone_400Hz_-38dBFS,1,-42.915,0,-34.9848,0,0,60,True,121
+baseline,cs7000p,tones,tone 400 Hz,-35,tone_400Hz_-35dBFS,1,-39.7234,0,-31.9974,0,0,60,True,121
+baseline,cs7000p,tones,tone 400 Hz,-32,tone_400Hz_-32dBFS,1,-36.3395,0,-29.0051,0,0,60,True,121
+baseline,cs7000p,tones,tone 400 Hz,-29,tone_400Hz_-29dBFS,1,-31.9671,0,-26.0011,0,0,60,True,121
+baseline,cs7000p,tones,tone 400 Hz,-26,tone_400Hz_-26dBFS,1,-28.1499,0,-23.0004,0,0,60,True,121
+baseline,cs7000p,tones,tone 400 Hz,-23,tone_400Hz_-23dBFS,1,-23.5241,0,-20.0029,0,0,60,True,121
+baseline,cs7000p,tones,tone 400 Hz,-20,tone_400Hz_-20dBFS,1,-20.5306,0,-16.9979,0,0,60,True,121
+baseline,cs7000p,tones,tone 400 Hz,-17,tone_400Hz_-17dBFS,1,-18.8635,0,-14.0042,0,0,60,True,121
+baseline,cs7000p,tones,tone 400 Hz,-14,tone_400Hz_-14dBFS,1,-17.1754,0,-11.0017,0,0,60,True,121
+baseline,cs7000p,tones,tone 400 Hz,-11,tone_400Hz_-11dBFS,1,-16.2586,0,-8.00347,0,0,61,True,123
+baseline,cs7000p,tones,tone 400 Hz,-8,tone_400Hz_-8dBFS,1,-15.5085,0,-5.00285,0,0,60,True,120
+baseline,cs7000p,tones,tone 400 Hz,-5,tone_400Hz_-5dBFS,1,-11.5457,0,-2.34103,0.3,0.24,60,True,120
+baseline,cs7000p,tones,tone 400 Hz,-2,tone_400Hz_-2dBFS,1,-10.0159,0,-1.45039,0.6,0.48,60,True,121
+baseline,cs7000p,tones,tone 400 Hz,0,tone_400Hz_+0dBFS,1,-12.3826,0,-1.05704,0.6,0.48,60,True,121
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-50,tone_1000Hz_-50dBFS,1,-53.203,0,-46.8541,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-47,tone_1000Hz_-47dBFS,1,-51.7005,0,-43.9156,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-44,tone_1000Hz_-44dBFS,1,-49.3207,0,-40.9504,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-41,tone_1000Hz_-41dBFS,1,-46.2395,0,-37.9653,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-38,tone_1000Hz_-38dBFS,1,-42.2882,0,-34.9757,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-35,tone_1000Hz_-35dBFS,1,-39.0644,0,-31.9787,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-32,tone_1000Hz_-32dBFS,1,-34.942,0,-28.9806,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-29,tone_1000Hz_-29dBFS,1,-32.6244,0,-25.982,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-26,tone_1000Hz_-26dBFS,1,-31.7518,0,-22.9827,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-23,tone_1000Hz_-23dBFS,1,-31.1497,0,-19.9826,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-20,tone_1000Hz_-20dBFS,1,-29.8948,0,-16.9827,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-17,tone_1000Hz_-17dBFS,1,-29.194,0,-13.9827,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-14,tone_1000Hz_-14dBFS,1,-28.092,0,-10.9828,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-11,tone_1000Hz_-11dBFS,1,-26.3445,0,-7.98276,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-8,tone_1000Hz_-8dBFS,1,-23.4945,0,-4.98279,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-5,tone_1000Hz_-5dBFS,1,-21.4421,0,-2.46632,0.25,0.2,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,-2,tone_1000Hz_-2dBFS,1,-18.5033,0,-1.24965,0.75,0.4,,,
+codec-only (nominal),cs7000p,tones,tone 1000 Hz,0,tone_1000Hz_+0dBFS,1,-18.4809,0,-1.24965,0.75,0.4,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-50,tone_400Hz_-50dBFS,1,-51.7409,0,-46.8489,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-47,tone_400Hz_-47dBFS,1,-50.8156,0,-43.9101,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-44,tone_400Hz_-44dBFS,1,-49.1706,0,-40.9439,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-41,tone_400Hz_-41dBFS,1,-46.0759,0,-37.9609,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-38,tone_400Hz_-38dBFS,1,-43.0406,0,-34.9695,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-35,tone_400Hz_-35dBFS,1,-39.6382,0,-31.9742,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-32,tone_400Hz_-32dBFS,1,-35.481,0,-28.9762,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-29,tone_400Hz_-29dBFS,1,-31.9506,0,-25.9776,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-26,tone_400Hz_-26dBFS,1,-28.2434,0,-22.9781,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-23,tone_400Hz_-23dBFS,1,-23.2351,0,-19.9783,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-20,tone_400Hz_-20dBFS,1,-20.9318,0,-16.9784,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-17,tone_400Hz_-17dBFS,1,-19.1193,0,-13.9784,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-14,tone_400Hz_-14dBFS,1,-17.8397,0,-10.9785,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-11,tone_400Hz_-11dBFS,1,-17.3331,0,-7.9785,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-8,tone_400Hz_-8dBFS,1,-16.1842,0,-4.97851,0,0,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-5,tone_400Hz_-5dBFS,1,-13.4882,0,-2.38196,0.3,0.24,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,-2,tone_400Hz_-2dBFS,1,-7.51954,0,-1.40785,0.5,0.48,,,
+codec-only (nominal),cs7000p,tones,tone 400 Hz,0,tone_400Hz_+0dBFS,1,-12.0395,0,-1.09834,0.7,0.48,,,
+prime_dc,cs7000p,tones,tone 1000 Hz,-50,tone_1000Hz_-50dBFS,1,-52.3747,0,-46.7873,0,0,61,True,123
+prime_dc,cs7000p,tones,tone 1000 Hz,-47,tone_1000Hz_-47dBFS,1,-51.046,0,-43.9229,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 1000 Hz,-44,tone_1000Hz_-44dBFS,1,-49.0859,0,-41.0148,0,0,61,True,122
+prime_dc,cs7000p,tones,tone 1000 Hz,-41,tone_1000Hz_-41dBFS,1,-46.2505,0,-38.0722,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 1000 Hz,-38,tone_1000Hz_-38dBFS,1,-42.4749,0,-35.1135,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 1000 Hz,-35,tone_1000Hz_-35dBFS,1,-39.2626,0,-32.1419,0,0,61,True,123
+prime_dc,cs7000p,tones,tone 1000 Hz,-32,tone_1000Hz_-32dBFS,1,-35.7657,0,-29.1579,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 1000 Hz,-29,tone_1000Hz_-29dBFS,1,-33.0694,0,-26.1744,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 1000 Hz,-26,tone_1000Hz_-26dBFS,1,-31.8672,0,-23.1838,0,0,59,True,119
+prime_dc,cs7000p,tones,tone 1000 Hz,-23,tone_1000Hz_-23dBFS,1,-31.2866,0,-20.1875,0,0,61,True,123
+prime_dc,cs7000p,tones,tone 1000 Hz,-20,tone_1000Hz_-20dBFS,1,-30.3439,0,-17.1762,0,0,61,True,122
+prime_dc,cs7000p,tones,tone 1000 Hz,-17,tone_1000Hz_-17dBFS,1,-29.6385,0,-14.1863,0,0,60,True,120
+prime_dc,cs7000p,tones,tone 1000 Hz,-14,tone_1000Hz_-14dBFS,1,-27.6532,0,-11.1835,0,0,59,True,118
+prime_dc,cs7000p,tones,tone 1000 Hz,-11,tone_1000Hz_-11dBFS,1,-26.4484,0,-8.18768,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 1000 Hz,-8,tone_1000Hz_-8dBFS,1,-24.5486,0,-5.18537,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 1000 Hz,-5,tone_1000Hz_-5dBFS,1,-21.2141,0,-2.33125,0.25,0.2,59,True,119
+prime_dc,cs7000p,tones,tone 1000 Hz,-2,tone_1000Hz_-2dBFS,1,-20.9257,0,-1.67692,0.5,0.4,61,True,123
+prime_dc,cs7000p,tones,tone 1000 Hz,0,tone_1000Hz_+0dBFS,1,-19.7641,0,-1.05235,0.5,0.4,60,True,121
+prime_dc,cs7000p,tones,tone 400 Hz,-50,tone_400Hz_-50dBFS,1,-50.9306,0,-46.7935,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 400 Hz,-47,tone_400Hz_-47dBFS,1,-49.8457,0,-43.8772,0,0,61,True,123
+prime_dc,cs7000p,tones,tone 400 Hz,-44,tone_400Hz_-44dBFS,1,-48.4734,0,-40.9298,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 400 Hz,-41,tone_400Hz_-41dBFS,1,-46.4247,0,-37.9642,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 400 Hz,-38,tone_400Hz_-38dBFS,1,-43.0039,0,-34.9848,0,0,60,True,120
+prime_dc,cs7000p,tones,tone 400 Hz,-35,tone_400Hz_-35dBFS,1,-39.706,0,-31.9974,0,0,61,True,123
+prime_dc,cs7000p,tones,tone 400 Hz,-32,tone_400Hz_-32dBFS,1,-36.3624,0,-29.0051,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 400 Hz,-29,tone_400Hz_-29dBFS,1,-32.1,0,-26.0011,0,0,59,True,118
+prime_dc,cs7000p,tones,tone 400 Hz,-26,tone_400Hz_-26dBFS,1,-28.0865,0,-23.0004,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 400 Hz,-23,tone_400Hz_-23dBFS,1,-23.5577,0,-20.0029,0,0,61,True,123
+prime_dc,cs7000p,tones,tone 400 Hz,-20,tone_400Hz_-20dBFS,1,-20.3836,0,-16.9977,0,0,61,True,122
+prime_dc,cs7000p,tones,tone 400 Hz,-17,tone_400Hz_-17dBFS,1,-19.0147,0,-14.0041,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 400 Hz,-14,tone_400Hz_-14dBFS,1,-17.3464,0,-11.0017,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 400 Hz,-11,tone_400Hz_-11dBFS,1,-16.2357,0,-8.00347,0,0,61,True,123
+prime_dc,cs7000p,tones,tone 400 Hz,-8,tone_400Hz_-8dBFS,1,-15.7367,0,-5.00285,0,0,60,True,121
+prime_dc,cs7000p,tones,tone 400 Hz,-5,tone_400Hz_-5dBFS,1,-11.4043,0,-2.34103,0.3,0.24,60,True,121
+prime_dc,cs7000p,tones,tone 400 Hz,-2,tone_400Hz_-2dBFS,1,-10.0181,0,-1.45039,0.6,0.48,60,True,120
+prime_dc,cs7000p,tones,tone 400 Hz,0,tone_400Hz_+0dBFS,1,-12.3854,0,-1.05704,0.6,0.48,61,True,123
+keep_sum,cs7000p,tones,tone 1000 Hz,-50,tone_1000Hz_-50dBFS,1,-52.9911,0,-47.0652,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-47,tone_1000Hz_-47dBFS,1,-51.5478,0,-44.13,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-44,tone_1000Hz_-44dBFS,1,-49.2617,0,-41.1633,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-41,tone_1000Hz_-41dBFS,1,-46.3837,0,-38.1718,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-38,tone_1000Hz_-38dBFS,1,-42.7387,0,-35.1825,0,0,60,True,120
+keep_sum,cs7000p,tones,tone 1000 Hz,-35,tone_1000Hz_-35dBFS,1,-38.7791,0,-32.1852,0,0,61,True,122
+keep_sum,cs7000p,tones,tone 1000 Hz,-32,tone_1000Hz_-32dBFS,1,-35.3556,0,-29.1867,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-29,tone_1000Hz_-29dBFS,1,-32.8654,0,-26.1875,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-26,tone_1000Hz_-26dBFS,1,-31.6171,0,-23.1876,0,0,61,True,123
+keep_sum,cs7000p,tones,tone 1000 Hz,-23,tone_1000Hz_-23dBFS,1,-31.0396,0,-20.1879,0,0,60,True,120
+keep_sum,cs7000p,tones,tone 1000 Hz,-20,tone_1000Hz_-20dBFS,1,-30.3162,0,-17.1865,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-17,tone_1000Hz_-17dBFS,1,-29.506,0,-14.1866,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-14,tone_1000Hz_-14dBFS,1,-27.9358,0,-11.1863,0,0,61,True,122
+keep_sum,cs7000p,tones,tone 1000 Hz,-11,tone_1000Hz_-11dBFS,1,-25.7384,0,-8.18665,0,0,61,True,123
+keep_sum,cs7000p,tones,tone 1000 Hz,-8,tone_1000Hz_-8dBFS,1,-23.6754,0,-5.18648,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 1000 Hz,-5,tone_1000Hz_-5dBFS,1,-21.1428,0,-2.33164,0.25,0.2,62,True,125
+keep_sum,cs7000p,tones,tone 1000 Hz,-2,tone_1000Hz_-2dBFS,1,-20.4431,0,-1.6774,0.5,0.4,61,True,123
+keep_sum,cs7000p,tones,tone 1000 Hz,0,tone_1000Hz_+0dBFS,1,-19.8915,0,-1.05308,0.5,0.4,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-50,tone_400Hz_-50dBFS,1,-51.8968,0,-46.8879,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-47,tone_400Hz_-47dBFS,1,-51.0553,0,-43.9453,0,0,62,True,125
+keep_sum,cs7000p,tones,tone 400 Hz,-44,tone_400Hz_-44dBFS,1,-49.0451,0,-40.9777,0,0,61,True,123
+keep_sum,cs7000p,tones,tone 400 Hz,-41,tone_400Hz_-41dBFS,1,-46.1918,0,-37.992,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-38,tone_400Hz_-38dBFS,1,-42.9268,0,-34.9993,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-35,tone_400Hz_-35dBFS,1,-39.5754,0,-32.0031,0,0,59,True,119
+keep_sum,cs7000p,tones,tone 400 Hz,-32,tone_400Hz_-32dBFS,1,-35.8411,0,-29.0038,0,0,61,True,123
+keep_sum,cs7000p,tones,tone 400 Hz,-29,tone_400Hz_-29dBFS,1,-31.9964,0,-26.0048,0,0,59,True,119
+keep_sum,cs7000p,tones,tone 400 Hz,-26,tone_400Hz_-26dBFS,1,-28.182,0,-23.0047,0,0,59,True,119
+keep_sum,cs7000p,tones,tone 400 Hz,-23,tone_400Hz_-23dBFS,1,-23.0399,0,-20.0046,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-20,tone_400Hz_-20dBFS,1,-20.8556,0,-17.0044,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-17,tone_400Hz_-17dBFS,1,-19.0016,0,-14.0039,0,0,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-14,tone_400Hz_-14dBFS,1,-18.1562,0,-11.0043,0,0,59,True,119
+keep_sum,cs7000p,tones,tone 400 Hz,-11,tone_400Hz_-11dBFS,1,-16.8266,0,-8.00391,0,0,61,True,122
+keep_sum,cs7000p,tones,tone 400 Hz,-8,tone_400Hz_-8dBFS,1,-15.8897,0,-5.00384,0,0,61,True,123
+keep_sum,cs7000p,tones,tone 400 Hz,-5,tone_400Hz_-5dBFS,1,-11.3598,0,-2.34124,0.3,0.24,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,-2,tone_400Hz_-2dBFS,1,-9.81628,0,-1.45046,0.6,0.48,60,True,121
+keep_sum,cs7000p,tones,tone 400 Hz,0,tone_400Hz_+0dBFS,1,-12.2267,0,-1.05705,0.6,0.48,61,True,123
+hpf,cs7000p,tones,tone 1000 Hz,-50,tone_1000Hz_-50dBFS,1,-52.1309,0,-46.7907,0,,59,True,119
+hpf,cs7000p,tones,tone 1000 Hz,-47,tone_1000Hz_-47dBFS,1,-50.8637,0,-43.925,0,,60,True,120
+hpf,cs7000p,tones,tone 1000 Hz,-44,tone_1000Hz_-44dBFS,1,-48.6487,0,-41.0164,0,,59,True,119
+hpf,cs7000p,tones,tone 1000 Hz,-41,tone_1000Hz_-41dBFS,1,-46.0831,0,-38.0734,0,,60,True,121
+hpf,cs7000p,tones,tone 1000 Hz,-38,tone_1000Hz_-38dBFS,1,-42.2086,0,-35.1146,0,,60,True,121
+hpf,cs7000p,tones,tone 1000 Hz,-35,tone_1000Hz_-35dBFS,1,-39.5177,0,-32.1428,0,,58,True,117
+hpf,cs7000p,tones,tone 1000 Hz,-32,tone_1000Hz_-32dBFS,1,-36.9986,0,-29.1587,0,,60,True,120
+hpf,cs7000p,tones,tone 1000 Hz,-29,tone_1000Hz_-29dBFS,1,-34.0083,0,-26.1752,0,,56,True,113
+hpf,cs7000p,tones,tone 1000 Hz,-26,tone_1000Hz_-26dBFS,1,-33.4954,0,-23.1846,0,,59,True,119
+hpf,cs7000p,tones,tone 1000 Hz,-23,tone_1000Hz_-23dBFS,1,-32.5172,0,-20.1883,0,,58,True,117
+hpf,cs7000p,tones,tone 1000 Hz,-20,tone_1000Hz_-20dBFS,1,-32.1484,0,-17.177,0,,60,True,121
+hpf,cs7000p,tones,tone 1000 Hz,-17,tone_1000Hz_-17dBFS,1,-31.1337,0,-14.1871,0,,60,True,121
+hpf,cs7000p,tones,tone 1000 Hz,-14,tone_1000Hz_-14dBFS,1,-29.2604,0,-11.1843,0,,58,True,117
+hpf,cs7000p,tones,tone 1000 Hz,-11,tone_1000Hz_-11dBFS,1,-27.1852,0,-8.1886,0,,60,True,121
+hpf,cs7000p,tones,tone 1000 Hz,-8,tone_1000Hz_-8dBFS,1,-24.8413,0,-5.18615,0,,60,True,121
+hpf,cs7000p,tones,tone 1000 Hz,-5,tone_1000Hz_-5dBFS,1,-21.9941,0,-2.37082,0.25,,60,True,121
+hpf,cs7000p,tones,tone 1000 Hz,-2,tone_1000Hz_-2dBFS,1,-19.9739,0,-1.65361,0.5,,60,True,121
+hpf,cs7000p,tones,tone 1000 Hz,0,tone_1000Hz_+0dBFS,1,-20.3745,0,-1.02044,0.5,,61,True,123
+hpf,cs7000p,tones,tone 400 Hz,-50,tone_400Hz_-50dBFS,1,-51.1618,0,-46.8205,0,,60,True,121
+hpf,cs7000p,tones,tone 400 Hz,-47,tone_400Hz_-47dBFS,1,-50.1539,0,-43.903,0,,61,True,123
+hpf,cs7000p,tones,tone 400 Hz,-44,tone_400Hz_-44dBFS,1,-48.6085,0,-40.9548,0,,60,True,121
+hpf,cs7000p,tones,tone 400 Hz,-41,tone_400Hz_-41dBFS,1,-46.3968,0,-37.9889,0,,61,True,123
+hpf,cs7000p,tones,tone 400 Hz,-38,tone_400Hz_-38dBFS,1,-43.2347,0,-35.0094,0,,60,True,121
+hpf,cs7000p,tones,tone 400 Hz,-35,tone_400Hz_-35dBFS,1,-39.6587,0,-32.0219,0,,61,True,123
+hpf,cs7000p,tones,tone 400 Hz,-32,tone_400Hz_-32dBFS,1,-36.3845,0,-29.0295,0,,60,True,121
+hpf,cs7000p,tones,tone 400 Hz,-29,tone_400Hz_-29dBFS,1,-32.1316,0,-26.0254,0,,60,True,121
+hpf,cs7000p,tones,tone 400 Hz,-26,tone_400Hz_-26dBFS,1,-27.9286,0,-23.0247,0,,58,True,117
+hpf,cs7000p,tones,tone 400 Hz,-23,tone_400Hz_-23dBFS,1,-23.7221,0,-20.0272,0,,59,True,119
+hpf,cs7000p,tones,tone 400 Hz,-20,tone_400Hz_-20dBFS,1,-20.4541,0,-17.0222,0,,60,True,120
+hpf,cs7000p,tones,tone 400 Hz,-17,tone_400Hz_-17dBFS,1,-18.912,0,-14.0285,0,,58,True,117
+hpf,cs7000p,tones,tone 400 Hz,-14,tone_400Hz_-14dBFS,1,-17.5256,0,-11.026,0,,57,True,115
+hpf,cs7000p,tones,tone 400 Hz,-11,tone_400Hz_-11dBFS,1,-16.5638,0,-8.02776,0,,59,True,119
+hpf,cs7000p,tones,tone 400 Hz,-8,tone_400Hz_-8dBFS,1,-15.2129,0,-5.02713,0,,61,True,122
+hpf,cs7000p,tones,tone 400 Hz,-5,tone_400Hz_-5dBFS,1,-11.5257,0,-2.38639,0.3,,60,True,121
+hpf,cs7000p,tones,tone 400 Hz,-2,tone_400Hz_-2dBFS,1,-10.9758,0,-1.43171,0.6,,60,True,121
+hpf,cs7000p,tones,tone 400 Hz,0,tone_400Hz_+0dBFS,1,-13.6491,0,-1.05987,0.7,,60,True,121
+agc,cs7000p,tones,tone 1000 Hz,-50,tone_1000Hz_-50dBFS,1,-31.1004,0,-25.2734,0,,60,True,121
+agc,cs7000p,tones,tone 1000 Hz,-47,tone_1000Hz_-47dBFS,1,-31.6084,0,-24.715,0,,58,True,117
+agc,cs7000p,tones,tone 1000 Hz,-44,tone_1000Hz_-44dBFS,1,-32.5753,0,-24.2686,0,,59,True,119
+agc,cs7000p,tones,tone 1000 Hz,-41,tone_1000Hz_-41dBFS,1,-32.4979,0,-23.8723,0,,59,True,119
+agc,cs7000p,tones,tone 1000 Hz,-38,tone_1000Hz_-38dBFS,1,-31.1505,0,-23.5402,0,,60,True,121
+agc,cs7000p,tones,tone 1000 Hz,-35,tone_1000Hz_-35dBFS,1,-30.6871,0,-23.2578,0,,60,True,121
+agc,cs7000p,tones,tone 1000 Hz,-32,tone_1000Hz_-32dBFS,1,-30.0019,0,-22.9958,0,,59,True,119
+agc,cs7000p,tones,tone 1000 Hz,-29,tone_1000Hz_-29dBFS,1,-29.4036,0,-22.7475,0,,59,True,119
+agc,cs7000p,tones,tone 1000 Hz,-26,tone_1000Hz_-26dBFS,1,-31.4973,0,-22.5025,0,,60,True,120
+agc,cs7000p,tones,tone 1000 Hz,-23,tone_1000Hz_-23dBFS,1,-33.0969,0,-22.2532,0,,60,True,121
+agc,cs7000p,tones,tone 1000 Hz,-20,tone_1000Hz_-20dBFS,1,-35.2554,0,-21.9989,0,,61,True,123
+agc,cs7000p,tones,tone 1000 Hz,-17,tone_1000Hz_-17dBFS,1,-37.0596,0,-21.745,0,,60,True,121
+agc,cs7000p,tones,tone 1000 Hz,-14,tone_1000Hz_-14dBFS,1,-38.067,0,-21.4908,0,,61,True,123
+agc,cs7000p,tones,tone 1000 Hz,-11,tone_1000Hz_-11dBFS,1,-39.4065,0,-21.2461,0,,61,True,123
+agc,cs7000p,tones,tone 1000 Hz,-8,tone_1000Hz_-8dBFS,1,-39.4593,0,-21.059,0,,60,True,121
+agc,cs7000p,tones,tone 1000 Hz,-5,tone_1000Hz_-5dBFS,1,-38.8131,0,-21.0012,0,,61,True,123
+agc,cs7000p,tones,tone 1000 Hz,-2,tone_1000Hz_-2dBFS,1,-37.7933,0,-21.0008,0,,60,True,121
+agc,cs7000p,tones,tone 1000 Hz,0,tone_1000Hz_+0dBFS,1,-36.258,0,-21.0012,0,,59,True,119
+agc,cs7000p,tones,tone 400 Hz,-50,tone_400Hz_-50dBFS,1,-29.7188,0,-25.2626,0,,60,True,121
+agc,cs7000p,tones,tone 400 Hz,-47,tone_400Hz_-47dBFS,1,-30.7521,0,-24.699,0,,58,True,117
+agc,cs7000p,tones,tone 400 Hz,-44,tone_400Hz_-44dBFS,1,-32.0742,0,-24.2487,0,,60,True,121
+agc,cs7000p,tones,tone 400 Hz,-41,tone_400Hz_-41dBFS,1,-32.2234,0,-23.8542,0,,59,True,119
+agc,cs7000p,tones,tone 400 Hz,-38,tone_400Hz_-38dBFS,1,-31.5901,0,-23.5283,0,,59,True,119
+agc,cs7000p,tones,tone 400 Hz,-35,tone_400Hz_-35dBFS,1,-31.019,0,-23.2466,0,,59,True,119
+agc,cs7000p,tones,tone 400 Hz,-32,tone_400Hz_-32dBFS,1,-30.5825,0,-22.985,0,,59,True,119
+agc,cs7000p,tones,tone 400 Hz,-29,tone_400Hz_-29dBFS,1,-28.9727,0,-22.7343,0,,59,True,119
+agc,cs7000p,tones,tone 400 Hz,-26,tone_400Hz_-26dBFS,1,-27.5578,0,-22.4885,0,,59,True,119
+agc,cs7000p,tones,tone 400 Hz,-23,tone_400Hz_-23dBFS,1,-25.7875,0,-22.239,0,,59,True,119
+agc,cs7000p,tones,tone 400 Hz,-20,tone_400Hz_-20dBFS,1,-25.5225,0,-21.9851,0,,58,True,117
+agc,cs7000p,tones,tone 400 Hz,-17,tone_400Hz_-17dBFS,1,-26.7796,0,-21.7309,0,,57,True,115
+agc,cs7000p,tones,tone 400 Hz,-14,tone_400Hz_-14dBFS,1,-27.7186,0,-21.4778,0,,59,True,119
+agc,cs7000p,tones,tone 400 Hz,-11,tone_400Hz_-11dBFS,1,-29.723,0,-21.2334,0,,59,True,119
+agc,cs7000p,tones,tone 400 Hz,-8,tone_400Hz_-8dBFS,1,-31.622,0,-21.0535,0,,62,True,125
+agc,cs7000p,tones,tone 400 Hz,-5,tone_400Hz_-5dBFS,1,-31.6119,0,-21.001,0,,62,True,125
+agc,cs7000p,tones,tone 400 Hz,-2,tone_400Hz_-2dBFS,1,-31.7754,0,-21.0007,0,,62,True,125
+agc,cs7000p,tones,tone 400 Hz,0,tone_400Hz_+0dBFS,1,-32.3979,0,-21.0005,0,,62,True,125
+full,cs7000p,tones,tone 1000 Hz,-50,tone_1000Hz_-50dBFS,1,-29.9294,0,-23.7091,0,,59,True,119
+full,cs7000p,tones,tone 1000 Hz,-47,tone_1000Hz_-47dBFS,1,-30.0396,0,-22.712,0,,60,True,120
+full,cs7000p,tones,tone 1000 Hz,-44,tone_1000Hz_-44dBFS,1,-30.458,0,-22.5208,0,,60,True,121
+full,cs7000p,tones,tone 1000 Hz,-41,tone_1000Hz_-41dBFS,1,-30.2938,0,-22.3197,0,,59,True,119
+full,cs7000p,tones,tone 1000 Hz,-38,tone_1000Hz_-38dBFS,1,-29.7705,0,-22.1113,0,,60,True,121
+full,cs7000p,tones,tone 1000 Hz,-35,tone_1000Hz_-35dBFS,1,-28.9508,0,-21.893,0,,60,True,121
+full,cs7000p,tones,tone 1000 Hz,-32,tone_1000Hz_-32dBFS,1,-29.2295,0,-21.6667,0,,60,True,121
+full,cs7000p,tones,tone 1000 Hz,-29,tone_1000Hz_-29dBFS,1,-29.472,0,-21.4309,0,,59,True,119
+full,cs7000p,tones,tone 1000 Hz,-26,tone_1000Hz_-26dBFS,1,-31.634,0,-21.1856,0,,60,True,121
+full,cs7000p,tones,tone 1000 Hz,-23,tone_1000Hz_-23dBFS,1,-33.8892,0,-21.0063,0,,60,True,121
+full,cs7000p,tones,tone 1000 Hz,-20,tone_1000Hz_-20dBFS,1,-35.9079,0,-21.004,0,,60,True,121
+full,cs7000p,tones,tone 1000 Hz,-17,tone_1000Hz_-17dBFS,1,-38.2251,0,-21.003,0,,60,True,121
+full,cs7000p,tones,tone 1000 Hz,-14,tone_1000Hz_-14dBFS,1,-39.0678,0,-21.0022,0,,61,True,122
+full,cs7000p,tones,tone 1000 Hz,-11,tone_1000Hz_-11dBFS,1,-39.6803,0,-21.0017,0,,61,True,123
+full,cs7000p,tones,tone 1000 Hz,-8,tone_1000Hz_-8dBFS,1,-39.7552,0,-21.0012,0,,61,True,123
+full,cs7000p,tones,tone 1000 Hz,-5,tone_1000Hz_-5dBFS,1,-37.1487,0,-21.0009,0,,60,True,121
+full,cs7000p,tones,tone 1000 Hz,-2,tone_1000Hz_-2dBFS,1,-35.7464,0,-21.0007,0,,60,True,121
+full,cs7000p,tones,tone 1000 Hz,0,tone_1000Hz_+0dBFS,1,-36.224,0,-21.0006,0,,59,True,119
+full,cs7000p,tones,tone 400 Hz,-50,tone_400Hz_-50dBFS,1,-29.0287,0,-23.5972,0,,60,True,121
+full,cs7000p,tones,tone 400 Hz,-47,tone_400Hz_-47dBFS,1,-29.8089,0,-22.7009,0,,60,True,121
+full,cs7000p,tones,tone 400 Hz,-44,tone_400Hz_-44dBFS,1,-30.6053,0,-22.5073,0,,59,True,119
+full,cs7000p,tones,tone 400 Hz,-41,tone_400Hz_-41dBFS,1,-30.8601,0,-22.3077,0,,59,True,119
+full,cs7000p,tones,tone 400 Hz,-38,tone_400Hz_-38dBFS,1,-30.1024,0,-22.0985,0,,59,True,119
+full,cs7000p,tones,tone 400 Hz,-35,tone_400Hz_-35dBFS,1,-29.5714,0,-21.8809,0,,59,True,119
+full,cs7000p,tones,tone 400 Hz,-32,tone_400Hz_-32dBFS,1,-28.5211,0,-21.6543,0,,59,True,119
+full,cs7000p,tones,tone 400 Hz,-29,tone_400Hz_-29dBFS,1,-27.5136,0,-21.4179,0,,59,True,119
+full,cs7000p,tones,tone 400 Hz,-26,tone_400Hz_-26dBFS,1,-26.079,0,-21.1718,0,,59,True,119
+full,cs7000p,tones,tone 400 Hz,-23,tone_400Hz_-23dBFS,1,-24.0574,0,-21.0054,0,,59,True,119
+full,cs7000p,tones,tone 400 Hz,-20,tone_400Hz_-20dBFS,1,-25.1116,0,-21.0039,0,,60,True,121
+full,cs7000p,tones,tone 400 Hz,-17,tone_400Hz_-17dBFS,1,-26.119,0,-21.0028,0,,60,True,121
+full,cs7000p,tones,tone 400 Hz,-14,tone_400Hz_-14dBFS,1,-27.8447,0,-21.0021,0,,59,True,119
+full,cs7000p,tones,tone 400 Hz,-11,tone_400Hz_-11dBFS,1,-30.2046,0,-21.0016,0,,59,True,119
+full,cs7000p,tones,tone 400 Hz,-8,tone_400Hz_-8dBFS,1,-31.8191,0,-21.0012,0,,62,True,125
+full,cs7000p,tones,tone 400 Hz,-5,tone_400Hz_-5dBFS,1,-31.4065,0,-21.0009,0,,61,True,123
+full,cs7000p,tones,tone 400 Hz,-2,tone_400Hz_-2dBFS,1,-31.5252,0,-21.0007,0,,61,True,123
+full,cs7000p,tones,tone 400 Hz,0,tone_400Hz_+0dBFS,1,-32.231,0,-21.0007,0,,62,True,125
+agc_slow,cs7000p,tones,tone 1000 Hz,-50,tone_1000Hz_-50dBFS,1,-30.6647,0,-25.0291,0,,59,True,119
+agc_slow,cs7000p,tones,tone 1000 Hz,-47,tone_1000Hz_-47dBFS,1,-31.3434,0,-24.568,0,,60,True,121
+agc_slow,cs7000p,tones,tone 1000 Hz,-44,tone_1000Hz_-44dBFS,1,-32.4812,0,-24.1952,0,,60,True,121
+agc_slow,cs7000p,tones,tone 1000 Hz,-41,tone_1000Hz_-41dBFS,1,-32.1866,0,-23.849,0,,60,True,121
+agc_slow,cs7000p,tones,tone 1000 Hz,-38,tone_1000Hz_-38dBFS,1,-30.991,0,-23.5393,0,,60,True,121
+agc_slow,cs7000p,tones,tone 1000 Hz,-35,tone_1000Hz_-35dBFS,1,-30.3747,0,-23.2578,0,,60,True,121
+agc_slow,cs7000p,tones,tone 1000 Hz,-32,tone_1000Hz_-32dBFS,1,-29.9423,0,-22.9958,0,,60,True,121
+agc_slow,cs7000p,tones,tone 1000 Hz,-29,tone_1000Hz_-29dBFS,1,-29.4238,0,-22.7475,0,,60,True,121
+agc_slow,cs7000p,tones,tone 1000 Hz,-26,tone_1000Hz_-26dBFS,1,-31.3116,0,-22.4954,0,,61,True,123
+agc_slow,cs7000p,tones,tone 1000 Hz,-23,tone_1000Hz_-23dBFS,1,-32.7905,0,-22.1036,0,,60,True,121
+agc_slow,cs7000p,tones,tone 1000 Hz,-20,tone_1000Hz_-20dBFS,1,-34.1695,0,-21.1931,0,,60,True,121
+agc_slow,cs7000p,tones,tone 1000 Hz,-17,tone_1000Hz_-17dBFS,1,-34.3523,0,-19.2366,0,,61,True,123
+agc_slow,cs7000p,tones,tone 1000 Hz,-14,tone_1000Hz_-14dBFS,1,-32.8381,0,-16.3442,0,,60,True,121
+agc_slow,cs7000p,tones,tone 1000 Hz,-11,tone_1000Hz_-11dBFS,1,-31.1189,0,-13.3483,0,,61,True,123
+agc_slow,cs7000p,tones,tone 1000 Hz,-8,tone_1000Hz_-8dBFS,1,-29.0003,0,-10.346,0,,60,True,121
+agc_slow,cs7000p,tones,tone 1000 Hz,-5,tone_1000Hz_-5dBFS,1,-26.2217,0,-7.42348,0,,61,True,123
+agc_slow,cs7000p,tones,tone 1000 Hz,-2,tone_1000Hz_-2dBFS,1,-23.9543,0,-5.00818,0,,60,True,120
+agc_slow,cs7000p,tones,tone 1000 Hz,0,tone_1000Hz_+0dBFS,1,-23.057,0,-3.84246,0,,60,True,121
+agc_slow,cs7000p,tones,tone 400 Hz,-50,tone_400Hz_-50dBFS,1,-29.4903,0,-25.0219,0,,60,True,121
+agc_slow,cs7000p,tones,tone 400 Hz,-47,tone_400Hz_-47dBFS,1,-30.6235,0,-24.5543,0,,60,True,121
+agc_slow,cs7000p,tones,tone 400 Hz,-44,tone_400Hz_-44dBFS,1,-32.1153,0,-24.1776,0,,60,True,121
+agc_slow,cs7000p,tones,tone 400 Hz,-41,tone_400Hz_-41dBFS,1,-32.2921,0,-23.8323,0,,60,True,121
+agc_slow,cs7000p,tones,tone 400 Hz,-38,tone_400Hz_-38dBFS,1,-31.5611,0,-23.5279,0,,60,True,121
+agc_slow,cs7000p,tones,tone 400 Hz,-35,tone_400Hz_-35dBFS,1,-30.9691,0,-23.2466,0,,59,True,119
+agc_slow,cs7000p,tones,tone 400 Hz,-32,tone_400Hz_-32dBFS,1,-30.5025,0,-22.985,0,,58,True,117
+agc_slow,cs7000p,tones,tone 400 Hz,-29,tone_400Hz_-29dBFS,1,-28.9827,0,-22.7343,0,,59,True,119
+agc_slow,cs7000p,tones,tone 400 Hz,-26,tone_400Hz_-26dBFS,1,-27.652,0,-22.4788,0,,59,True,119
+agc_slow,cs7000p,tones,tone 400 Hz,-23,tone_400Hz_-23dBFS,1,-25.5833,0,-22.069,0,,59,True,119
+agc_slow,cs7000p,tones,tone 400 Hz,-20,tone_400Hz_-20dBFS,1,-24.7779,0,-21.1099,0,,59,True,119
+agc_slow,cs7000p,tones,tone 400 Hz,-17,tone_400Hz_-17dBFS,1,-24.0135,0,-19.0802,0,,59,True,119
+agc_slow,cs7000p,tones,tone 400 Hz,-14,tone_400Hz_-14dBFS,1,-22.4456,0,-16.1622,0,,59,True,119
+agc_slow,cs7000p,tones,tone 400 Hz,-11,tone_400Hz_-11dBFS,1,-21.7595,0,-13.164,0,,59,True,119
+agc_slow,cs7000p,tones,tone 400 Hz,-8,tone_400Hz_-8dBFS,1,-20.5169,0,-10.1641,0,,60,True,121
+agc_slow,cs7000p,tones,tone 400 Hz,-5,tone_400Hz_-5dBFS,1,-15.5861,0,-7.26076,0,,60,True,121
+agc_slow,cs7000p,tones,tone 400 Hz,-2,tone_400Hz_-2dBFS,1,-13.4179,0,-4.85806,0,,61,True,123
+agc_slow,cs7000p,tones,tone 400 Hz,0,tone_400Hz_+0dBFS,1,-12.0902,0,-3.70558,0,,60,True,121
+agc_mid,cs7000p,tones,tone 1000 Hz,-50,tone_1000Hz_-50dBFS,1,-30.7706,0,-25.0598,0,,59,True,119
+agc_mid,cs7000p,tones,tone 1000 Hz,-47,tone_1000Hz_-47dBFS,1,-31.5541,0,-24.5817,0,,59,True,119
+agc_mid,cs7000p,tones,tone 1000 Hz,-44,tone_1000Hz_-44dBFS,1,-32.6091,0,-24.2003,0,,60,True,121
+agc_mid,cs7000p,tones,tone 1000 Hz,-41,tone_1000Hz_-41dBFS,1,-31.9443,0,-23.849,0,,60,True,121
+agc_mid,cs7000p,tones,tone 1000 Hz,-38,tone_1000Hz_-38dBFS,1,-30.8717,0,-23.5393,0,,59,True,119
+agc_mid,cs7000p,tones,tone 1000 Hz,-35,tone_1000Hz_-35dBFS,1,-30.4839,0,-23.2578,0,,60,True,121
+agc_mid,cs7000p,tones,tone 1000 Hz,-32,tone_1000Hz_-32dBFS,1,-29.9437,0,-22.9958,0,,60,True,121
+agc_mid,cs7000p,tones,tone 1000 Hz,-29,tone_1000Hz_-29dBFS,1,-29.2373,0,-22.7475,0,,59,True,119
+agc_mid,cs7000p,tones,tone 1000 Hz,-26,tone_1000Hz_-26dBFS,1,-31.3524,0,-22.5025,0,,60,True,121
+agc_mid,cs7000p,tones,tone 1000 Hz,-23,tone_1000Hz_-23dBFS,1,-33.0496,0,-22.2532,0,,60,True,121
+agc_mid,cs7000p,tones,tone 1000 Hz,-20,tone_1000Hz_-20dBFS,1,-35.2243,0,-21.9989,0,,60,True,121
+agc_mid,cs7000p,tones,tone 1000 Hz,-17,tone_1000Hz_-17dBFS,1,-37.2119,0,-21.6898,0,,60,True,121
+agc_mid,cs7000p,tones,tone 1000 Hz,-14,tone_1000Hz_-14dBFS,1,-37.5655,0,-21.1111,0,,60,True,121
+agc_mid,cs7000p,tones,tone 1000 Hz,-11,tone_1000Hz_-11dBFS,1,-38.0904,0,-19.9863,0,,59,True,119
+agc_mid,cs7000p,tones,tone 1000 Hz,-8,tone_1000Hz_-8dBFS,1,-35.6156,0,-18.1431,0,,60,True,121
+agc_mid,cs7000p,tones,tone 1000 Hz,-5,tone_1000Hz_-5dBFS,1,-32.8994,0,-15.6912,0,,60,True,120
+agc_mid,cs7000p,tones,tone 1000 Hz,-2,tone_1000Hz_-2dBFS,1,-30.7076,0,-12.8867,0,,60,True,121
+agc_mid,cs7000p,tones,tone 1000 Hz,0,tone_1000Hz_+0dBFS,1,-27.0626,0,-10.9262,0,,61,True,123
+agc_mid,cs7000p,tones,tone 400 Hz,-50,tone_400Hz_-50dBFS,1,-29.3643,0,-25.0502,0,,61,True,123
+agc_mid,cs7000p,tones,tone 400 Hz,-47,tone_400Hz_-47dBFS,1,-30.6543,0,-24.5695,0,,60,True,121
+agc_mid,cs7000p,tones,tone 400 Hz,-44,tone_400Hz_-44dBFS,1,-32.0465,0,-24.1827,0,,61,True,123
+agc_mid,cs7000p,tones,tone 400 Hz,-41,tone_400Hz_-41dBFS,1,-32.2165,0,-23.8323,0,,61,True,123
+agc_mid,cs7000p,tones,tone 400 Hz,-38,tone_400Hz_-38dBFS,1,-31.5072,0,-23.5279,0,,60,True,121
+agc_mid,cs7000p,tones,tone 400 Hz,-35,tone_400Hz_-35dBFS,1,-31.1155,0,-23.2466,0,,61,True,123
+agc_mid,cs7000p,tones,tone 400 Hz,-32,tone_400Hz_-32dBFS,1,-30.5469,0,-22.985,0,,58,True,117
+agc_mid,cs7000p,tones,tone 400 Hz,-29,tone_400Hz_-29dBFS,1,-28.9615,0,-22.7343,0,,60,True,121
+agc_mid,cs7000p,tones,tone 400 Hz,-26,tone_400Hz_-26dBFS,1,-27.6208,0,-22.4885,0,,60,True,121
+agc_mid,cs7000p,tones,tone 400 Hz,-23,tone_400Hz_-23dBFS,1,-25.7739,0,-22.239,0,,60,True,121
+agc_mid,cs7000p,tones,tone 400 Hz,-20,tone_400Hz_-20dBFS,1,-25.6305,0,-21.9851,0,,59,True,119
+agc_mid,cs7000p,tones,tone 400 Hz,-17,tone_400Hz_-17dBFS,1,-26.663,0,-21.6663,0,,59,True,119
+agc_mid,cs7000p,tones,tone 400 Hz,-14,tone_400Hz_-14dBFS,1,-27.3155,0,-21.0619,0,,60,True,121
+agc_mid,cs7000p,tones,tone 400 Hz,-11,tone_400Hz_-11dBFS,1,-28.3895,0,-19.8944,0,,58,True,117
+agc_mid,cs7000p,tones,tone 400 Hz,-8,tone_400Hz_-8dBFS,1,-27.801,0,-18.0087,0,,60,True,121
+agc_mid,cs7000p,tones,tone 400 Hz,-5,tone_400Hz_-5dBFS,1,-27.0384,0,-15.5286,0,,60,True,121
+agc_mid,cs7000p,tones,tone 400 Hz,-2,tone_400Hz_-2dBFS,1,-25.5176,0,-12.708,0,,59,True,119
+agc_mid,cs7000p,tones,tone 400 Hz,0,tone_400Hz_+0dBFS,1,-20.38,0,-10.7482,0,,60,True,120

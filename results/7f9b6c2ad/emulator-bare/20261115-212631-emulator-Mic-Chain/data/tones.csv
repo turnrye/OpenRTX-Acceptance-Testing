@@ -1,0 +1,73 @@
+variant,profile,test,signal,level,take,over,rms_dbfs,post_clip_fraction,pre_rms_dbfs,pre_clip_fraction,model_clip_fraction,frames,lsf_crc_ok,precodec_blocks
+keep_sum,emulator-bare,tones,tone 1000 Hz,-50,tone_1000Hz_-50dBFS,1,-37.9414,0,-52.9806,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 1000 Hz,-47,tone_1000Hz_-47dBFS,1,-39.991,0,-50.021,0,0,60,True,121
+keep_sum,emulator-bare,tones,tone 1000 Hz,-44,tone_1000Hz_-44dBFS,1,-36.5697,0,-46.9897,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 1000 Hz,-41,tone_1000Hz_-41dBFS,1,-33.7805,0,-43.9751,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 1000 Hz,-38,tone_1000Hz_-38dBFS,1,-37.849,0,-40.9827,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 1000 Hz,-35,tone_1000Hz_-35dBFS,1,-31.8426,0,-37.9851,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 1000 Hz,-32,tone_1000Hz_-32dBFS,1,-50.5807,0,-34.989,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 1000 Hz,-29,tone_1000Hz_-29dBFS,1,-31.6804,0,-31.9877,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 1000 Hz,-26,tone_1000Hz_-26dBFS,1,-44.3107,0,-28.9902,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 1000 Hz,-23,tone_1000Hz_-23dBFS,1,-41.1789,0,-25.9889,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 1000 Hz,-20,tone_1000Hz_-20dBFS,1,-38.0508,0,-22.9881,0,0,60,True,120
+keep_sum,emulator-bare,tones,tone 1000 Hz,-17,tone_1000Hz_-17dBFS,1,-34.9217,0,-19.9887,0,0,60,True,121
+keep_sum,emulator-bare,tones,tone 1000 Hz,-14,tone_1000Hz_-14dBFS,1,-34.7703,0,-16.9894,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 1000 Hz,-11,tone_1000Hz_-11dBFS,1,-28.6686,0,-13.9891,0,0,60,True,121
+keep_sum,emulator-bare,tones,tone 1000 Hz,-8,tone_1000Hz_-8dBFS,1,-25.5426,0,-10.9889,0,0,61,True,122
+keep_sum,emulator-bare,tones,tone 1000 Hz,-5,tone_1000Hz_-5dBFS,1,-22.417,0,-7.98852,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 1000 Hz,-2,tone_1000Hz_-2dBFS,1,-27.5686,0,-4.98867,0,0,60,True,121
+keep_sum,emulator-bare,tones,tone 1000 Hz,0,tone_1000Hz_+0dBFS,1,-40.106,0,-3.01014,0,0.2,61,True,123
+keep_sum,emulator-bare,tones,tone 400 Hz,-50,tone_400Hz_-50dBFS,1,-35.8039,0,-52.9613,0,0,61,True,122
+keep_sum,emulator-bare,tones,tone 400 Hz,-47,tone_400Hz_-47dBFS,1,-33.9096,0,-50.0075,0,0,60,True,120
+keep_sum,emulator-bare,tones,tone 400 Hz,-44,tone_400Hz_-44dBFS,1,-34.7708,0,-46.9947,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 400 Hz,-41,tone_400Hz_-41dBFS,1,-33.575,0,-43.9861,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 400 Hz,-38,tone_400Hz_-38dBFS,1,-32.675,0,-40.9888,0,0,60,True,121
+keep_sum,emulator-bare,tones,tone 400 Hz,-35,tone_400Hz_-35dBFS,1,-29.865,0,-37.9913,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 400 Hz,-32,tone_400Hz_-32dBFS,1,-35.076,0,-34.9866,0,0,61,True,122
+keep_sum,emulator-bare,tones,tone 400 Hz,-29,tone_400Hz_-29dBFS,1,-29.4016,0,-31.9885,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 400 Hz,-26,tone_400Hz_-26dBFS,1,-42.1863,0,-28.9899,0,0,60,True,121
+keep_sum,emulator-bare,tones,tone 400 Hz,-23,tone_400Hz_-23dBFS,1,-26.9026,0,-25.9888,0,0,60,True,121
+keep_sum,emulator-bare,tones,tone 400 Hz,-20,tone_400Hz_-20dBFS,1,-27.9031,0,-22.9902,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 400 Hz,-17,tone_400Hz_-17dBFS,1,-27.9769,0,-19.9892,0,0,60,True,121
+keep_sum,emulator-bare,tones,tone 400 Hz,-14,tone_400Hz_-14dBFS,1,-32.6312,0,-16.9898,0,0,60,True,121
+keep_sum,emulator-bare,tones,tone 400 Hz,-11,tone_400Hz_-11dBFS,1,-32.2311,0,-13.9898,0,0,60,True,121
+keep_sum,emulator-bare,tones,tone 400 Hz,-8,tone_400Hz_-8dBFS,1,-23.0995,0,-10.9895,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 400 Hz,-5,tone_400Hz_-5dBFS,1,-24.1337,0,-7.98945,0,0,61,True,123
+keep_sum,emulator-bare,tones,tone 400 Hz,-2,tone_400Hz_-2dBFS,1,-25.5523,0,-4.98951,0,0,62,True,125
+keep_sum,emulator-bare,tones,tone 400 Hz,0,tone_400Hz_+0dBFS,1,-15.642,0,-2.99737,0,0.08,62,True,125
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-50,tone_1000Hz_-50dBFS,1,-46.3673,0,-53.0105,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-47,tone_1000Hz_-47dBFS,1,-38.1215,0,-50.0422,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-44,tone_1000Hz_-44dBFS,1,-38.9839,0,-47.0109,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-41,tone_1000Hz_-41dBFS,1,-36.7682,0,-44.0006,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-38,tone_1000Hz_-38dBFS,1,-50.5807,0,-41.0008,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-35,tone_1000Hz_-35dBFS,1,-33.9619,0,-38.0085,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-32,tone_1000Hz_-32dBFS,1,-50.5808,0,-35.0109,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-29,tone_1000Hz_-29dBFS,1,-47.4435,0,-32.0096,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-26,tone_1000Hz_-26dBFS,1,-35.314,0,-29.0121,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-23,tone_1000Hz_-23dBFS,1,-31.3523,0,-26.0108,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-20,tone_1000Hz_-20dBFS,1,-38.0499,0,-23.0101,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-17,tone_1000Hz_-17dBFS,1,-34.922,0,-20.0098,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-14,tone_1000Hz_-14dBFS,1,-31.0398,0,-17.0105,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-11,tone_1000Hz_-11dBFS,1,-28.6686,0,-14.0106,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-8,tone_1000Hz_-8dBFS,1,-32.4922,0,-11.0105,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-5,tone_1000Hz_-5dBFS,1,-22.417,0,-8.01039,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,-2,tone_1000Hz_-2dBFS,1,-25.8944,0,-5.01062,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 1000 Hz,0,tone_1000Hz_+0dBFS,1,-15.6137,0,-3.01078,0.125,0.2,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-50,tone_400Hz_-50dBFS,1,-26.0702,0,-52.9835,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-47,tone_400Hz_-47dBFS,1,-28.7785,0,-50.0295,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-44,tone_400Hz_-44dBFS,1,-31.9751,0,-47.0007,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-41,tone_400Hz_-41dBFS,1,-28.8862,0,-44.0089,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-38,tone_400Hz_-38dBFS,1,-31.8097,0,-41.0128,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-35,tone_400Hz_-35dBFS,1,-34.2921,0,-38.0109,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-32,tone_400Hz_-32dBFS,1,-29.326,0,-35.0094,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-29,tone_400Hz_-29dBFS,1,-43.7531,0,-32.0091,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-26,tone_400Hz_-26dBFS,1,-35.3575,0,-29.0105,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-23,tone_400Hz_-23dBFS,1,-26.0931,0,-26.0097,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-20,tone_400Hz_-20dBFS,1,-34.5349,0,-23.0105,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-17,tone_400Hz_-17dBFS,1,-35.3576,0,-20.0099,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-14,tone_400Hz_-14dBFS,1,-35.3576,0,-17.0106,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-11,tone_400Hz_-11dBFS,1,-28.2931,0,-14.0107,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-8,tone_400Hz_-8dBFS,1,-25.696,0,-11.0102,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-5,tone_400Hz_-5dBFS,1,-25.5219,0,-8.01049,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,-2,tone_400Hz_-2dBFS,1,-13.9807,0,-5.0105,0,0,,,
+codec-only (nominal),emulator-bare,tones,tone 400 Hz,0,tone_400Hz_+0dBFS,1,-14.059,0,-3.01061,0.05,0.08,,,

@@ -1,0 +1,2 @@
+variant,speech_spread_db,stoi_mean,stoi_deficit,pre_spread_db,onset_median_dbfs,pre_onset_median_dbfs,pre_clip_max,attack_s,release_s,release_rate_db_s,rise_db,listen_stoi_mean,listen_stoi_worst,listen_worst_level_dbfs,listen_worst_noise_dbfs,listen_deficit_worst,listen_deficit_worst_level_dbfs,listen_deficit_worst_noise_dbfs,speech_to_pause_db,pause_drift_db
+prime_dc,34.5185,0.767802,0.0383047,35.5163,-54.2559,-50.5777,0,0,0,,19.9992,0.558061,0.293317,-40,-35,0.346697,-40,-45,28.628,0.279915

@@ -39,6 +39,12 @@ they keep the run's `REPORT.md`, `METHODS.md`, `run.json` (provenance, signal re
 SVG), about 2 MB a run. The decoded audio of each take stays in the tester's take cache: it is
 regenerated exactly from the recipes, seeds and firmware the run records.
 
+A campaign (`scripts/emu-mic-campaign.py`: one run per firmware variant for one radio model)
+also publishes its comparison next to its runs, as
+`results/<OpenRTX sha>/<radio file>/campaign-<yyyymmdd>-Mic-Chain/`: the cross-variant
+`REPORT.md`, `METHODS.md`, `run.json`, `data/` and `charts/`, and a `README.md` that names the run
+folder of each variant.
+
 ## Rules
 
 - **Append only.** A wrong result is superseded by a new run, never edited.
