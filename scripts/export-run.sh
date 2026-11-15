@@ -16,13 +16,19 @@
 # if an absolute path survived, so nothing from the tester's machine reaches a
 # commit.
 #
-# Usage: scripts/export-run.sh [-r rerun outputdir]... <robot outputdir> [results dir]
+# A run of two radios at once (acceptance/m17/mic-chain-device.robot) has a
+# bench folder per radio, bench-<suite>-<radio file>: -b names the one to
+# export, so each radio is published under its own radio file.
+#
+# Usage: scripts/export-run.sh [-b bench folder] [-r rerun outputdir]... <robot outputdir> [results dir]
 
 set -euo pipefail
-usage="usage: scripts/export-run.sh [-r rerun]... <robot outputdir> [results dir]"
+usage="usage: scripts/export-run.sh [-b bench folder] [-r rerun]... <robot outputdir> [results dir]"
+bench=
 reruns=()
-while getopts "r:" opt; do
+while getopts "b:r:" opt; do
     case $opt in
+        b) bench=$OPTARG ;;
         r) reruns+=("$OPTARG") ;;
         *) echo "$usage" >&2; exit 1 ;;
     esac
@@ -61,11 +67,11 @@ done
 # the emulator bench agc@7f9b6c2ad -> 7f9b6c2ad), or the name made path-safe
 # when it has none (stock-1.2). A run of several suites
 # is published as one, named after its top suite.
-dest=$(uv run python - "$run" "$results" <<'PY'
+dest=$(uv run python - "$run" "$results" "$bench" <<'PY'
 import re, sys
 from pathlib import Path
 from oat.results import run_measurements
-m = run_measurements(Path(sys.argv[1]))
+m = run_measurements(Path(sys.argv[1]), sys.argv[3] or None)
 safe = lambda s: re.sub(r"[^A-Za-z0-9._-]", "_", s)
 sha = re.search(r"(?:^|-g|@)([0-9a-f]{7,40})$", m["firmware"])
 firmware = sha.group(1) if sha else safe(m["firmware"])
@@ -90,25 +96,27 @@ if [ "$rc" -gt 250 ]; then
     echo "rebot failed ($rc)" >&2
     false
 fi
-uv run python - "$dest/measurements.json" "$run" ${reruns[@]+"${reruns[@]}"} <<'PY'
+uv run python - "$dest/measurements.json" "$bench" "$run" ${reruns[@]+"${reruns[@]}"} <<'PY'
 import json, sys
 from pathlib import Path
 from oat.results import merge_reruns
 from oat.sanitize import scrub
-merged = merge_reruns(Path(sys.argv[2]), [Path(p) for p in sys.argv[3:]])
+merged = merge_reruns(Path(sys.argv[3]), [Path(p) for p in sys.argv[4:]],
+                      sys.argv[2] or None)
 Path(sys.argv[1]).write_text(scrub(json.dumps(merged, indent=2)) + "\n")
 PY
 
 # The emulator bench's artifacts, from the run's own bench folder
-uv run python - "$run" "$dest" <<'PY'
+uv run python - "$run" "$dest" "$bench" <<'PY'
 import shutil, sys
 from pathlib import Path
-benches = sorted(Path(sys.argv[1]).glob("bench-*"))
+benches = sorted(p.parent for p in Path(sys.argv[1]).glob(
+    f"{sys.argv[3] or 'bench-*'}/measurements.json"))
 if len(benches) == 1:
     for name in ("REPORT.md", "METHODS.md", "run.json", "openrtx.patch"):
         if (benches[0] / name).exists():
             shutil.copy(benches[0] / name, Path(sys.argv[2]) / name)
-    for name in ("data", "charts"):
+    for name in ("data", "charts", "voice"):
         if (benches[0] / name).is_dir():
             shutil.copytree(benches[0] / name, Path(sys.argv[2]) / name)
 PY

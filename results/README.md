@@ -45,6 +45,14 @@ also publishes its comparison next to its runs, as
 `REPORT.md`, `METHODS.md`, `run.json`, `data/` and `charts/`, and a `README.md` that names the run
 folder of each variant.
 
+## Two radios in one run
+
+`acceptance/m17/mic-chain-device.robot` measures two radios at once and writes a bench folder
+per radio, `bench-Mic-Chain-Device-<radio file>`. Each is exported on its own, under its own
+radio file: `scripts/export-run.sh -b bench-Mic-Chain-Device-<radio file> <run>`. Without `-b`
+the export refuses the run. Each export keeps its `REPORT.md`, `METHODS.md`, `data/`, `charts/`
+and the decoded voice of each take (`voice/`, about 160 kB a take); the raw captures stay local.
+
 ## Rules
 
 - **Append only.** A wrong result is superseded by a new run, never edited.

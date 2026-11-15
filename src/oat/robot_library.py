@@ -20,6 +20,7 @@ from scipy.io import wavfile
 
 from oat import aprs
 from oat import audio as audio_mod
+from oat import device_mic
 from oat import emu_bench
 from oat.analysis import demodulated_audio, measure_capture, to_analysis_rate
 from oat.calibration import load_calibration
@@ -168,6 +169,8 @@ class OpenRTXAcceptance:
         self._aprs_batches = 0
         # The emulator bench's firmware build, when the bench is one
         self.emulator = None
+        # Two radios keyed together (Open Radio Pair Bench)
+        self.pair = None
 
     # Bench --------------------------------------------------------------
 
@@ -449,6 +452,9 @@ class OpenRTXAcceptance:
             **({"tnc_junk": self.tnc.junk} if self.tnc is not None else {}),
             "operator": self.operator.exchanges(),
         }
+        if self.pair is not None:
+            self._close_pair(report)
+            return
         text = scrub(json.dumps(report, indent=2, default=plain))
         (self.run_dir / "measurements.json").write_text(text + "\n")
         if self.emulator is not None:
@@ -456,6 +462,278 @@ class OpenRTXAcceptance:
                 "suite": self.suite, "station": report["station"],
                 "radio_file": report["radio_file"], "firmware": self.firmware,
                 "hardware": self.hardware, "oat": {"describe": report["suite_commit"]}})
+
+    # Two radios at once -------------------------------------------------
+
+    @keyword
+    def open_radio_pair_bench(self, bench: str, calibration: str, radio_a: str,
+                              hardware_a: str, radio_b: str, hardware_b: str,
+                              firmware: str, frequency_a_hz: str = "",
+                              frequency_b_hz: str = "", image_a: str = "",
+                              image_b: str = "", dsp: str = ""):
+        """
+        Open the bench for two radios keyed together, A and B, on two
+        frequencies one capture holds (default each radio file's 70cm band;
+        at least 25 kHz apart). Both run `firmware`; image_a and image_b,
+        the flashed files, are recorded by their SHA-256. Each radio's
+        transmissions are channelised out of the capture and measured on
+        their own; close_bench writes a folder per radio
+        (bench-<suite>-<radio file>), each exported on its own.
+        """
+        missing = [n for n, v in (("RADIO_A", radio_a), ("HARDWARE_A", hardware_a),
+                                  ("RADIO_B", radio_b), ("HARDWARE_B", hardware_b))
+                   if not v]
+        if missing:
+            raise ValueError("Pass " + " ".join(f"-v {m}:..." for m in missing))
+        self.open_bench(bench, calibration, radio_a, firmware, hardware_a, dsp)
+        radios = []
+        for which, path, hw, freq, image in (("A", radio_a, hardware_a, frequency_a_hz, image_a),
+                                             ("B", radio_b, hardware_b, frequency_b_hz, image_b)):
+            data = load_yaml(Path(path))
+            if "mic_chain" not in data:
+                raise ValueError(f"{path}: no mic_chain section")
+            f = float(freq) if str(freq).strip() else float(
+                data["bands"]["70cm"]["frequency_hz"])
+            check_receiver_safe(data, self.calibration, self.receiver.max_input_dbm, f)
+            radios.append({"which": which, "file": Path(path), "stem": Path(path).stem,
+                           "radio": data, "hardware": str(hw), "frequency_hz": f,
+                           "image_sha256": emu_bench.emu.sha256(Path(image))
+                           if str(image).strip() else None})
+        if radios[0]["stem"] == radios[1]["stem"]:
+            raise ValueError("the two radios need different radio files")
+        rate = float(self.bench["receiver"]["rate"])
+        tuning = device_mic.pair_tuning(radios[0]["frequency_hz"],
+                                        radios[1]["frequency_hz"], rate)
+        for r, off in zip(radios, tuning.offsets_hz):
+            r["offset_hz"] = off
+        self.pair = {"radios": radios, "center_hz": tuning.center_hz, "rows": [],
+                     "playback": None, "clips": {}}
+        for name, value in (
+                ("Radio", "; ".join(f"{r['which']}: {r['radio']['name']} ({r['stem']}) at "
+                                    f"{r['frequency_hz'] / 1e6:.4f} MHz" for r in radios)),
+                ("Hardware", "; ".join(f"{r['which']}: {r['hardware']}" for r in radios)),
+                ("Receiver", f"tuned to {tuning.center_hz / 1e6:.4f} MHz")):
+            BuiltIn().set_suite_metadata(name, value, top=True)
+        self.operator.instruct(
+            "Two radios, keyed together for every take:\n" + "\n".join(
+                f"  {r['which']}: {r['hardware']}, M17, {r['frequency_hz'] / 1e6:.4f} MHz, "
+                "low power" for r in radios)
+            + f"\n  Receiver at {tuning.center_hz / 1e6:.4f} MHz. Both mics about 10 cm "
+            "from the speaker. Continue when set.")
+
+    def _need_pair(self) -> dict:
+        if self.pair is None:
+            raise RuntimeError("Open Radio Pair Bench first")
+        return self.pair
+
+    def _clip(self, path: str, seconds: float) -> np.ndarray:
+        key = (str(path), float(seconds))
+        clips = self._need_pair()["clips"]
+        if key not in clips:
+            clips[key] = device_mic.speech_clip(Path(path), float(seconds))
+        return clips[key]
+
+    def _played_file(self, path: str, seconds: float, gain_db: float) -> Path:
+        """The clip at a playback level, written for the audio interface."""
+        interface = self._need_audio()
+        x = device_mic.to_rate(self._clip(path, seconds), device_mic.RATE, interface.rate)
+        x = x * 10 ** (float(gain_db) / 20)
+        return audio_mod.write_wav(self._audio_path(f"played{float(gain_db):+.0f}dB"), x,
+                                   interface.rate)
+
+    @keyword
+    def set_speaker_volume(self, speech_file: str, seconds: float = 10.0):
+        """
+        Loop the clip at 0 dB (peak -1 dBFS) while the operator sets the
+        speaker (or the interface's output) loud but not distorting at both
+        mics; record the setting they report. Leave it for both firmware
+        phases.
+        """
+        pair = self._need_pair()
+        interface = self._need_audio()
+        interface.play(self._played_file(speech_file, seconds, 0.0), repeat=True)
+        try:
+            self.operator.instruct("The clip is playing at 0 dB. Set the speaker volume loud "
+                                   "but not distorting at the mics (radios not keyed); leave "
+                                   "it there for the whole session.")
+        finally:
+            interface.stop_playing()
+        pair["playback"] = self.operator.ask(
+            "The playback setting, to record (interface output knob, speaker volume):")
+        self._record("observation", text="playback setting", answer=pair["playback"])
+        BuiltIn().set_suite_metadata("Playback", pair["playback"], top=True)
+
+    def _pair_capture(self, steps) -> tuple[str, dict]:
+        """
+        Record both radios while steps() runs (operator prompts, playback),
+        then measure each radio's channel. Returns the capture name and
+        {radio file: [(measurement, voice float or None, voice file)]}.
+        """
+        pair = self._need_pair()
+        rx = self.bench["receiver"]
+        self._captures += 1
+        name = f"capture{self._captures:02d}"
+        path = self.run_dir / f"{name}.{self._iq_suffix()}"
+        self.receiver.start(pair["center_hz"], rx["rate"], path)
+        try:
+            steps()
+        finally:
+            capture = self.receiver.stop()
+        audio_dir, clipped = self._after_capture(name, capture)
+        out = {}
+        for r in pair["radios"]:
+            d = audio_dir / r["stem"]
+            d.mkdir(exist_ok=True)
+            found = device_mic.measure_channel(
+                capture.blocks(), capture.rate, r["offset_hz"], d,
+                center_hz=r["frequency_hz"], ppm=self._ppm(rx) or 0.0)
+            takes = []
+            for i, m in enumerate(found, 1):
+                voice, vfile = None, None
+                if m.payload and m17_tools.available("c2dec"):
+                    vfile = d / f"tx{i}-voice.wav"
+                    voice = device_mic.write_voice(vfile, m17_tools.codec2_decode(m.payload))
+                takes.append((m, voice, vfile))
+            out[r["stem"]] = takes
+            self._record("m17-capture", radio=r["stem"], files=[
+                str(p.relative_to(self.run_dir)) for p in capture.paths],
+                receiver_clipped=clipped, transmissions=[
+                    {**m.as_dict(), **({"voice_file": str(vf.relative_to(self.run_dir))}
+                                       if vf else {})} for m, _, vf in takes])
+        return name, out
+
+    def _score_pair(self, test: str, takes: dict, levels: list, labels: list | None = None,
+                    clean: np.ndarray | None = None) -> dict:
+        """Score each radio's takes in order against the expected levels."""
+        pair = self._need_pair()
+        variant = device_mic.variant_of(self.firmware)
+        fixed_gain = "-DMIC_EXP_AGC" not in emu_bench.camp.VARIANTS.get(variant, ())
+        problems, summaries = [], {}
+        for r in pair["radios"]:
+            got = takes[r["stem"]]
+            if len(got) != len(levels):
+                problems.append(f"{r['which']} ({r['stem']}): {len(got)} transmissions, "
+                                f"expected {len(levels)}")
+            for i, (m, voice, vfile) in enumerate(got[: len(levels)]):
+                row = {"radio": r["stem"], "variant": variant, "firmware": self.firmware,
+                       "test": test, "take": i + 1, "level": levels[i],
+                       "label": labels[i] if labels else None,
+                       "lsf_crc_ok": bool(m.lsf_crc_ok), "stream_frames": m.stream_frames,
+                       "voice_file": str(vfile.relative_to(self.run_dir)) if vfile else None}
+                if voice is None:
+                    row["error"] = "no voice decoded"
+                else:
+                    row.update(device_mic.score_take(test, voice, clean))
+                    if fixed_gain:
+                        mic = r["radio"]["mic_chain"]
+                        row["adc_active_dbfs"] = device_mic.adc_level(row["active_dbfs"], mic)
+                        row["adc_peak_dbfs"] = device_mic.adc_level(row["peak_dbfs"], mic)
+                pair["rows"].append(row)
+                self._record("mic-take", **row)
+            summaries[r["stem"]] = device_mic.summary(pair["rows"], r["stem"], test)
+            self._record("mic-chain", what=test, **summaries[r["stem"]])
+        if problems:
+            raise AssertionError("; ".join(problems))
+        return summaries
+
+    @keyword("Capture Key-up Silence")
+    def capture_key_up_silence(self, overs: int = 3, seconds: float = 3.0) -> dict:
+        """
+        Both radios keyed together `overs` times for `seconds`, nobody
+        speaking: each radio's key-up transient (peak of the first 100 ms)
+        and floor.
+        """
+        overs, seconds = int(overs), float(seconds)
+
+        def steps():
+            self.operator.instruct(
+                f"Quiet room. Key BOTH radios together for {seconds:g} s, release, wait 2 s; "
+                f"{overs} times. Then continue.")
+        _, takes = self._pair_capture(steps)
+        return self._score_pair("silence", takes, [None] * overs)
+
+    @keyword
+    def capture_played_speech(self, speech_file: str, gains="-20 -10 0",
+                              seconds: float = 10.0, lead_s: float = 3.0) -> dict:
+        """
+        For each playback level (dB relative to the set speaker volume): the
+        operator continues and keys both radios, the clip plays lead_s later
+        (both hands stay on the radios), then the operator releases.
+        Each radio's decoded level, spread, STOI and listening STOI.
+        """
+        gains = self._floats(gains)
+        files = [self._played_file(speech_file, seconds, g) for g in gains]
+        interface = self._need_audio()
+
+        def steps():
+            for g, f in zip(gains, files):
+                self.operator.instruct(
+                    f"Continue, then at once key BOTH radios and hold them: the clip plays "
+                    f"at {g:+.0f} dB {float(lead_s):g} s later, for {float(seconds):g} s.")
+                self.wait_seconds(lead_s)
+                interface.play(f)
+                interface.wait_playing()
+                self.operator.instruct("Clip done: release both radios, then continue.")
+                self.wait_seconds(1)
+        _, takes = self._pair_capture(steps)
+        return self._score_pair("speech", takes, gains, clean=self._clip(speech_file, seconds))
+
+    @keyword
+    def capture_live_voice(self, sentence: str, labels="quietly normally loudly") -> dict:
+        """
+        The operator reads the sentence once per label (quietly, normally,
+        loudly), keying both radios each time, at their usual distance.
+        """
+        labels = str(labels).split()
+
+        def steps():
+            for lab in labels:
+                self.operator.instruct(f"Key BOTH radios, read {lab.upper()} at your usual "
+                                       f"distance: \"{sentence}\", release; then continue.")
+        _, takes = self._pair_capture(steps)
+        return self._score_pair("live", takes, list(range(1, len(labels) + 1)), labels)
+
+    def _close_pair(self, report: dict):
+        """One folder per radio: its measurements, tables, charts, voices and report."""
+        pair = self.pair
+        methods = (Path(__file__).resolve().parents[2] / "docs"
+                   / "device-mic-campaign.md")
+        for r in pair["radios"]:
+            folder = self.output_dir / f"{self.run_dir.name}-{r['stem']}"
+            if folder.exists():
+                shutil.rmtree(folder)
+            folder.mkdir(parents=True)
+            mine = {**report, "radio": r["radio"]["name"], "radio_file": r["stem"],
+                    "hardware": r["hardware"],
+                    "bands": {"pair": r["frequency_hz"]},
+                    "pair": {"other": next(o["stem"] for o in pair["radios"] if o is not r),
+                             "receiver_center_hz": pair["center_hz"],
+                             "offset_hz": r["offset_hz"],
+                             "image_sha256": r["image_sha256"],
+                             "playback": pair["playback"],
+                             "mic_chain": {k: v for k, v in r["radio"]["mic_chain"].items()
+                                           if k != "limits"}},
+                    "records": [x for x in report["records"]
+                                if x.get("radio") in (None, r["stem"])]}
+            (folder / "measurements.json").write_text(
+                scrub(json.dumps(mine, indent=2, default=plain)) + "\n")
+            rows = [x for x in pair["rows"] if x["radio"] == r["stem"]]
+            for x in rows:
+                if x.get("voice_file"):
+                    src = self.run_dir / x["voice_file"]
+                    dst = folder / "voice" / f"{x['test']}-{x['take']}.wav"
+                    dst.parent.mkdir(exist_ok=True)
+                    shutil.copy(src, dst)
+                    x["voice_file"] = str(dst.relative_to(folder))
+            emu_bench.camp.write_tables(folder / "data", rows, [])
+            meta = {"hardware": r["hardware"], "firmware": [self.firmware],
+                    "suite_commit": report["suite_commit"], "station": report["station"],
+                    "playback": pair["playback"]}
+            ch = device_mic.charts(rows, r["stem"], folder / "charts")
+            (folder / "REPORT.md").write_text(scrub(device_mic.report(
+                rows, r["stem"], r["radio"]["name"], meta, ch)) + "\n")
+            if methods.exists():
+                (folder / "METHODS.md").write_text(methods.read_text())
 
     # Emulator bench -----------------------------------------------------
 

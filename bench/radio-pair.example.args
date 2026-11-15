@@ -1,0 +1,19 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Robot Framework argument file for two radios keyed together
+# (acceptance/m17/mic-chain-device.robot). Copy to bench/<name>-pair.local.args,
+# point it at your pair bench, calibration and speech file, then per firmware:
+#
+#   uv run robot -A bench/<name>-pair.local.args -v FIRMWARE:baseline@<sha> \
+#       -v "HARDWARE_A:Connect Systems CS7000-PLUS <serial>" \
+#       -v "HARDWARE_B:TYT MD-UV380 <serial>, M17 mod" \
+#       -d runs/<dir> acceptance/m17/mic-chain-device.robot
+
+--include needs:radio-pair
+--variable BENCH:bench/radio-pair.example.yaml
+--variable CALIBRATION:calibration/example.yaml
+--variable RADIO_A:radios/cs7000p.yaml
+--variable RADIO_B:radios/mduv3x0.yaml
+--variable SPEECH_FILE:CHANGE-ME/OSR_us_000_0010_8k.wav

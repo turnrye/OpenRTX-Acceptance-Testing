@@ -87,7 +87,8 @@ grow into a compliance report: measurements against the regulatory limits, per r
   steps do not.
 - Tests that need the audio interface are tagged `needs:audio`, and those that need absolute
   levels `needs:abs-level`, so a bench without them excludes them; those that run only on the
-  emulator bench are tagged `needs:emulator`.
+  emulator bench are tagged `needs:emulator`, and those that need two radios keyed together
+  `needs:radio-pair`.
 - Every run names the firmware, the unit and, for radios with a separately flashed DSP, the DSP
   image, so runs of different firmware states can't be confused.
 - Suites tag their tests `tx`, `rx` and `manual`, so a run can pick what the bench can do, and

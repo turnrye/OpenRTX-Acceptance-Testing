@@ -20,5 +20,7 @@
 --variable RADIO:radios/c62.yaml
 --variable BENCH:bench/example.yaml
 --variable CALIBRATION:calibration/example.yaml
-# The emulator bench's suites (acceptance/m17/mic-chain.robot) need no radio
+# The emulator bench's suites (acceptance/m17/mic-chain.robot) need no radio, and
+# the two-radio suite (mic-chain-device.robot) runs from its own argument file
 --exclude needs:emulator
+--exclude needs:radio-pair

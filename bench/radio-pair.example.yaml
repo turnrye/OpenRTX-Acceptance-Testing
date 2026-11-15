@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: Copyright 2026 OpenRTX Contributors
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# A bench for two radios keyed together (acceptance/m17/mic-chain-device.robot):
+# one receiver holding both radios' frequencies in one capture, and an audio
+# interface driving a speaker in front of both mics. Copy to
+# bench/<name>-pair.local.yaml (ignored by git) and fill in.
+#
+# The receiver is tuned 30 kHz below the lower radio, so at 250 kS/s the two
+# radios 50 kHz apart sit at +30 and +80 kHz; tune_offset_hz is not used.
+
+station: CHANGE-ME
+
+receiver:
+  type: rtlsdr
+  gain_db: 0
+  rate: 250000
+
+# Unused by the two-radio suite, but every bench names one
+transmitter:
+  type: hackrf
+  tx_vga_db: 0
+  amp: false
+  rate: 2000000
+
+operator:
+  type: console
+
+# The interface that plays speech into the speaker. "find:<text>" picks the
+# first card in `aplay -l` whose name holds the text, so the card number
+# needn't be known before it's plugged in; or name it, plughw:CARD=<id>,DEV=0.
+# Nothing is recorded from it. Leave its mixer to the hardware knobs: the
+# operator sets the speaker volume once and the run records the setting.
+audio:
+  type: alsa
+  playback_device: "find:Scarlett"
+  capture_device: "find:Scarlett"
+  rate: 48000

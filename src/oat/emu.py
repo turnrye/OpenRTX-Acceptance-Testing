@@ -324,7 +324,8 @@ def find_lag(ref: np.ndarray, x: np.ndarray, max_lag_s: float = 0.5,
     """
     The delay of x behind ref, in samples. A vocoder does not keep the
     waveform, so it comes from the cross-correlation of 2.5 ms log-energy
-    envelopes, searched within +-max_lag_s.
+    envelopes, searched within +-max_lag_s over lags that overlap at least half
+    the shorter signal.
     """
     hop = rate // 400
     er, ex = _envelope(ref, hop), _envelope(x, hop)
@@ -334,7 +335,7 @@ def find_lag(ref: np.ndarray, x: np.ndarray, max_lag_s: float = 0.5,
         a = er[max(0, -k): len(er) - max(0, k)]
         b = ex[max(0, k): max(0, k) + len(a)]
         n = min(len(a), len(b))
-        if n < 100:
+        if n < max(100, min(len(er), len(ex)) // 2):
             continue
         c = float(np.dot(a[:n], b[:n]) / n)
         if c > best:

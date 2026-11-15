@@ -20,15 +20,18 @@ SAME_METADATA = ("Firmware", "Radio", "Station", "Calibration", "Hardware",
                  "DSP", "Suite commit")
 
 
-def run_measurements(run: Path) -> dict:
+def run_measurements(run: Path, bench: str | None = None) -> dict:
     """
     A run's measurements. A run of several suites (robot given several
     files) has a bench-*/measurements.json per suite: they are combined
     under the run's top suite, each suite's capture files named under its
     bench folder. Refuses suites run on different firmware, radios or
     benches.
+    With bench, only that bench folder's measurements: a run of two radios
+    at once (acceptance/m17/mic-chain-device.robot) has one per radio, each
+    published on its own.
     """
-    found = sorted(Path(run).glob("bench-*/measurements.json"))
+    found = sorted(Path(run).glob(f"{bench or 'bench-*'}/measurements.json"))
     if not found:
         raise ValueError(f"{run}: no bench-*/measurements.json")
     parts = [json.loads(f.read_text()) for f in found]
@@ -79,17 +82,17 @@ def rerun_root(run: Path, rerun: Path) -> str | None:
     return None
 
 
-def merge_reruns(run: Path, reruns: list[Path]) -> dict:
+def merge_reruns(run: Path, reruns: list[Path], bench: str | None = None) -> dict:
     """
     A run's measurements with each rerun's tests in place of the run's own:
     the run's records for a rerun test are replaced by the rerun's, its
     capture files named under rerun<N>/. Refuses a rerun of a different
     firmware, radio, bench, calibration or suite commit.
     """
-    merged = run_measurements(run)
+    merged = run_measurements(run, bench)
     meta = ExecutionResult(str(Path(run) / "output.xml")).suite.metadata
     for i, rerun in enumerate(reruns, 1):
-        again = run_measurements(rerun)
+        again = run_measurements(rerun, bench)
         result = ExecutionResult(str(Path(rerun) / "output.xml"))
         differ = [k for k in SAME_RUN
                   if k != "suite" and again.get(k) != merged.get(k)]

@@ -15,5 +15,6 @@
 # it) to leave them off the command line.
 
 --include needs:emulator
+--exclude needs:radio-pair
 --variable BENCH:bench/emulator.yaml
 --variable CALIBRATION:calibration/emulator.yaml

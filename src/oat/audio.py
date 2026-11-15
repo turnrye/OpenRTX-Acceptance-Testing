@@ -608,15 +608,40 @@ class SerialPtt:
                 self._fd = None
 
 
+def find_alsa_device(spec: str, listing: str | None = None) -> str:
+    """
+    An ALSA device name. "find:<text>" picks the first card in `aplay -l`
+    (or `arecord -l`) whose name contains the text, ignoring case, as
+    plughw:CARD=<id>,DEV=<device>: for an interface whose card number or id
+    isn't known until it's plugged in. Anything else is returned as it is.
+    """
+    if not str(spec).startswith("find:"):
+        return spec
+    want = spec[len("find:"):].strip().lower()
+    if listing is None:
+        listing = subprocess.run(["aplay", "-l"], capture_output=True,
+                                 text=True).stdout
+    for line in listing.splitlines():
+        m = re.match(r"card \d+: (\S+) \[([^\]]*)\], device (\d+): (.*)", line)
+        if m and (want in m.group(2).lower() or want in m.group(1).lower()
+                  or want in m.group(4).lower()):
+            return f"plughw:CARD={m.group(1)},DEV={m.group(3)}"
+    raise ValueError(f"no ALSA card matching {want!r} in `aplay -l`: plug the "
+                     "interface in, or name its device in the bench file")
+
+
 def make_audio(cfg: dict | None) -> AudioInterface | None:
     """Audio interface from a bench 'audio' section, or None without one."""
     if not cfg:
         return None
     kind = cfg.get("type", "alsa")
     if kind == "alsa":
-        return AlsaAudio(cfg.get("playback_device", "default"),
-                         cfg.get("capture_device", "default"),
-                         int(cfg.get("rate", RATE)), cfg.get("mixer"))
+        playback = find_alsa_device(cfg.get("playback_device", "default"))
+        capture = cfg.get("capture_device", "default")
+        capture = playback if capture == cfg.get("playback_device") else \
+            find_alsa_device(capture)
+        return AlsaAudio(playback, capture, int(cfg.get("rate", RATE)),
+                         cfg.get("mixer"))
     if kind == "coreaudio":
         if cfg.get("mixer"):
             raise ValueError("audio mixer needs ALSA; on macOS set the levels "
