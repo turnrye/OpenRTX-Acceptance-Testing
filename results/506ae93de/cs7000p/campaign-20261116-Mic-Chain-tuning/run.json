@@ -1,0 +1,644 @@
+{
+  "started": "2026-11-16T00:42:01+00:00",
+  "finished": "2026-11-16T01:05:55+00:00",
+  "suite": "Mic-Chain",
+  "station": "emulator",
+  "radio_file": "cs7000p",
+  "hardware": "emulated: OpenRTX Linux emulator (openrtx_linux) with the Connect Systems CS7000-PLUS mic chain model",
+  "oat": {
+    "describe": "285528699d"
+  },
+  "openrtx": {
+    "sha": "506ae93dee2d0d8330aa14f935b2ed61663cc3ca",
+    "describe": "v0.4.5-57-g506ae93de",
+    "branch": "poc/m17-mic-agc",
+    "patch": null
+  },
+  "profile": {
+    "name": "cs7000p",
+    "oversample": 6,
+    "gain": 32,
+    "adc_bits": 12,
+    "noise_lsb": 2.0,
+    "bias": true
+  },
+  "mic_chain_sources": {
+    "oversample": "platform/targets/CS7000-PLUS/hwconfig.h (CONFIG_MIC_OVERSAMPLE)",
+    "gain": "platform/targets/CS7000-PLUS/hwconfig.h (CONFIG_MIC_GAIN)",
+    "adc_bits": "the STM32's 12-bit ADC",
+    "bias": "assumed until bench-measured",
+    "noise_lsb": "assumed until bench-measured"
+  },
+  "variants": {
+    "baseline": {
+      "defines": [],
+      "binary_sha256": "3a382ae90cb01874d8ee0ec98ca1f0b022310c355d99f014bb835289fefe339a",
+      "firmware": "baseline@506ae93de"
+    },
+    "full": {
+      "defines": [
+        "-DMIC_EXP_PRIME_DC",
+        "-DMIC_EXP_KEEP_SUM",
+        "-DMIC_EXP_HPF",
+        "-DMIC_EXP_AGC"
+      ],
+      "binary_sha256": "441a47767d584ee79da5c6e6c28e2a23eb47d21b65abda4aa06cd302fe90a5d4",
+      "firmware": "full@506ae93de"
+    },
+    "full_t27": {
+      "defines": [
+        "-DMIC_EXP_PRIME_DC",
+        "-DMIC_EXP_KEEP_SUM",
+        "-DMIC_EXP_HPF",
+        "-DMIC_EXP_AGC",
+        "-DMIC_EXP_AGC_TARGET=-27.0f"
+      ],
+      "binary_sha256": "2e87b9e1df9c2bcee3f5bdf11a7eae40b03c87857a63d089cec946ebd7279f5c",
+      "firmware": "full_t27@506ae93de"
+    },
+    "full_t24": {
+      "defines": [
+        "-DMIC_EXP_PRIME_DC",
+        "-DMIC_EXP_KEEP_SUM",
+        "-DMIC_EXP_HPF",
+        "-DMIC_EXP_AGC",
+        "-DMIC_EXP_AGC_TARGET=-24.0f"
+      ],
+      "binary_sha256": "756c6579d02f24746f3d4e3ee8383c8b0ca623a3802e432d01d6c8905977e2f7",
+      "firmware": "full_t24@506ae93de"
+    },
+    "full_t18": {
+      "defines": [
+        "-DMIC_EXP_PRIME_DC",
+        "-DMIC_EXP_KEEP_SUM",
+        "-DMIC_EXP_HPF",
+        "-DMIC_EXP_AGC",
+        "-DMIC_EXP_AGC_TARGET=-18.0f"
+      ],
+      "binary_sha256": "13b753cb2136ea8a8d27f4ef457e27a175e874aa8d1c0a879ae7b7af91116bc3",
+      "firmware": "full_t18@506ae93de"
+    },
+    "full_exp": {
+      "defines": [
+        "-DMIC_EXP_PRIME_DC",
+        "-DMIC_EXP_KEEP_SUM",
+        "-DMIC_EXP_HPF",
+        "-DMIC_EXP_AGC",
+        "-DMIC_EXP_EXPANDER=20.0f"
+      ],
+      "binary_sha256": "dbb5c3a1f331390934f18000e43c8a9e94e6627b223ca21ce0cc39f1234f3bf7",
+      "firmware": "full_exp@506ae93de"
+    },
+    "full_sil": {
+      "defines": [
+        "-DMIC_EXP_PRIME_DC",
+        "-DMIC_EXP_KEEP_SUM",
+        "-DMIC_EXP_HPF",
+        "-DMIC_EXP_AGC",
+        "-DMIC_EXP_SILENCE_FRAME"
+      ],
+      "binary_sha256": "af7077a672d9469868c890ba8fd6efa75e4d2aec324ce95bcd3ef6e18f0fbf65",
+      "firmware": "full_sil@506ae93de"
+    }
+  },
+  "tools": {
+    "python": "3.13.13",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1",
+    "pystoi": "0.4.1",
+    "matplotlib": "3.11.2",
+    "robotframework": "7.5",
+    "meson": "1.10.1",
+    "cc": "cc (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+    "codec2_package": "1.2.0-4"
+  },
+  "adc_seed": 17,
+  "tail_s": 0.5,
+  "speech_files": {
+    "OSR_us_000_0010_8k.wav": "a4bf9becd046d7aedb6d05b6e12347a6294a44f74d263089c636fb0a2b1e6561",
+    "OSR_us_000_0011_8k.wav": "3b3b791dc1eda4ed9ae7869c6adff95cbd9a0a4b0f45e31be31324024279b739",
+    "OSR_us_000_0030_8k.wav": "d3e1cfba98a44ddfc6e99508e663794c8dc41bdb2baced224f779c453143b622",
+    "OSR_us_000_0031_8k.wav": "dff349ae6b5d71a696c22bb838319addd5eb10dc0fafd1b15ddfbde13d57a43c"
+  },
+  "signals": {
+    "tones": [
+      {
+        "take": "tone_1000Hz_-50dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -50.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-47dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -47.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-44dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -44.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-41dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -41.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-38dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -38.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-35dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -35.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-32dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -32.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-29dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -29.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-26dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -26.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-23dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -23.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-20dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -20.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-17dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -17.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-14dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -14.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-11dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -11.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-8dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -8.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-5dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -5.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_-2dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": -2.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_1000Hz_+0dBFS",
+        "kind": "tone",
+        "freq_hz": 1000.0,
+        "peak_dbfs": 0.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-50dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -50.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-47dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -47.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-44dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -44.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-41dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -41.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-38dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -38.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-35dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -35.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-32dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -32.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-29dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -29.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-26dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -26.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-23dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -23.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-20dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -20.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-17dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -17.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-14dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -14.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-11dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -11.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-8dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -8.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-5dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -5.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_-2dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": -2.0,
+        "seconds": 2.0
+      },
+      {
+        "take": "tone_400Hz_+0dBFS",
+        "kind": "tone",
+        "freq_hz": 400.0,
+        "peak_dbfs": 0.0,
+        "seconds": 2.0
+      }
+    ],
+    "speech": [
+      {
+        "take": "speech_OSR_us_000_0010_8k_-40dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0010_8k.wav",
+        "sha256": "a4bf9becd046d7aedb6d05b6e12347a6294a44f74d263089c636fb0a2b1e6561",
+        "peak_dbfs": -40.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0010_8k_-30dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0010_8k.wav",
+        "sha256": "a4bf9becd046d7aedb6d05b6e12347a6294a44f74d263089c636fb0a2b1e6561",
+        "peak_dbfs": -30.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0010_8k_-20dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0010_8k.wav",
+        "sha256": "a4bf9becd046d7aedb6d05b6e12347a6294a44f74d263089c636fb0a2b1e6561",
+        "peak_dbfs": -20.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0010_8k_-12dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0010_8k.wav",
+        "sha256": "a4bf9becd046d7aedb6d05b6e12347a6294a44f74d263089c636fb0a2b1e6561",
+        "peak_dbfs": -12.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0010_8k_-6dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0010_8k.wav",
+        "sha256": "a4bf9becd046d7aedb6d05b6e12347a6294a44f74d263089c636fb0a2b1e6561",
+        "peak_dbfs": -6.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0010_8k_-1dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0010_8k.wav",
+        "sha256": "a4bf9becd046d7aedb6d05b6e12347a6294a44f74d263089c636fb0a2b1e6561",
+        "peak_dbfs": -1.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0011_8k_-40dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0011_8k.wav",
+        "sha256": "3b3b791dc1eda4ed9ae7869c6adff95cbd9a0a4b0f45e31be31324024279b739",
+        "peak_dbfs": -40.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0011_8k_-30dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0011_8k.wav",
+        "sha256": "3b3b791dc1eda4ed9ae7869c6adff95cbd9a0a4b0f45e31be31324024279b739",
+        "peak_dbfs": -30.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0011_8k_-20dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0011_8k.wav",
+        "sha256": "3b3b791dc1eda4ed9ae7869c6adff95cbd9a0a4b0f45e31be31324024279b739",
+        "peak_dbfs": -20.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0011_8k_-12dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0011_8k.wav",
+        "sha256": "3b3b791dc1eda4ed9ae7869c6adff95cbd9a0a4b0f45e31be31324024279b739",
+        "peak_dbfs": -12.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0011_8k_-6dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0011_8k.wav",
+        "sha256": "3b3b791dc1eda4ed9ae7869c6adff95cbd9a0a4b0f45e31be31324024279b739",
+        "peak_dbfs": -6.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0011_8k_-1dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0011_8k.wav",
+        "sha256": "3b3b791dc1eda4ed9ae7869c6adff95cbd9a0a4b0f45e31be31324024279b739",
+        "peak_dbfs": -1.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0030_8k_-40dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0030_8k.wav",
+        "sha256": "d3e1cfba98a44ddfc6e99508e663794c8dc41bdb2baced224f779c453143b622",
+        "peak_dbfs": -40.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0030_8k_-30dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0030_8k.wav",
+        "sha256": "d3e1cfba98a44ddfc6e99508e663794c8dc41bdb2baced224f779c453143b622",
+        "peak_dbfs": -30.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0030_8k_-20dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0030_8k.wav",
+        "sha256": "d3e1cfba98a44ddfc6e99508e663794c8dc41bdb2baced224f779c453143b622",
+        "peak_dbfs": -20.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0030_8k_-12dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0030_8k.wav",
+        "sha256": "d3e1cfba98a44ddfc6e99508e663794c8dc41bdb2baced224f779c453143b622",
+        "peak_dbfs": -12.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0030_8k_-6dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0030_8k.wav",
+        "sha256": "d3e1cfba98a44ddfc6e99508e663794c8dc41bdb2baced224f779c453143b622",
+        "peak_dbfs": -6.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0030_8k_-1dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0030_8k.wav",
+        "sha256": "d3e1cfba98a44ddfc6e99508e663794c8dc41bdb2baced224f779c453143b622",
+        "peak_dbfs": -1.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0031_8k_-40dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0031_8k.wav",
+        "sha256": "dff349ae6b5d71a696c22bb838319addd5eb10dc0fafd1b15ddfbde13d57a43c",
+        "peak_dbfs": -40.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0031_8k_-30dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0031_8k.wav",
+        "sha256": "dff349ae6b5d71a696c22bb838319addd5eb10dc0fafd1b15ddfbde13d57a43c",
+        "peak_dbfs": -30.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0031_8k_-20dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0031_8k.wav",
+        "sha256": "dff349ae6b5d71a696c22bb838319addd5eb10dc0fafd1b15ddfbde13d57a43c",
+        "peak_dbfs": -20.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0031_8k_-12dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0031_8k.wav",
+        "sha256": "dff349ae6b5d71a696c22bb838319addd5eb10dc0fafd1b15ddfbde13d57a43c",
+        "peak_dbfs": -12.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0031_8k_-6dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0031_8k.wav",
+        "sha256": "dff349ae6b5d71a696c22bb838319addd5eb10dc0fafd1b15ddfbde13d57a43c",
+        "peak_dbfs": -6.0,
+        "seconds": 12.0
+      },
+      {
+        "take": "speech_OSR_us_000_0031_8k_-1dBFS",
+        "kind": "speech",
+        "file": "OSR_us_000_0031_8k.wav",
+        "sha256": "dff349ae6b5d71a696c22bb838319addd5eb10dc0fafd1b15ddfbde13d57a43c",
+        "peak_dbfs": -1.0,
+        "seconds": 12.0
+      }
+    ],
+    "listen": [
+      {
+        "kind": "listen",
+        "of": "speech",
+        "noise": "pink",
+        "seed": 11,
+        "noise_dbfs": [
+          -45.0,
+          -35.0
+        ]
+      }
+    ],
+    "step": [
+      {
+        "take": "step_3s-30_3s-10_6s-30",
+        "kind": "step",
+        "segments": [
+          [
+            3.0,
+            -30.0
+          ],
+          [
+            3.0,
+            -10.0
+          ],
+          [
+            6.0,
+            -30.0
+          ]
+        ],
+        "f0_hz": 140.0,
+        "seed": 3
+      }
+    ],
+    "gate": [
+      {
+        "take": "gate_OSR_us_000_0010_8k_-12dBFS_pink-55dBFS",
+        "kind": "gate",
+        "file": "OSR_us_000_0010_8k.wav",
+        "sha256": "a4bf9becd046d7aedb6d05b6e12347a6294a44f74d263089c636fb0a2b1e6561",
+        "noise_dbfs": -55.0,
+        "peak_dbfs": -12.0,
+        "speech_s": 3.0,
+        "pause_s": 4.0,
+        "bursts": 3,
+        "noise": "pink",
+        "seed": 5
+      },
+      {
+        "take": "gate_OSR_us_000_0010_8k_-12dBFS_pink-40dBFS",
+        "kind": "gate",
+        "file": "OSR_us_000_0010_8k.wav",
+        "sha256": "a4bf9becd046d7aedb6d05b6e12347a6294a44f74d263089c636fb0a2b1e6561",
+        "noise_dbfs": -40.0,
+        "peak_dbfs": -12.0,
+        "speech_s": 3.0,
+        "pause_s": 4.0,
+        "bursts": 3,
+        "noise": "pink",
+        "seed": 5
+      }
+    ]
+  },
+  "runs": {
+    "baseline": "runs/baseline",
+    "full": "runs/full",
+    "full_t27": "runs/full_t27",
+    "full_t24": "runs/full_t24",
+    "full_t18": "runs/full_t18",
+    "full_exp": "runs/full_exp",
+    "full_sil": "runs/full_sil"
+  }
+}
