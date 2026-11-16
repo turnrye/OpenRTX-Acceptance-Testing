@@ -23,7 +23,9 @@ from oat.emu_campaign import VARIANTS
 GREY = "#8a8986"
 # Categorical slots in fixed order (the dataviz reference palette, light mode).
 SLOTS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300",
-         "#6250d6", "#e34948"]
+         "#6250d6", "#e34948",
+         # Extended for the second-pass variants
+         "#00a3c4", "#9e4f00", "#0f4c81", "#c2185b"]
 MARKERS = ["o", "s", "^", "D", "v", "P", "X", "*"]
 REF_STYLE = {"codec-only (nominal)": ("#0b0b0b", "--"),
              "codec-only (ideal)": ("#0b0b0b", "--"),

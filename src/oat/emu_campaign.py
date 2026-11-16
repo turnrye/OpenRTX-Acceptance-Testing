@@ -49,6 +49,19 @@ VARIANTS: dict[str, tuple[str, ...]] = {
                  "-DMIC_EXP_AGC_ATTACK=0.1f"),
     "agc_mid": ("-DMIC_EXP_AGC", "-DMIC_EXP_AGC_FASTDOWN=0.0f",
                 "-DMIC_EXP_AGC_ATTACK=0.3f", "-DMIC_EXP_AGC_KNEE=-3.0f"),
+    # Second pass, all on top of full: the AGC target (full is -21 dBFS) and
+    # two ways of handling pauses (gate closed past a 240 ms hangover): a
+    # 20 dB downward expander, or codec2 3200's silence frame.
+    "full_t27": ("-DMIC_EXP_PRIME_DC", "-DMIC_EXP_KEEP_SUM", "-DMIC_EXP_HPF",
+                 "-DMIC_EXP_AGC", "-DMIC_EXP_AGC_TARGET=-27.0f"),
+    "full_t24": ("-DMIC_EXP_PRIME_DC", "-DMIC_EXP_KEEP_SUM", "-DMIC_EXP_HPF",
+                 "-DMIC_EXP_AGC", "-DMIC_EXP_AGC_TARGET=-24.0f"),
+    "full_t18": ("-DMIC_EXP_PRIME_DC", "-DMIC_EXP_KEEP_SUM", "-DMIC_EXP_HPF",
+                 "-DMIC_EXP_AGC", "-DMIC_EXP_AGC_TARGET=-18.0f"),
+    "full_exp": ("-DMIC_EXP_PRIME_DC", "-DMIC_EXP_KEEP_SUM", "-DMIC_EXP_HPF",
+                 "-DMIC_EXP_AGC", "-DMIC_EXP_EXPANDER=20.0f"),
+    "full_sil": ("-DMIC_EXP_PRIME_DC", "-DMIC_EXP_KEEP_SUM", "-DMIC_EXP_HPF",
+                 "-DMIC_EXP_AGC", "-DMIC_EXP_SILENCE_FRAME"),
 }
 
 TESTS = ("tones", "speech", "step", "gate", "listen")
