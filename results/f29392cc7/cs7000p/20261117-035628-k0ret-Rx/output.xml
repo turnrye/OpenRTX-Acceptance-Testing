@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Rebot 7.5 (Python 3.13.13 on darwin)" generated="2026-11-16T21:58:07.784439" rpa="false" schemaversion="5">
+<suite id="s1" name="Rx" source="acceptance/m17/rx.robot">
+<kw name="Open Bench" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-16T21:56:28.927481" level="INFO">Results in bench-Rx</msg>
+<msg time="2026-11-16T21:56:28.936221" level="INFO">Set suite metadata 'Firmware' to value 'v0.4.5-46-gf29392cc7'.</msg>
+<msg time="2026-11-16T21:56:28.936336" level="INFO">Set suite metadata 'Radio' to value 'Connect Systems CS7000-PLUS (cs7000p)'.</msg>
+<msg time="2026-11-16T21:56:28.936355" level="INFO">Set suite metadata 'Hardware' to value 'CS7000-PLUS 2709D157450086'.</msg>
+<msg time="2026-11-16T21:56:28.936370" level="INFO">Set suite metadata 'Station' to value 'k0ret'.</msg>
+<msg time="2026-11-16T21:56:28.936381" level="INFO">Set suite metadata 'Calibration' to value 'assumed, measured 2026-10-20 (d55ce4aa0a3c)'.</msg>
+<msg time="2026-11-16T21:56:28.936394" level="INFO">Set suite metadata 'Suite commit' to value 'be862b1ada'.</msg>
+<arg>${BENCH}</arg>
+<arg>${CALIBRATION}</arg>
+<arg>${RADIO}</arg>
+<arg>${FIRMWARE}</arg>
+<arg>${HARDWARE}</arg>
+<arg>dsp=${DSP}</arg>
+<doc>Load the bench, its calibration and the radio file, and prepare the
+instruments. All five are mandatory and differ from tester to tester,
+so suites take them from the command line (-v BENCH:... and so on).
+`firmware` names what the radio runs, such as a git describe;
+`hardware` names the unit, by model and serial number, since units of
+one model measure differently. `dsp` names the DSP image the radio's
+audio processor runs, such as its sha256; it is mandatory for radio
+files with dsp_image: true, whose firmware states can differ in it
+alone.</doc>
+<status status="PASS" start="2026-11-16T21:56:28.922901" elapsed="0.901635"/>
+</kw>
+<test id="s1-t1" name="70cm: M17 RX Shows The Callsign" line="53">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-16T21:56:29.826555" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-16T21:56:29.826713" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-16T21:56:29.826016" elapsed="0.000735"/>
+</kw>
+<kw name="Set Up M17 Receive">
+<kw name="Set Radio Volume Once" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-16T21:56:46.789648" level="INFO">Set suite metadata 'Radio volume' to value 'knob 3 pm'.</msg>
+<doc>Have the operator set the radio's volume for the receive tests that
+record its speaker, once per run, and record the setting. Later calls
+return the first setting.</doc>
+<status status="PASS" start="2026-11-16T21:56:29.827300" elapsed="16.962597"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17, ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, volume unchanged</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-11-16T21:56:46.790189" elapsed="4.836603"/>
+</kw>
+<status status="PASS" start="2026-11-16T21:56:29.827106" elapsed="21.799903"/>
+</kw>
+<kw name="Start Transmitting M17 Stream" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${SOURCE}</arg>
+<arg>audio=${TONE}</arg>
+<doc>Loop an M17 voice stream on the test frequency until stopped:
+preamble, LSF from `source` to `destination`, stream frames, EOT,
+then gap_s without carrier, so the radio sees separate
+transmissions. `audio` is tone:&lt;Hz&gt; or tone:&lt;Hz&gt;:&lt;dBFS&gt; (Codec2,
+`frames` long), a WAV file (Codec2, its whole length), or random
+(random payload bytes, for decoding without Codec2). offset_hz moves
+the carrier off the channel; inverted sends the symbols with the
+wrong sign; level_dbm sets the level at the radio's antenna port.
+With loop=False the stream plays once.</doc>
+<status status="PASS" start="2026-11-16T21:56:51.627349" elapsed="0.153838"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Each transmission shows ${SOURCE} and plays a steady tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="PASS" start="2026-11-16T21:56:51.781405" elapsed="2.112137"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-16T21:56:53.894173" elapsed="0.004263"/>
+</kw>
+<doc>M17-RX-1: the generated stream decodes on the radio.</doc>
+<tag>band:70cm</tag>
+<tag>manual</tag>
+<tag>mode:m17</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-16T21:56:29.824962" elapsed="24.073590"/>
+</test>
+<kw name="Close Bench" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the instruments and write measurements.json: every capture,
+check and operator answer, with the run's provenance. Absolute paths
+are made relative, so the file can be published as it is.</doc>
+<status status="PASS" start="2026-11-16T21:56:53.899443" elapsed="0.020140"/>
+</kw>
+<doc>M17 on receive: the transmitter plays a generated voice stream
+(oat.m17: preamble, LSF from OAT1, stream frames carrying a Codec2
+tone, EOT, looped with a gap) and the radio must show the callsign
+and play the tone. With the audio interface the speaker is measured;
+without it the operator listens.
+
+Generating the Codec2 tone needs c2enc (the codec2 package).</doc>
+<meta name="Calibration">assumed, measured 2026-10-20 (d55ce4aa0a3c)</meta>
+<meta name="Firmware">v0.4.5-46-gf29392cc7</meta>
+<meta name="Hardware">CS7000-PLUS 2709D157450086</meta>
+<meta name="Radio">Connect Systems CS7000-PLUS (cs7000p)</meta>
+<meta name="Radio volume">knob 3 pm</meta>
+<meta name="Station">k0ret</meta>
+<meta name="Suite commit">be862b1ada</meta>
+<status status="PASS" start="2026-11-16T21:56:28.613051" elapsed="25.306658"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="0" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="1" fail="0" skip="0">band:70cm</stat>
+<stat pass="1" fail="0" skip="0">manual</stat>
+<stat pass="1" fail="0" skip="0">mode:m17</stat>
+<stat pass="1" fail="0" skip="0">per-band</stat>
+<stat pass="1" fail="0" skip="0">rx</stat>
+</tag>
+<suite>
+<stat name="Rx" id="s1" pass="1" fail="0" skip="0">Rx</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

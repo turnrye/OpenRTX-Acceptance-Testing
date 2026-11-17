@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Rebot 7.5 (Python 3.13.13 on darwin)" generated="2026-11-16T21:58:07.050345" rpa="false" schemaversion="5">
+<suite id="s1" name="Bandwidth" source="acceptance/fm/bandwidth.robot">
+<kw name="Open Bench" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-16T21:44:39.406503" level="INFO">Results in bench-Bandwidth</msg>
+<msg time="2026-11-16T21:44:39.415639" level="INFO">Set suite metadata 'Firmware' to value 'v0.4.5-50-g83ed1fe5a'.</msg>
+<msg time="2026-11-16T21:44:39.415756" level="INFO">Set suite metadata 'Radio' to value 'Connect Systems CS7000-PLUS (cs7000p)'.</msg>
+<msg time="2026-11-16T21:44:39.415776" level="INFO">Set suite metadata 'Hardware' to value 'CS7000-PLUS 2709D157450086'.</msg>
+<msg time="2026-11-16T21:44:39.415790" level="INFO">Set suite metadata 'Station' to value 'k0ret'.</msg>
+<msg time="2026-11-16T21:44:39.415801" level="INFO">Set suite metadata 'Calibration' to value 'assumed, measured 2026-10-20 (d55ce4aa0a3c)'.</msg>
+<msg time="2026-11-16T21:44:39.415814" level="INFO">Set suite metadata 'Suite commit' to value 'be862b1ada'.</msg>
+<arg>${BENCH}</arg>
+<arg>${CALIBRATION}</arg>
+<arg>${RADIO}</arg>
+<arg>${FIRMWARE}</arg>
+<arg>${HARDWARE}</arg>
+<arg>dsp=${DSP}</arg>
+<doc>Load the bench, its calibration and the radio file, and prepare the
+instruments. All five are mandatory and differ from tester to tester,
+so suites take them from the command line (-v BENCH:... and so on).
+`firmware` names what the radio runs, such as a git describe;
+`hardware` names the unit, by model and serial number, since units of
+one model measure differently. `dsp` names the DSP image the radio's
+audio processor runs, such as its sha256; it is mandatory for radio
+files with dsp_image: true, whose firmware states can differ in it
+alone.</doc>
+<status status="PASS" start="2026-11-16T21:44:39.401600" elapsed="0.400366"/>
+</kw>
+<test id="s1-t1" name="70cm: FM RX CTCSS Opens Only On Its Tone" line="359">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-16T21:44:39.804174" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-16T21:44:39.804367" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-16T21:44:39.803560" elapsed="0.000851"/>
+</kw>
+<kw name="Set Listening Volume" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-16T21:44:39.804691" level="INFO">${volume} = volume comfortable</msg>
+<var>${volume}</var>
+<doc>The volume for a listening test's setup prompt. With an audio
+interface the radio keeps the volume Set Radio Volume Once sets for
+the tests that record its speaker, so it is set here if no test has
+set it yet and then left unchanged; without one the operator picks.</doc>
+<status status="PASS" start="2026-11-16T21:44:39.804590" elapsed="0.000113"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, CTCSS Tone ${CTCSS_HZ} Hz, CTCSS En. Decode, ${volume}</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-11-16T21:44:39.804769" elapsed="0.255936"/>
+</kw>
+<kw name="Start Transmitting Fm Tone" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>3000</arg>
+<arg>ctcss_hz=${CTCSS_HZ}</arg>
+<arg>ctcss_deviation_hz=${CTCSS_RX_DEVIATION_HZ}</arg>
+<doc>Loop an FM tone on the test frequency until stopped. With level_dbm,
+at that level at the radio's antenna port (see Transmit Level).</doc>
+<status status="PASS" start="2026-11-16T21:44:40.060966" elapsed="0.118594"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-16T21:44:50.662109" level="FAIL">Operator: With the 100.0 Hz tone, the radio plays a steady 1 kHz tone -&gt; no</msg>
+<arg>With the ${CTCSS_HZ} Hz tone, the radio plays a steady 1 kHz tone</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="FAIL" start="2026-11-16T21:44:40.179798" elapsed="10.484679">Operator: With the 100.0 Hz tone, the radio plays a steady 1 kHz tone -&gt; no</status>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="NOT RUN" start="2026-11-16T21:44:50.664808" elapsed="0.000034"/>
+</kw>
+<kw name="Start Transmitting Fm Tone" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>3000</arg>
+<arg>ctcss_hz=${CTCSS_OTHER_HZ}</arg>
+<arg>ctcss_deviation_hz=${CTCSS_RX_DEVIATION_HZ}</arg>
+<doc>Loop an FM tone on the test frequency until stopped. With level_dbm,
+at that level at the radio's antenna port (see Transmit Level).</doc>
+<status status="NOT RUN" start="2026-11-16T21:44:50.664948" elapsed="0.000015"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>With ${CTCSS_OTHER_HZ} Hz instead, the radio stays silent</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="NOT RUN" start="2026-11-16T21:44:50.665035" elapsed="0.000012"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Stop the transmitter.</doc>
+<status status="NOT RUN" start="2026-11-16T21:44:50.665107" elapsed="0.000012"/>
+</kw>
+<kw name="Start Transmitting Fm Tone" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>3000</arg>
+<doc>Loop an FM tone on the test frequency until stopped. With level_dbm,
+at that level at the radio's antenna port (see Transmit Level).</doc>
+<status status="NOT RUN" start="2026-11-16T21:44:50.665201" elapsed="0.000012"/>
+</kw>
+<kw name="Operator Confirms" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>With no CTCSS tone, the radio stays silent</arg>
+<doc>Ask the operator a yes/no question; fail the test on no.</doc>
+<status status="NOT RUN" start="2026-11-16T21:44:50.665272" elapsed="0.000012"/>
+</kw>
+<kw name="Stop Transmitting" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the transmitter.</doc>
+<status status="PASS" start="2026-11-16T21:44:50.665775" elapsed="0.004378"/>
+</kw>
+<doc>CTCSS-1: with CTCSS decode on, the squelch opens for the channel's
+tone and stays shut for the next standard tone up and for no tone.
+The right tone comes first: a radio whose decoder hears nothing
+fails there.</doc>
+<tag>band:70cm</tag>
+<tag>manual</tag>
+<tag>mode:fm</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="FAIL" start="2026-11-16T21:44:39.802473" elapsed="10.867824">Operator: With the 100.0 Hz tone, the radio plays a steady 1 kHz tone -&gt; no</status>
+</test>
+<kw name="Close Bench" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the instruments and write measurements.json: every capture,
+check and operator answer, with the run's provenance. Absolute paths
+are made relative, so the file can be published as it is.</doc>
+<status status="PASS" start="2026-11-16T21:44:50.670974" elapsed="0.016989"/>
+</kw>
+<doc>FM follows the 12.5/25 kHz channel bandwidth setting, on transmit
+and on receive, on every band the radio has.
+
+Run it with a bench's argument file (bench/example.args), whose
+oat.expand repeats each test on every band in the radio file. Transmit is measured from the SDR capture. Receive is judged by
+the operator, or, on a bench with an audio interface, measured
+from its recording of the speaker once Set Radio Volume Once has
+set the volume by level.
+The programming cable stays out throughout: it disconnects the mic
+and the speaker.
+
+A bench with an audio interface on the accessory jack keys the radio
+and plays the test tones into the mic itself; otherwise the operator
+plays a tone at the mic, whistles and keys.
+
+To measure stock firmware as a reference, exclude mode:m17.</doc>
+<meta name="Calibration">assumed, measured 2026-10-20 (d55ce4aa0a3c)</meta>
+<meta name="Firmware">v0.4.5-50-g83ed1fe5a</meta>
+<meta name="Hardware">CS7000-PLUS 2709D157450086</meta>
+<meta name="Radio">Connect Systems CS7000-PLUS (cs7000p)</meta>
+<meta name="Station">k0ret</meta>
+<meta name="Suite commit">be862b1ada</meta>
+<status status="FAIL" start="2026-11-16T21:44:39.070079" elapsed="11.618001"/>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="1" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="0" fail="1" skip="0">band:70cm</stat>
+<stat pass="0" fail="1" skip="0">manual</stat>
+<stat pass="0" fail="1" skip="0">mode:fm</stat>
+<stat pass="0" fail="1" skip="0">per-band</stat>
+<stat pass="0" fail="1" skip="0">rx</stat>
+</tag>
+<suite>
+<stat name="Bandwidth" id="s1" pass="0" fail="1" skip="0">Bandwidth</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

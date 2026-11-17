@@ -1,0 +1,86 @@
+{
+  "schema": 1,
+  "suite": "Rx",
+  "started": "2026-11-17T03:56:28+00:00",
+  "station": "k0ret",
+  "radio": "Connect Systems CS7000-PLUS",
+  "radio_file": "cs7000p",
+  "firmware": "v0.4.5-46-gf29392cc7",
+  "hardware": "CS7000-PLUS 2709D157450086",
+  "suite_commit": "be862b1ada",
+  "bands": {
+    "70cm": 445925000
+  },
+  "calibration": {
+    "method": "assumed",
+    "measured": "2026-10-20",
+    "expires": "2026-12-31",
+    "sha256": "d55ce4aa0a3c"
+  },
+  "records": [
+    {
+      "test": "70cm: M17 RX Shows The Callsign",
+      "band": "70cm",
+      "kind": "observation",
+      "text": "Set the radio volume where it will stay for the rest of this run. Where is the knob (e.g. 1 o'clock)?",
+      "answer": "3 pm"
+    },
+    {
+      "test": "70cm: M17 RX Shows The Callsign",
+      "band": "70cm",
+      "kind": "radio_volume",
+      "knob": "3 pm"
+    },
+    {
+      "test": "70cm: M17 RX Shows The Callsign",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the radio to M17, 445.925 MHz, no encryption, any destination accepted, volume unchanged",
+      "answer": ""
+    },
+    {
+      "test": "70cm: M17 RX Shows The Callsign",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "OAT1",
+      "destination": "@ALL",
+      "audio": "tone:1000",
+      "frames": 50,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0
+    },
+    {
+      "test": "70cm: M17 RX Shows The Callsign",
+      "band": "70cm",
+      "kind": "assertion",
+      "text": "Each transmission shows OAT1 and plays a steady tone",
+      "passed": true,
+      "note": ""
+    }
+  ],
+  "operator": [
+    {
+      "kind": "instruct",
+      "text": "Plan for Rx:\n  Radio: CS7000-PLUS 2709D157450086 as Connect Systems CS7000-PLUS (radios/cs7000p.yaml), firmware v0.4.5-46-gf29392cc7\n  Bench: k0ret, receiver rtlsdr, transmitter hackrf, calibration assumed of 2026-10-20\n  70cm: 445.925 MHz (to receiver 58.0 dB, from transmitter 58.3 dB)\n  Modes: m17\n  Receive tests (first): attenuator chain from the hackrf to the radio\n  Tests (1):\n    - 70cm: M17 RX Shows The Callsign\nCheck the setup, then continue to begin.",
+      "answer": ""
+    },
+    {
+      "kind": "ask",
+      "text": "Set the radio volume where it will stay for the rest of this run. Where is the knob (e.g. 1 o'clock)?",
+      "answer": "3 pm"
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to M17, 445.925 MHz, no encryption, any destination accepted, volume unchanged",
+      "answer": ""
+    },
+    {
+      "kind": "confirm",
+      "text": "Each transmission shows OAT1 and plays a steady tone",
+      "answer": "yes"
+    }
+  ]
+}
