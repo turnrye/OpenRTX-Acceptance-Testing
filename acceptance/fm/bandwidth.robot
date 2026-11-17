@@ -41,6 +41,10 @@ ${DSP}            ${EMPTY}
 ${RATIO_LOW}      0.4
 ${RATIO_HIGH}     0.65
 ${CTCSS_HZ}       100.0
+# CTCSS receive: the next standard tone up must not open the squelch, and the
+# bench sends its tones at a deviation inside both bandwidths' TIA-603-E range
+${CTCSS_OTHER_HZ}            103.5
+${CTCSS_RX_DEVIATION_HZ}     500
 # How far CTCSS deviation and RX SINAD may move after a trip through M17
 # (MODE-1): about the repeatability of the bench
 ${MODE_RATIO_LOW}     0.9
@@ -350,4 +354,22 @@ FM RX SINAD Is Unchanged After M17
     ${change}=    Evaluate    20 * math.log10(${after}[tone_amplitude] / ${before}[tone_amplitude])
     Value Should Be Within    ${change}    0    ${MODE_SINAD_DB}    tone level after M17 / before (dB)
     ...    relative=False
+    [Teardown]    Stop Transmitting
+
+FM RX CTCSS Opens Only On Its Tone
+    [Documentation]    CTCSS-1: with CTCSS decode on, the squelch opens for the channel's
+    ...                tone and stays shut for the next standard tone up and for no tone.
+    ...                The right tone comes first: a radio whose decoder hears nothing
+    ...                fails there.
+    [Tags]    rx    manual
+    ${volume}=    Set Listening Volume
+    Operator Does    Set the radio to FM, ${FREQUENCY_MHZ} MHz, 25 kHz bandwidth, CTCSS Tone ${CTCSS_HZ} Hz, CTCSS En. Decode, ${volume}
+    Start Transmitting FM Tone    3000    ctcss_hz=${CTCSS_HZ}    ctcss_deviation_hz=${CTCSS_RX_DEVIATION_HZ}
+    Operator Confirms    With the ${CTCSS_HZ} Hz tone, the radio plays a steady 1 kHz tone
+    Stop Transmitting
+    Start Transmitting FM Tone    3000    ctcss_hz=${CTCSS_OTHER_HZ}    ctcss_deviation_hz=${CTCSS_RX_DEVIATION_HZ}
+    Operator Confirms    With ${CTCSS_OTHER_HZ} Hz instead, the radio stays silent
+    Stop Transmitting
+    Start Transmitting FM Tone    3000
+    Operator Confirms    With no CTCSS tone, the radio stays silent
     [Teardown]    Stop Transmitting
