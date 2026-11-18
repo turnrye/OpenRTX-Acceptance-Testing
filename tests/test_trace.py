@@ -151,3 +151,11 @@ def test_score_stream_takes_the_lsf_from_the_frames_without_an_lsf_line():
                   for i in range(4)])
     r = trace.score_stream(ev, PAYLOADS)
     assert (r["lsf_after_frames"], r["lsf_from"]) == (2, "I")
+
+
+def test_score_stream_counts_the_decoder_empty_frame_as_rejected():
+    ev = events("LOCK 0 1", str_line(40, 0, 0, bytes(16)), "LOCK 80 0",
+                "LOCK 200 1", *[str_line(240 + 40 * i, i, 1, PAYLOADS[i])
+                                for i in range(4)])
+    r = trace.score_stream(ev, PAYLOADS)
+    assert (r["decoded"], r["garbled"], r["repeated"]) == (4, 0, 1)
