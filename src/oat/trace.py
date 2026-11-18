@@ -282,19 +282,17 @@ def make_trace(cfg: dict | None, log: Path | None = None,
 def score_stream(events: list[Event], payloads: list[bytes]) -> dict:
     """
     Score one voice transmission's trace against the payloads sent, frame
-    numbers 0 up, up to its EOT line (a false lock on the noise after it
-    doesn't count). Each STR line is decoded (its frame number and payload
+    numbers 0 up, up to the first EOT line after a frame decoded as sent (a
+    false lock on the noise before or after it doesn't count). Each STR line is decoded (its frame number and payload
     as sent, the first time), repeated (the decoder rejected the frame and
     still holds the one before, or its empty frame after a reset: frame 0,
-    all zeros, as on a false lock on noise) or garbled (anything else). Played frames come from the PLAY lines, garbled ones
-    being those whose last STR line was garbled. The link setup data's
+    all zeros, as on a false lock on noise) or garbled (anything else).
+    Played frames come from the PLAY lines, garbled ones being those whose
+    last STR line was garbled. The link setup data's
     arrival comes from its LSF line, or, when the trace saw no change (the
     same link setup as the transmission before), from the first STR line
     that has it valid: before any stream frame it came from the LSF frame.
     """
-    eot = next((i for i, e in enumerate(events) if e.kind == "EOT"), None)
-    if eot is not None:
-        events = events[:eot + 1]
     sent = len(payloads)
     decoded, garbled, repeated = set(), 0, 0
     played, played_garbled = 0, 0
@@ -302,6 +300,12 @@ def score_stream(events: list[Event], payloads: list[bytes]) -> dict:
     first_lsf_frame, lsf_source, first_play_frame = None, None, None
     frames_seen = 0
     for e in events:
+        if (e.kind == "EOT") and decoded:
+            break
+        if (e.kind == "LOCK") and (e.fields[1:2] == ["1"]) and not decoded:
+            # A new lock before anything decoded: what came before was noise
+            frames_seen, first_play_frame = 0, None
+            first_lsf_frame, lsf_source = None, None
         if e.kind == "LSF" and len(e.fields) >= 4 and e.fields[1] == "1":
             if lsf_source is None:
                 lsf_source = e.fields[2]
