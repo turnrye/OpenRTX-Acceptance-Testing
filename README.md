@@ -124,6 +124,7 @@ audio tests were left out on purpose.
 | `fm/audio.robot` | FM audio through the audio interface: mic sensitivity, response, distortion, speech deviation, mic level after cold boots, 12 dB SINAD sensitivity, receive response and dropouts, receive after the radio idles (`slow`) |
 | `m17/tx.robot` | M17 transmit: deviations and ratio, symbol rate, carrier, bandwidth, EVM, decode rate, preamble, long transmissions, power, Codec2 input level and aliasing |
 | `m17/rx.robot` | M17 receive of a generated stream: callsign, Codec2 tone, sensitivity, carrier offset, speaker images, receive right after a transmission, key presses during receive |
+| `m17/trace.robot` | M17 receive read from the radio's own trace (needs:trace, a trace build from `firmware/m17-trace`): every frame at the bench's level, joining a transmission late (link setup rebuilt from the LICH), back-to-back transmissions, stream and SMS sensitivity sweeps (90% and 50% points), the receive thread's stack, and a soak (tag `long`). No operator after setup |
 | `aprs/rx.robot` | APRS receive (OpenRTX#559): messages to the radio's APRS callsign reach the inbox, matched as an address, stored once, not pushed out by other traffic; full-size frames; deviation and pre-emphasis. The operator reads the inbox; message tags end in the run's tag, so reruns aren't copies |
 | `aprs/performance.robot` | APRS receive performance read from the radio's KISS TNC (needs:tnc): every frame at the bench's level, full-size and escaped frames through the TNC, a sensitivity sweep (90% and 50% points), twist, deviation, short TXDELAY, off-frequency and clock error, back-to-back frames, and a soak (tag `long`). No operator after setup |
 
@@ -214,7 +215,15 @@ bandwidth, preamble and polarity. Every frame is decoded in Python (LSF with its
 LICH, stream frames, frame numbers, EOT), so no outside decoder is needed; the encoder and decoder
 are checked symbol for symbol against libm17 (`scripts/m17-reference-vectors.py`). The bench
 generates M17 streams the same way, with a Codec2 tone, a WAV file or random payload, at any
-deviation, offset or polarity. Limits are the radio file's `m17` block.
+deviation, offset or polarity, with or without the LSF frame, and SMS as packet transmissions.
+Limits are the radio file's `m17` block.
+
+A trace build of OpenRTX (`firmware/m17-trace`, built for any commit with its
+`build_trace_fw.sh`) reports every frame the radio decodes on its USB serial port, which the
+bench's `trace` section names. `m17/trace.robot` scores those reports against what was sent, frame
+by frame, so receive performance is measured exactly, without the speaker. On the MD-UV3x0 the
+USB port and the audio interface share the accessory jack: run the `needs:trace` and `needs:audio`
+tests in separate passes.
 
 ### Transmit power
 
@@ -267,6 +276,7 @@ links to the suite on `main` instead, so push before you run.
 | `results/` | Published evidence runs, append-only |
 | `scripts/export-run.sh` | Adds a run to `results/` |
 | `scripts/m17-reference-vectors.py` | Writes the M17 test vectors from a libm17 build |
+| `firmware/m17-trace/` | The M17 receive trace: a test-only addition to OpenRTX and the script that builds it into an image |
 | `src/oat/` | The Robot library: SDR and VNA backends, signals, FM and M17 analysis, audio, operator, keywords, modifiers, calibration and comparison tools |
 | `tests/` | Unit tests of the library (`uv run pytest`) |
 | `docs/DESIGN.md` | Goals and how the pieces fit |

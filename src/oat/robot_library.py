@@ -25,6 +25,8 @@ from oat.calibration import load_calibration
 from oat.config import check_receiver_safe, load_yaml
 from oat.iq import IqFormat, clipped_fraction, write_iq
 from oat.kiss import make_tnc
+from oat import trace as trace_mod
+from oat.trace import make_trace
 from oat.sanitize import scrub
 from oat.operator import make_operator
 from oat import recorded
@@ -161,6 +163,11 @@ class OpenRTXAcceptance:
         self._open_capture = None
         # The radio's KISS TNC, when the bench has one
         self.tnc = None
+        # The radio's M17 receive trace, when the bench has one
+        self.trace = None
+        # Payloads of the last M17 stream sent, to score the trace against
+        self._m17_sent = []
+        self._m17_sends = 0
         # Differs from run to run, for test traffic (Run Tag)
         self.run_id = secrets.token_hex(2)
         self._aprs_sends = 0
@@ -236,6 +243,10 @@ class OpenRTXAcceptance:
         # every byte from the port goes to tnc.log
         self.tnc = make_tnc(self.bench.get("tnc"), self.run_dir / "tnc.log",
                             getattr(self.receiver, "clock", None))
+        # The same for the M17 trace, to trace.log
+        self.trace = make_trace(self.bench.get("trace"),
+                                self.run_dir / "trace.log",
+                                getattr(self.receiver, "clock", None))
         # Shown in Robot's report, and filterable in robotframework-dashboard
         cal = self.calibration.summary()
         for name, value in (
@@ -246,6 +257,8 @@ class OpenRTXAcceptance:
                 ("Station", self.bench.get("station", "unnamed")),
                 *((("TNC", self.bench["tnc"]["type"]),)
                   if self.bench.get("tnc") else ()),
+                *((("Trace", self.bench["trace"]["type"]),)
+                  if self.bench.get("trace") else ()),
                 ("Calibration", f"{cal['method']}, measured "
                                 f"{cal['measured']} ({cal['sha256']})"),
                 *((("Audio mixer", "; ".join(
@@ -417,6 +430,8 @@ class OpenRTXAcceptance:
                 logger.warn(f"Couldn't release PTT on {self.ptt.device}: {e}")
         if self.tnc is not None:
             self.tnc.close()
+        if self.trace is not None:
+            self.trace.close()
         if self.run_dir is None:
             return
         report = {
@@ -437,6 +452,8 @@ class OpenRTXAcceptance:
                if getattr(self, "audio_mixer", None) else {}),
             "records": self.records,
             **({"tnc_junk": self.tnc.junk} if self.tnc is not None else {}),
+            **({"trace_build": self.trace.label}
+               if self.trace is not None else {}),
             "operator": self.operator.exchanges(),
         }
         text = scrub(json.dumps(report, indent=2, default=plain))
@@ -1273,7 +1290,9 @@ class OpenRTXAcceptance:
                                       preamble_ms: float = 40.0,
                                       gap_s: float = 1.0,
                                       level_dbm: float | None = None,
-                                      loop: bool = True):
+                                      loop: bool = True,
+                                      lsf: bool = True,
+                                      level_db=None) -> float:
         """
         Loop an M17 voice stream on the test frequency until stopped:
         preamble, LSF from `source` to `destination`, stream frames, EOT,
@@ -1282,13 +1301,21 @@ class OpenRTXAcceptance:
         `frames` long), a WAV file (Codec2, its whole length), or random
         (random payload bytes, for decoding without Codec2). offset_hz moves
         the carrier off the channel; inverted sends the symbols with the
-        wrong sign; level_dbm sets the level at the radio's antenna port.
-        With loop=False the stream plays once.
+        wrong sign; level_dbm sets the level at the radio's antenna port,
+        level_db the level relative to the bench's gain instead. With
+        loop=False the stream plays once. Without the LSF (lsf=False) the
+        radio can only learn the link setup from the LICH, as when it joins
+        a transmission late. Returns the seconds one transmission and its
+        gap last.
         """
         payloads = self._m17_payloads(str(audio), int(frames))
         preamble = int(round(float(preamble_ms) / 1000 * m17_codec.SYMBOL_RATE))
+        with_lsf = str(lsf).lower() not in ("false", "0", "no")
         symbols = m17_codec.stream_symbols(
-            m17_codec.Lsf(destination, source), payloads, preamble)
+            m17_codec.Lsf(destination, source), payloads, preamble, with_lsf)
+        self._m17_sent = payloads
+        if hasattr(self.trace, "hear"):
+            self.trace.hear(symbols, self._sim_level(level_dbm, level_db))
         tx = self.bench["transmitter"]
         iq = np.concatenate([
             m17_phy.m17_iq(symbols, tx["rate"], float(deviation_hz),
@@ -1297,12 +1324,285 @@ class OpenRTXAcceptance:
             silence(float(gap_s), tx["rate"])])
         level = self._play(iq, f"tx-m17-{source.replace('/', '_')}-"
                                f"{int(float(offset_hz))}hz", level_dbm,
-                           repeat=bool(loop), mode="m17")
+                           repeat=bool(loop), mode="m17", level_db=level_db)
         self._record("transmit", mode="m17", source=source,
                      destination=destination, audio=str(audio),
                      frames=len(payloads), deviation_hz=float(deviation_hz),
                      offset_hz=float(offset_hz), inverted=bool(inverted),
-                     preamble_ms=float(preamble_ms), **level)
+                     preamble_ms=float(preamble_ms), lsf=with_lsf, **level)
+        return len(iq) / tx["rate"]
+
+    @keyword
+    def start_transmitting_m17_sms(self, *texts: str, source: str = "N0CALL",
+                                   destination: str = "@ALL",
+                                   deviation_hz: float = 2400.0,
+                                   preamble_ms: float = 40.0,
+                                   gap_s: float = 1.0,
+                                   level_dbm=None, level_db=None,
+                                   loop: bool = False) -> float:
+        """
+        Send each text as an M17 SMS: one packet transmission per text
+        (preamble, LSF in packet mode, the packet frames, EOT), gap_s apart.
+        Levels as for Start Transmitting M17 Stream. Returns the seconds the
+        whole sequence lasts.
+        """
+        lsf = m17_codec.Lsf(destination, source, m17_codec.TYPE_PACKET_DATA)
+        preamble = int(round(float(preamble_ms) / 1000 * m17_codec.SYMBOL_RATE))
+        tx = self.bench["transmitter"]
+        parts = []
+        for text in texts:
+            symbols = m17_codec.packet_symbols(
+                lsf, m17_codec.sms_packet(str(text)), preamble)
+            if hasattr(self.trace, "hear"):
+                self.trace.hear(symbols, self._sim_level(level_dbm, level_db))
+            parts.append(m17_phy.m17_iq(symbols, tx["rate"],
+                                        float(deviation_hz),
+                                        self._tx_baseband_offset(0.0), False))
+            parts.append(silence(float(gap_s), tx["rate"]))
+        iq = np.concatenate(parts)
+        self._m17_sends += 1
+        level = self._play(iq, f"tx-m17-sms-{self._m17_sends:03d}", level_dbm,
+                           repeat=bool(loop), mode="m17", level_db=level_db)
+        self._record("transmit", mode="m17-sms", source=source,
+                     destination=destination, texts=[str(t) for t in texts],
+                     **level)
+        return len(iq) / tx["rate"]
+
+    @staticmethod
+    def _sim_level(level_dbm, level_db) -> float:
+        """The level the simulated radio hears, as for APRS."""
+        if level_dbm not in (None, "", "None"):
+            return float(level_dbm)
+        return SIM_BENCH_LEVEL_DBM + float(level_db or 0.0)
+
+    # M17 receive trace ----------------------------------------------------
+
+    def _need_trace(self):
+        if self.trace is None:
+            BuiltIn().skip("No M17 trace: add a trace section to the bench "
+                           "file (see bench/example.yaml), or exclude "
+                           "needs:trace")
+        return self.trace
+
+    @keyword
+    def m17_trace_should_be_running(self, timeout_s: float = 3.0) -> str:
+        """
+        The radio answered with its trace build's label: it runs a trace
+        build (firmware/m17-trace) and the bench's trace port is its port.
+        """
+        trace = self._need_trace()
+        deadline = time.monotonic() + float(timeout_s)
+        while (trace.label is None) and (time.monotonic() < deadline):
+            time.sleep(0.1)
+        if trace.label is None:
+            raise AssertionError("No answer on the trace port: flash a trace "
+                                 "build (firmware/m17-trace) and check the "
+                                 "bench file's trace port")
+        self._record("m17-trace", build=trace.label)
+        BuiltIn().set_test_message(f"trace build {trace.label}", append=True)
+        return trace.label
+
+    @keyword
+    def score_m17_stream(self, frames: int = 250, settle_s: float = 1.0,
+                         **options) -> dict:
+        """
+        Send one M17 stream of `frames` random payloads and score what the
+        radio's trace reported: frames decoded, missed, garbled (decoded
+        wrong) and repeated (rejected, the decoder keeping the frame
+        before), frames played and garbled frames played, and after how
+        many frames the link setup data became valid, and from where (F:
+        the LSF frame, I: rebuilt from the LICH). Takes Start Transmitting
+        M17 Stream's options, lsf=False among them.
+        """
+        trace = self._need_trace()
+        options.pop("audio", None)
+        options.pop("loop", None)
+        start = trace.now()
+        seconds = self.start_transmitting_m17_stream(
+            audio="random", frames=int(frames), loop=False, **options)
+        self.wait_seconds(seconds + float(settle_s))
+        self.stop_transmitting()
+        result = trace_mod.score_stream(trace.events_since(start),
+                                        self._m17_sent)
+        result["options"] = {k: str(v) for k, v in options.items()}
+        self._record("m17-trace-stream", **result)
+        logger.info(f"{result['decoded']}/{result['sent']} decoded, "
+                    f"{result['garbled']} garbled, {result['repeated']} "
+                    f"repeated, {result['played']} played "
+                    f"({result['played_garbled']} garbled), LSF after "
+                    f"{result['lsf_after_frames']} frames from "
+                    f"{result['lsf_from']}")
+        return result
+
+    @keyword
+    def score_m17_back_to_back(self, overs: int = 5, frames: int = 25,
+                               gap_s: float = 0.1, settle_s: float = 1.0,
+                               source: str = "N0CALL",
+                               destination: str = "@ALL",
+                               deviation_hz: float = 2400.0,
+                               level_dbm=None, level_db=None) -> dict:
+        """
+        Send `overs` voice transmissions of `frames` random payloads, gap_s
+        apart, and score each one from the trace separately: the frames it
+        decoded and after how many frames its link setup data was valid.
+        """
+        trace = self._need_trace()
+        payloads = m17_tools.random_payloads(int(frames))
+        symbols = m17_codec.stream_symbols(
+            m17_codec.Lsf(destination, source), payloads)
+        tx = self.bench["transmitter"]
+        over = m17_phy.m17_iq(symbols, tx["rate"], float(deviation_hz),
+                              self._tx_baseband_offset(0.0), False)
+        gap = silence(float(gap_s), tx["rate"])
+        start = trace.now()
+        for _ in range(int(overs)):
+            if hasattr(self.trace, "hear"):
+                self.trace.hear(symbols, self._sim_level(level_dbm, level_db))
+        iq = np.concatenate([part for _ in range(int(overs))
+                             for part in (over, gap)])
+        self._m17_sends += 1
+        level = self._play(iq, f"tx-m17-b2b-{self._m17_sends:03d}", level_dbm,
+                           repeat=False, mode="m17", level_db=level_db)
+        self.wait_seconds(len(iq) / tx["rate"] + float(settle_s))
+        self.stop_transmitting()
+        segments, current = [], []
+        for e in trace.events_since(start):
+            current.append(e)
+            if e.kind == "EOT":
+                segments.append(current)
+                current = []
+        scores = [trace_mod.score_stream(seg, payloads) for seg in segments]
+        result = {"overs": int(overs), "frames": int(frames),
+                  "gap_s": float(gap_s), "heard_overs": len(scores),
+                  "decoded": [r["decoded"] for r in scores],
+                  "lsf_after_frames": [r["lsf_after_frames"] for r in scores],
+                  **level}
+        self._record("m17-trace-back-to-back", **result)
+        logger.info(f"{len(scores)}/{overs} transmissions heard, frames "
+                    f"decoded {result['decoded']}, LSF after "
+                    f"{result['lsf_after_frames']} frames")
+        return result
+
+    @keyword
+    def find_m17_trace_sensitivity(self, start: float = 0.0,
+                                   stop: float = -40.0, step: float = 2.0,
+                                   frames: int = 250, absolute=None,
+                                   kind: str = "stream",
+                                   **options) -> dict:
+        """
+        Step the level down from `start` to `stop` until fewer than half
+        get through: for kind=stream a `frames`-long stream at each level,
+        counting frames decoded (and garbled frames played); for kind=sms
+        `frames` SMS, counting those intact. The result has the curve and
+        the levels where 90% and 50% still got through, interpolated.
+        Levels are dBm at the radio with a transmitter level table (or
+        absolute: true), otherwise dB relative to the bench's gain: compare
+        relative results only within one session, on one bench. Takes
+        Score M17 Stream's or Score M17 SMS's options.
+        """
+        if absolute in (None, "", "None"):
+            absolute = self.calibration.transmitter_levels is not None
+        absolute = str(absolute).lower() in ("true", "1", "yes")
+        key = "level_dbm" if absolute else "level_db"
+        points = []
+        level = float(start)
+        while level >= float(stop) - 1e-9:
+            if kind == "sms":
+                r = self.score_m17_sms(frames, **{key: level}, **options)
+                points.append((level, r["rate"], r["crc_failed"]))
+            else:
+                r = self.score_m17_stream(frames, **{key: level}, **options)
+                points.append((level, r["rate"], r["played_garbled"]))
+            if r["rate"] < 0.5:
+                break
+            level -= float(step)
+
+        def crossing(target):
+            for (l1, r1, _), (l2, r2, _) in zip(points, points[1:]):
+                if r1 >= target > r2:
+                    return float(l1 + (target - r1) * (l2 - l1) / (r2 - r1))
+            return None
+
+        result = {"unit": "dBm" if absolute else "dB re bench",
+                  "traffic": kind, "points": points, "count": int(frames),
+                  "level_90": crossing(0.9), "level_50": crossing(0.5),
+                  "options": {k: str(v) for k, v in options.items()}}
+        self._record("m17-trace-sensitivity", **result)
+        third = "CRC failed" if kind == "sms" else "garbled played"
+        rows = "".join(f"<tr><td>{l:+.1f}</td><td>{r:.1%}</td>"
+                       f"<td>{g}</td></tr>" for l, r, g in points)
+        logger.info(f"<table><tr><th>level ({result['unit']})</th>"
+                    f"<th>{'intact' if kind == 'sms' else 'decoded'}</th>"
+                    f"<th>{third}</th></tr>{rows}</table>", html=True)
+        if result["level_50"] is None:
+            raise AssertionError(f"the {kind} rate never fell below 50% "
+                                 f"between {start} and {stop}: {points}")
+        BuiltIn().set_test_message(
+            "90% at "
+            + (f"{result['level_90']:+.1f}" if result["level_90"] is not None
+               else "n/a")
+            + f", 50% at {result['level_50']:+.1f} {result['unit']}",
+            append=True)
+        return result
+
+    @keyword
+    def score_m17_sms(self, count: int = 10, length: int = 60,
+                      settle_s: float = 1.0, **options) -> dict:
+        """
+        Send `count` numbered SMS of `length` characters, one transmission
+        each, and count the packets the radio's trace reported intact (its
+        packet frames in order, the CRC holding, the text ours): heard,
+        missing, failed CRC. Takes Start Transmitting M17 SMS's options.
+        """
+        trace = self._need_trace()
+        count, length = int(count), int(length)
+        self._m17_sends += 1
+        batch = f"oat{self.run_id}.{self._m17_sends:03d}"
+        texts = []
+        for i in range(count):
+            label = f"{batch}.{i:03d} "
+            texts.append((label + "x" * length)[:max(length, len(label))])
+        wanted = {m17_codec.sms_packet(t): n for n, t in enumerate(texts)}
+        start = trace.now()
+        seconds = self.start_transmitting_m17_sms(*texts, **options)
+        self.wait_seconds(seconds + float(settle_s))
+        self.stop_transmitting()
+        packets = trace_mod.reassemble_packets(trace.events_since(start))
+        got = {wanted[p] for p, ok in packets if ok and p in wanted}
+        result = {"sent": count, "length": length, "heard": len(got),
+                  "missing": sorted(set(range(count)) - got),
+                  "crc_failed": sum(1 for _, ok in packets if not ok),
+                  "rate": len(got) / count if count else 0.0,
+                  "options": {k: str(v) for k, v in options.items()}}
+        self._record("m17-trace-sms", **result)
+        logger.info(f"{result['heard']}/{count} SMS intact, "
+                    f"{result['crc_failed']} failed their CRC")
+        return result
+
+    @keyword
+    def m17_trace_stack_should_have_headroom(self, min_free_bytes: int = 128):
+        """
+        Over the whole run so far, the receive thread never had less than
+        min_free_bytes of stack left, the radio didn't reset, and the trace
+        dropped no lines (dropped lines make every score uncertain).
+        """
+        trace = self._need_trace()
+        report = trace_mod.stack_report(trace.events_since(0.0))
+        self._record("m17-trace-stack", min_free_bytes=int(min_free_bytes),
+                     **report)
+        if report["beats"] == 0:
+            raise AssertionError("no heartbeat from the trace build")
+        BuiltIn().set_test_message(
+            f"stack {report['stack']} B, least free {report['least_free']} "
+            f"B, {report['dropped']} lines dropped", append=True)
+        if report["resets"]:
+            raise AssertionError(f"the radio reset {report['resets']} times")
+        if report["dropped"]:
+            raise AssertionError(f"the trace dropped {report['dropped']} "
+                                 "lines")
+        if report["least_free"] < int(min_free_bytes):
+            raise AssertionError(f"only {report['least_free']} B of stack "
+                                 f"left at worst, under {min_free_bytes} B")
 
     @staticmethod
     def _m17_payloads(audio: str, frames: int) -> list[bytes]:
