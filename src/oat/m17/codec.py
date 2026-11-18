@@ -36,8 +36,15 @@ SYMBOL_MAP = np.array([+1, +3, -1, -3], dtype=np.int8)
 
 # Data type values of the LSF TYPE field
 TYPE_STREAM = 0x0001
+TYPE_DATA = 0x0002
 TYPE_VOICE = 0x0004
 TYPE_VOICE_STREAM = TYPE_STREAM | TYPE_VOICE
+TYPE_PACKET_DATA = TYPE_DATA  # packet mode is TYPE bit 0 clear
+
+# Packet application layer: the protocol byte of an SMS
+PACKET_SMS = 0x05
+PACKET_FRAME_BYTES = 25  # data bytes per packet frame
+PACKET_MAX_BYTES = 33 * PACKET_FRAME_BYTES  # 32 frames of 25, then the last
 
 CRC_POLY = 0x5935
 CALLSIGN_ALPHABET = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-/."
@@ -51,6 +58,7 @@ GOLAY_MATRIX = (0x8EB, 0x93E, 0xA97, 0xDC6, 0x367, 0x6CD,
 # Puncture patterns: P1 for the LSF, P2 for stream frames
 P1 = np.array([1] + [1, 0, 1, 1] * 15, dtype=bool)
 P2 = np.array([1] * 11 + [0], dtype=bool)
+P3 = np.array([1] * 7 + [0], dtype=bool)
 
 RANDOMIZER = bytes.fromhex(
     "D6B5E23082FF8462BA4E9690D898DD5D0CC85243911DF8"
@@ -317,17 +325,76 @@ def stream_frame(lsf: Lsf, counter: int, fn: int, payload: bytes) -> np.ndarray:
 
 
 def stream_symbols(lsf: Lsf, payloads: list[bytes],
-                   preamble_symbols: int = SYMBOLS_PER_FRAME) -> np.ndarray:
+                   preamble_symbols: int = SYMBOLS_PER_FRAME,
+                   with_lsf: bool = True) -> np.ndarray:
     """
     A whole voice stream transmission: preamble, LSF, one stream frame per
-    16-byte payload, the last flagged, then the EOT marker.
+    16-byte payload, the last flagged, then the EOT marker. Without the LSF
+    (with_lsf false) a receiver can only learn the link setup from the
+    LICH, as when it joins a transmission late.
     """
-    frames = [preamble(preamble_symbols), lsf_frame(lsf)]
+    frames = [preamble(preamble_symbols)]
+    if with_lsf:
+        frames.append(lsf_frame(lsf))
     for i, payload in enumerate(payloads):
         fn = i & 0x7FFF
         if i == len(payloads) - 1:
             fn |= 0x8000
         frames.append(stream_frame(lsf, i % 6, fn, payload))
+    frames.append(eot())
+    return np.concatenate(frames)
+
+
+def sms_packet(text: str) -> bytes:
+    """
+    An SMS as the packet application layer carries it: the SMS protocol
+    byte, the UTF-8 text, a NUL, then the CRC of all that.
+    """
+    body = bytes([PACKET_SMS]) + text.encode("utf-8") + b"\0"
+    packet = body + crc16(body).to_bytes(2, "big")
+    if len(packet) > PACKET_MAX_BYTES:
+        raise ValueError(f"an SMS packet holds at most {PACKET_MAX_BYTES} "
+                         "bytes")
+    return packet
+
+
+def packet_chunks(packet: bytes) -> list[tuple[bytes, int, bool]]:
+    """
+    A packet cut into packet frames: 25 data bytes each, with the counter
+    and end flag. Frames before the last count up from 0; the last has the
+    end flag, and its counter is how many of its bytes are data.
+    """
+    chunks = []
+    for i in range(0, len(packet), PACKET_FRAME_BYTES):
+        data = packet[i:i + PACKET_FRAME_BYTES]
+        last = i + PACKET_FRAME_BYTES >= len(packet)
+        counter = len(data) if last else i // PACKET_FRAME_BYTES
+        chunks.append((data.ljust(PACKET_FRAME_BYTES, b"\0"), counter, last))
+    return chunks
+
+
+def packet_frame(data: bytes, counter: int, eof: bool) -> np.ndarray:
+    """
+    A packet frame: sync burst, then 25 data bytes, the end flag and a
+    5-bit counter (206 bits), coded and punctured by P3.
+    """
+    if len(data) != PACKET_FRAME_BYTES:
+        raise ValueError("a packet frame carries 25 data bytes")
+    meta = (int(bool(eof)) << 7) | ((int(counter) & 0x1F) << 2)
+    bits = _bits(bytes(data) + bytes([meta]), 206)
+    type3 = conv_encode(bits, P3)
+    return np.concatenate([sync_symbols(SYNC_PACKET),
+                           bits_to_symbols(_physical(type3))])
+
+
+def packet_symbols(lsf: Lsf, packet: bytes,
+                   preamble_symbols: int = SYMBOLS_PER_FRAME) -> np.ndarray:
+    """
+    A whole packet transmission: preamble, LSF, the packet frames, then the
+    EOT marker. The LSF's TYPE should be packet mode (TYPE_PACKET_DATA).
+    """
+    frames = [preamble(preamble_symbols), lsf_frame(lsf)]
+    frames += [packet_frame(*chunk) for chunk in packet_chunks(packet)]
     frames.append(eot())
     return np.concatenate(frames)
 
@@ -356,10 +423,17 @@ def _type3_soft(payload_symbols: np.ndarray) -> np.ndarray:
     return out
 
 
+def decode_lsf_bytes(payload_symbols: np.ndarray) -> tuple[bytes, bool, float]:
+    """The 30 LSF bytes from its 184 payload symbols, CRC check, metric."""
+    bits, metric = viterbi_decode(_type3_soft(payload_symbols), P1, 240)
+    raw = _bytes(bits)
+    return raw, crc16(raw[:28]) == int.from_bytes(raw[28:30], "big"), metric
+
+
 def decode_lsf(payload_symbols: np.ndarray) -> tuple[Lsf, bool, float]:
     """LSF contents from its 184 payload symbols, CRC check, path metric."""
-    bits, metric = viterbi_decode(_type3_soft(payload_symbols), P1, 240)
-    lsf, ok = Lsf.from_bytes(_bytes(bits))
+    raw, _, metric = decode_lsf_bytes(payload_symbols)
+    lsf, ok = Lsf.from_bytes(raw)
     return lsf, ok, metric
 
 
@@ -392,6 +466,24 @@ def decode_stream_frame(payload_symbols: np.ndarray) -> StreamFrame:
     fn = int.from_bytes(data[:2], "big")
     return StreamFrame(lich[5] >> 5, lich[:5], fn & 0x7FFF, bool(fn & 0x8000),
                        data[2:], metric, errors)
+
+
+@dataclass
+class PacketFrame:
+    """A decoded packet frame."""
+
+    data: bytes  # 25 bytes
+    counter: int
+    eof: bool
+    metric: float  # Viterbi path metric
+
+
+def decode_packet_frame(payload_symbols: np.ndarray) -> PacketFrame:
+    """A packet frame from its 184 payload symbols."""
+    bits, metric = viterbi_decode(_type3_soft(payload_symbols), P3, 206)
+    raw = _bytes(np.concatenate([bits, np.zeros(2, np.uint8)]))
+    return PacketFrame(raw[:PACKET_FRAME_BYTES], (raw[25] >> 2) & 0x1F,
+                       bool(raw[25] & 0x80), metric)
 
 
 def lsf_from_lich(frames: list[StreamFrame]) -> tuple[Lsf, bool] | None:

@@ -112,3 +112,43 @@ def test_stream_frames_decode_and_rebuild_the_lsf():
     assert [f.payload for f in frames] == payloads
     rebuilt, ok = codec.lsf_from_lich(frames)
     assert ok and rebuilt.source == "AB1CDE"
+
+
+@pytest.mark.parametrize("ref", REFERENCE["packet"],
+                         ids=lambda r: f"{r['counter']}-{r['eof']}")
+def test_packet_frames_match_libm17(ref):
+    symbols = codec.packet_frame(bytes.fromhex(ref["data"]), ref["counter"],
+                                 ref["eof"])
+    assert list(symbols) == ref["symbols"]
+
+
+def test_sms_packet_is_cut_into_counted_frames():
+    packet = codec.sms_packet("x" * 60)
+    # protocol byte, 60 characters, NUL, CRC
+    assert len(packet) == 64 and packet[0] == codec.PACKET_SMS
+    assert codec.crc16(packet[:-2]) == int.from_bytes(packet[-2:], "big")
+    chunks = codec.packet_chunks(packet)
+    assert [(c, e) for _, c, e in chunks] == [(0, False), (1, False),
+                                              (14, True)]
+    assert b"".join(d for d, _, _ in chunks)[:64] == packet
+
+
+def test_stream_without_lsf_starts_with_a_stream_frame():
+    symbols = codec.stream_symbols(Lsf(), [bytes(16)] * 2, with_lsf=False)
+    assert len(symbols) == 192 * (1 + 2 + 1)
+    assert list(symbols[192:200]) == list(
+        codec.sync_symbols(codec.SYNC_STREAM))
+
+
+def test_packet_frames_decode_through_noise():
+    lsf = Lsf("@ALL", "AB1CDE", codec.TYPE_PACKET_DATA)
+    packet = codec.sms_packet("hello from the bench")
+    symbols = codec.packet_symbols(lsf, packet)
+    chunks = codec.packet_chunks(packet)
+    for i, (data, counter, eof) in enumerate(chunks):
+        start = 192 * (2 + i)
+        assert list(symbols[start:start + 8]) == list(
+            codec.sync_symbols(codec.SYNC_PACKET))
+        frame = codec.decode_packet_frame(
+            noisy(symbols[start + 8:start + 192].astype(float), 0.4, i))
+        assert (frame.data, frame.counter, frame.eof) == (data, counter, eof)

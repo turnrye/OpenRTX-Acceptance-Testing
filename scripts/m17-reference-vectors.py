@@ -6,7 +6,8 @@
 Write the M17 reference vectors that tests/test_m17_codec.py checks oat.m17
 against, from libm17, the M17 Foundation's reference C library: callsign
 encodings, CRCs, Golay codewords, the 48 kHz RRC filter, and the symbols of Link Setup Frames,
-stream frames, the preamble and the End of Transmission marker.
+stream frames, packet frames, the preamble and the End of Transmission
+marker.
 
 Build libm17 as a shared library anywhere outside this repository, then
 
@@ -28,6 +29,15 @@ LSFS = [
 ]
 STREAM_FNS = [0, 1, 5, 0x7FFF, 0x8006]
 PAYLOAD = bytes(range(0x30, 0x40))
+# Packet frames: 25 data bytes, counter, end flag (the last frame's counter
+# is its number of data bytes)
+PACKETS = [
+    (bytes(range(0x41, 0x41 + 25)), 0, False),
+    (bytes(range(0x61, 0x61 + 25)), 7, False),
+    (b"tail".ljust(25, b"\0"), 4, True),
+    (bytes(range(25)), 25, True),
+]
+FRAME_PKT = 2
 
 
 class Lsf(ctypes.Structure):
@@ -40,7 +50,8 @@ def main() -> None:
     lib = ctypes.CDLL(sys.argv[1])
     out = {"source": f"libm17 {sys.argv[2] if len(sys.argv) > 2 else ''}"
                      .strip(),
-           "callsigns": {}, "crc": {}, "golay": {}, "lsf": [], "stream": []}
+           "callsigns": {}, "crc": {}, "golay": {}, "lsf": [], "stream": [],
+           "packet": []}
 
     def symbols(fn, *args) -> list[int]:
         buf = (ctypes.c_int8 * 192)()
@@ -91,6 +102,12 @@ def main() -> None:
                 "payload": PAYLOAD.hex(),
                 "symbols": symbols(lib.gen_frame_i8, payload, 1,
                                    ctypes.byref(lsf), i % 6, fn)})
+    for data, counter, eof in PACKETS:
+        raw = (ctypes.c_uint8 * 26)(*data,
+                                    (int(eof) << 7) | ((counter & 0x1F) << 2))
+        out["packet"].append({
+            "data": data.hex(), "counter": counter, "eof": eof,
+            "symbols": symbols(lib.gen_frame_i8, raw, FRAME_PKT, None, 0, 0)})
     out["rrc_taps_10"] = [round(float(t), 9) for t in
                           (ctypes.c_float * 81).in_dll(lib, "rrc_taps_10")]
     json.dump(out, sys.stdout, indent=None, separators=(",", ":"))
