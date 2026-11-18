@@ -284,9 +284,9 @@ def score_stream(events: list[Event], payloads: list[bytes]) -> dict:
     Score one voice transmission's trace against the payloads sent, frame
     numbers 0 up, up to its EOT line (a false lock on the noise after it
     doesn't count). Each STR line is decoded (its frame number and payload
-    as sent, the first time), repeated (the decoder kept the previous frame
-    after rejecting one, so the same frame comes again) or garbled
-    (anything else). Played frames come from the PLAY lines, garbled ones
+    as sent, the first time), repeated (the decoder rejected the frame and
+    still holds the one before, or its empty frame after a reset: frame 0,
+    all zeros, as on a false lock on noise) or garbled (anything else). Played frames come from the PLAY lines, garbled ones
     being those whose last STR line was garbled. The link setup data's
     arrival comes from its LSF line, or, when the trace saw no change (the
     same link setup as the transmission before), from the first STR line
@@ -314,7 +314,8 @@ def score_stream(events: list[Event], payloads: list[bytes]) -> dict:
             fn = int(e.fields[1]) & 0x7FFF
             payload = bytes.fromhex(e.fields[3])
             key = (fn, payload)
-            if key == previous:
+            empty = (fn == 0) and (payload == bytes(len(payload)))
+            if (key == previous) or (empty and payloads[:1] != [payload]):
                 repeated += 1
             elif fn < sent and payloads[fn] == payload:
                 decoded.add(fn)
