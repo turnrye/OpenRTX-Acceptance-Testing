@@ -282,12 +282,19 @@ def make_trace(cfg: dict | None, log: Path | None = None,
 def score_stream(events: list[Event], payloads: list[bytes]) -> dict:
     """
     Score one voice transmission's trace against the payloads sent, frame
-    numbers 0 up. Each STR line is decoded (its frame number and payload as
-    sent, the first time), repeated (the decoder kept the previous frame
+    numbers 0 up, up to its EOT line (a false lock on the noise after it
+    doesn't count). Each STR line is decoded (its frame number and payload
+    as sent, the first time), repeated (the decoder kept the previous frame
     after rejecting one, so the same frame comes again) or garbled
     (anything else). Played frames come from the PLAY lines, garbled ones
-    being those whose last STR line was garbled.
+    being those whose last STR line was garbled. The link setup data's
+    arrival comes from its LSF line, or, when the trace saw no change (the
+    same link setup as the transmission before), from the first STR line
+    that has it valid: before any stream frame it came from the LSF frame.
     """
+    eot = next((i for i, e in enumerate(events) if e.kind == "EOT"), None)
+    if eot is not None:
+        events = events[:eot + 1]
     sent = len(payloads)
     decoded, garbled, repeated = set(), 0, 0
     played, played_garbled = 0, 0
@@ -300,6 +307,9 @@ def score_stream(events: list[Event], payloads: list[bytes]) -> dict:
                 lsf_source = e.fields[2]
                 first_lsf_frame = frames_seen
         elif e.kind == "STR" and len(e.fields) >= 4:
+            if (lsf_source is None) and (e.fields[2] == "1"):
+                lsf_source = "F" if frames_seen == 0 else "I"
+                first_lsf_frame = frames_seen
             frames_seen += 1
             fn = int(e.fields[1]) & 0x7FFF
             payload = bytes.fromhex(e.fields[3])
