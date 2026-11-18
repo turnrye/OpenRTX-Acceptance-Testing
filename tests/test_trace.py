@@ -134,3 +134,20 @@ def test_sim_trace_reports_an_sms():
     sim.hear(codec.packet_symbols(Lsf(type=codec.TYPE_PACKET_DATA), packet),
              -80.0)
     assert trace.reassemble_packets(sim.events_since(0.0)) == [(packet, True)]
+
+
+def test_score_stream_stops_at_the_eot():
+    ev = events(*[str_line(40 * i, i, 1, PAYLOADS[i]) for i in range(4)],
+                "EOT 200", "LOCK 900 1", str_line(940, 0, 0, bytes(16)))
+    r = trace.score_stream(ev, PAYLOADS)
+    assert (r["decoded"], r["garbled"]) == (4, 0)
+
+
+def test_score_stream_takes_the_lsf_from_the_frames_without_an_lsf_line():
+    ev = events(*[str_line(40 * i, i, 1, PAYLOADS[i]) for i in range(4)])
+    r = trace.score_stream(ev, PAYLOADS)
+    assert (r["lsf_after_frames"], r["lsf_from"]) == (0, "F")
+    ev = events(*[str_line(40 * i, i, int(i >= 2), PAYLOADS[i])
+                  for i in range(4)])
+    r = trace.score_stream(ev, PAYLOADS)
+    assert (r["lsf_after_frames"], r["lsf_from"]) == (2, "I")
