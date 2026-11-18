@@ -86,6 +86,10 @@ class Trace:
         """Stop the trace and stop listening."""
 
 
+# How long closing waits for the radio's OFF line
+CLOSE_DRAIN_S = 1.0
+
+
 class SerialTrace(Trace):
     """
     The trace of a radio on its USB serial port. Opening it asks for the
@@ -143,10 +147,20 @@ class SerialTrace(Trace):
                 self._add(line.decode("ascii", "replace"), at)
 
     def close(self) -> None:
+        """
+        Turn the trace off and close the port, reading until the radio's
+        OFF line arrives: a line left unread in the radio's USB endpoint
+        has hung an MD-UV390 until something read it.
+        """
         try:
             self.command("TRACE OFF")
         except OSError:
             pass
+        asked = self.now()
+        end = time.monotonic() + CLOSE_DRAIN_S
+        while (time.monotonic() < end) and not any(
+                e.kind == "OFF" for e in self.events_since(asked)):
+            time.sleep(0.02)
         self._stop.set()
         self._thread.join(timeout=1.0)
         try:

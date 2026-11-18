@@ -170,3 +170,25 @@ def test_score_stream_reads_past_a_false_lock_before_the_transmission():
     r = trace.score_stream(ev, payloads)
     assert (r["decoded"], r["garbled"], r["repeated"]) == (4, 0, 1)
     assert (r["lsf_after_frames"], r["lsf_from"]) == (0, "F")
+
+
+def test_serial_trace_reads_the_off_line_before_closing():
+    import os
+    import pty
+    import threading
+    import time
+    radio, host = pty.openpty()
+    t = trace.SerialTrace(os.ttyname(host))
+
+    def reply():
+        buf = b""
+        while b"TRACE OFF" not in buf:
+            buf += os.read(radio, 64)
+        time.sleep(0.1)
+        os.write(radio, b"OFF 1234\n")
+
+    threading.Thread(target=reply, daemon=True).start()
+    t0 = time.monotonic()
+    t.close()
+    assert time.monotonic() - t0 < trace.CLOSE_DRAIN_S
+    os.close(radio)
