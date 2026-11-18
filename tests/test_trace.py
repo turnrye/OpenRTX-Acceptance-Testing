@@ -159,3 +159,14 @@ def test_score_stream_counts_the_decoder_empty_frame_as_rejected():
                                 for i in range(4)])
     r = trace.score_stream(ev, PAYLOADS)
     assert (r["decoded"], r["garbled"], r["repeated"]) == (4, 0, 1)
+
+
+def test_score_stream_reads_past_a_false_lock_before_the_transmission():
+    payloads = [bytes([i + 1]) * 16 for i in range(4)]
+    ev = events("LOCK 0 1", str_line(40, 0, 0, bytes(16)), "LOCK 80 0",
+                "EOT 80", "LOCK 200 1",
+                *[str_line(240 + 40 * i, i, 1, payloads[i]) for i in range(4)],
+                "EOT 400")
+    r = trace.score_stream(ev, payloads)
+    assert (r["decoded"], r["garbled"], r["repeated"]) == (4, 0, 1)
+    assert (r["lsf_after_frames"], r["lsf_from"]) == (0, "F")
