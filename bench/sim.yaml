@@ -25,6 +25,11 @@ operator:
 tnc:
   type: sim
 
+# The simulated radio's M17 receive trace: it decodes each M17 transmission
+# with oat.m17 through noise set by the level
+trace:
+  type: sim
+
 # A simulated audio interface and radio: the radio's speaker plays what the
 # simulated transmitter sends, with noise that follows its level
 audio:
