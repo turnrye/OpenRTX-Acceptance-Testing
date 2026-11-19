@@ -1,0 +1,1524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Rebot 7.5 (Python 3.13.13 on darwin)" generated="2026-11-18T21:31:41.476689" rpa="false" schemaversion="5">
+<suite id="s1" name="Trace" source="acceptance/m17/trace.robot">
+<kw name="Open Bench" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:18:35.185410" level="INFO">Results in runs/trace-pr524/bench-Trace</msg>
+<msg time="2026-11-18T09:18:35.195914" level="INFO">Set suite metadata 'Firmware' to value 'trace-pr524-643ad793'.</msg>
+<msg time="2026-11-18T09:18:35.196033" level="INFO">Set suite metadata 'Radio' to value 'TYT MD-UV3x0 (uv390-m17-radio.local)'.</msg>
+<msg time="2026-11-18T09:18:35.196051" level="INFO">Set suite metadata 'Hardware' to value 'TYT MD-UV390'.</msg>
+<msg time="2026-11-18T09:18:35.196065" level="INFO">Set suite metadata 'Station' to value 'k0ret'.</msg>
+<msg time="2026-11-18T09:18:35.196075" level="INFO">Set suite metadata 'Trace' to value 'serial'.</msg>
+<msg time="2026-11-18T09:18:35.196086" level="INFO">Set suite metadata 'Calibration' to value 'assumed, measured 2026-10-20 (d55ce4aa0a3c)'.</msg>
+<msg time="2026-11-18T09:18:35.196099" level="INFO">Set suite metadata 'Suite commit' to value '570c8cb3f8'.</msg>
+<arg>${BENCH}</arg>
+<arg>${CALIBRATION}</arg>
+<arg>${RADIO}</arg>
+<arg>${FIRMWARE}</arg>
+<arg>${HARDWARE}</arg>
+<arg>dsp=${DSP}</arg>
+<doc>Load the bench, its calibration and the radio file, and prepare the
+instruments. All five are mandatory and differ from tester to tester,
+so suites take them from the command line (-v BENCH:... and so on).
+`firmware` names what the radio runs, such as a git describe;
+`hardware` names the unit, by model and serial number, since units of
+one model measure differently. `dsp` names the DSP image the radio's
+audio processor runs, such as its sha256; it is mandatory for radio
+files with dsp_image: true, whose firmware states can differ in it
+alone.</doc>
+<status status="PASS" start="2026-11-18T09:18:35.180046" elapsed="1.554353"/>
+</kw>
+<test id="s1-t1" name="2m: M17 Trace Every Frame At The Bench Level" line="79">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:18:36.736739" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-11-18T09:18:36.736987" level="INFO">${FREQUENCY_MHZ} = 146.537</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:18:36.736081" elapsed="0.000953"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-11-18T09:18:36.738118" elapsed="62.059014"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:19:38.797549" level="INFO">Set test message to:
+trace build pr524-643ad793</msg>
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="PASS" start="2026-11-18T09:19:38.797356" elapsed="0.000227"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="PASS" start="2026-11-18T09:19:38.797670" elapsed="0.000386"/>
+</kw>
+<status status="PASS" start="2026-11-18T09:18:36.737811" elapsed="62.060269"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:18:36.737779" elapsed="62.060335"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:18:36.737555" elapsed="62.060612"/>
+</kw>
+<kw name="Score M17 Stream" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:19:51.525825" level="INFO">250/250 decoded, 1 garbled, 0 repeated, 250 played (0 garbled), LSF after 1 frames from F</msg>
+<msg time="2026-11-18T09:19:51.526438" level="INFO">${r} = {'sent': 250, 'decoded': 250, 'missed': 0, 'garbled': 1, 'repeated': 0, 'played': 250, 'played_garbled': 0, 'rate': 1.0, 'lsf_after_frames': 1, 'lsf_from': 'F', 'first_play_frame': 1, 'options': {}}</msg>
+<var>${r}</var>
+<arg>${FRAMES}</arg>
+<doc>Send one M17 stream of `frames` random payloads and score what the
+radio's trace reported: frames decoded, missed, garbled (decoded
+wrong) and repeated (rejected, the decoder keeping the frame
+before), frames played and garbled frames played, and after how
+many frames the link setup data became valid, and from where (F:
+the LSF frame, I: rebuilt from the LICH). Takes Start Transmitting
+M17 Stream's options, lsf=False among them.</doc>
+<status status="PASS" start="2026-11-18T09:19:38.798289" elapsed="12.728179"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${r}[decoded]</arg>
+<arg>${r}[sent]</arg>
+<arg>frames decoded</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:19:51.526994" elapsed="0.000732"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-11-18T09:19:51.527972" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<msg time="2026-11-18T09:19:51.528164" level="FAIL">frames garbled: 1 != 0</msg>
+<arg>${r}[garbled]</arg>
+<arg>0</arg>
+<arg>frames garbled</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="FAIL" start="2026-11-18T09:19:51.527828" elapsed="0.001020">frames garbled: 1 != 0</status>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${r}[played]</arg>
+<arg>${r}[sent]</arg>
+<arg>frames played</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="NOT RUN" start="2026-11-18T09:19:51.528970" elapsed="0.000014"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${r}[lsf_from]</arg>
+<arg>F</arg>
+<arg>link setup from</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="NOT RUN" start="2026-11-18T09:19:51.529079" elapsed="0.000009"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${r}[lsf_after_frames]</arg>
+<arg>0</arg>
+<arg>LSF after frames</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="NOT RUN" start="2026-11-18T09:19:51.529142" elapsed="0.000008"/>
+</kw>
+<doc>M17-TRACE-1: at the bench's level every stream frame decodes as
+sent, none garbled, every one played, and the link setup data
+comes from the LSF frame before the first stream frame.</doc>
+<tag>band:2m</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="FAIL" start="2026-11-18T09:18:36.734934" elapsed="74.794387">frames garbled: 1 != 0</status>
+</test>
+<test id="s1-t2" name="2m: M17 Trace Joins A Transmission Late" line="91">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:19:51.530347" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-11-18T09:19:51.530506" level="INFO">${FREQUENCY_MHZ} = 146.537</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:19:51.530021" elapsed="0.000514"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-18T09:19:51.531192" elapsed="0.000211"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="NOT RUN" start="2026-11-18T09:19:51.531450" elapsed="0.000007"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:19:51.531511" elapsed="0.000006"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:19:51.530965" elapsed="0.000565"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:19:51.530942" elapsed="0.000606"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:19:51.530794" elapsed="0.000782"/>
+</kw>
+<kw name="Score M17 Stream" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:19:55.765506" level="INFO">50/50 decoded, 0 garbled, 0 repeated, 45 played (0 garbled), LSF after 5 frames from I</msg>
+<msg time="2026-11-18T09:19:55.765762" level="INFO">${r} = {'sent': 50, 'decoded': 50, 'missed': 0, 'garbled': 0, 'repeated': 0, 'played': 45, 'played_garbled': 0, 'rate': 1.0, 'lsf_after_frames': 5, 'lsf_from': 'I', 'first_play_frame': 5, 'options': {'lsf': ...</msg>
+<var>${r}</var>
+<arg>${LATE_FRAMES}</arg>
+<arg>lsf=False</arg>
+<doc>Send one M17 stream of `frames` random payloads and score what the
+radio's trace reported: frames decoded, missed, garbled (decoded
+wrong) and repeated (rejected, the decoder keeping the frame
+before), frames played and garbled frames played, and after how
+many frames the link setup data became valid, and from where (F:
+the LSF frame, I: rebuilt from the LICH). Takes Start Transmitting
+M17 Stream's options, lsf=False among them.</doc>
+<status status="PASS" start="2026-11-18T09:19:51.531636" elapsed="4.234142"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${r}[lsf_from]</arg>
+<arg>I</arg>
+<arg>link setup from</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" start="2026-11-18T09:19:55.766063" elapsed="0.000339"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>$r['lsf_after_frames'] is not None and $r['lsf_after_frames'] &lt;= ${LATE_LSF_FRAMES}</arg>
+<arg>LSF rebuilt after ${r}[lsf_after_frames] frames</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-11-18T09:19:55.766481" elapsed="0.000305"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${r}[decoded]</arg>
+<arg>${r}[sent]</arg>
+<arg>frames decoded</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:19:55.766858" elapsed="0.000125"/>
+</kw>
+<doc>M17-TRACE-2: without the LSF frame, as when joining a
+transmission late, the radio rebuilds the link setup data from
+the LICH within 12 frames and then plays.</doc>
+<tag>band:2m</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:19:51.529571" elapsed="4.237484"/>
+</test>
+<test id="s1-t3" name="2m: M17 Trace Joins Late Through A Weak Signal" line="102">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:19:55.767688" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-11-18T09:19:55.767807" level="INFO">${FREQUENCY_MHZ} = 146.537</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:19:55.767496" elapsed="0.000326"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-18T09:19:55.768141" elapsed="0.000008"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="NOT RUN" start="2026-11-18T09:19:55.768178" elapsed="0.000005"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:19:55.768220" elapsed="0.000007"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:19:55.768065" elapsed="0.000171"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:19:55.768055" elapsed="0.000190"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:19:55.767969" elapsed="0.000293"/>
+</kw>
+<kw name="Level">
+<if>
+<branch type="IF" condition="'${ABSOLUTE_LEVELS}'.lower() == 'true'">
+<kw name="Create Dictionary" owner="BuiltIn">
+<var>${option}</var>
+<arg>level_dbm=${level}</arg>
+<doc>Creates and returns a dictionary based on the given `items`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:19:55.768701" elapsed="0.000007"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:19:55.768618" elapsed="0.000102"/>
+</branch>
+<branch type="ELSE">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-11-18T09:19:55.768916" level="INFO">${option} = {'level_db': '-21'}</msg>
+<var>${option}</var>
+<arg>level_db=${level}</arg>
+<doc>Creates and returns a dictionary based on the given `items`.</doc>
+<status status="PASS" start="2026-11-18T09:19:55.768772" elapsed="0.000153"/>
+</kw>
+<status status="PASS" start="2026-11-18T09:19:55.768728" elapsed="0.000211"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:19:55.768611" elapsed="0.000336"/>
+</if>
+<return>
+<value>${option}</value>
+<status status="PASS" start="2026-11-18T09:19:55.768963" elapsed="0.000031"/>
+</return>
+<msg time="2026-11-18T09:19:55.769032" level="INFO">${level} = {'level_db': '-21'}</msg>
+<var>${level}</var>
+<arg>${WEAK_LEVEL}</arg>
+<doc>The option that sets a level in the sweep's units, to pass
+as &amp;{level}.</doc>
+<status status="PASS" start="2026-11-18T09:19:55.768534" elapsed="0.000505"/>
+</kw>
+<kw name="Score M17 Stream" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:20:08.367644" level="INFO">250/250 decoded, 0 garbled, 0 repeated, 245 played (0 garbled), LSF after 5 frames from I</msg>
+<msg time="2026-11-18T09:20:08.368273" level="INFO">${r} = {'sent': 250, 'decoded': 250, 'missed': 0, 'garbled': 0, 'repeated': 0, 'played': 245, 'played_garbled': 0, 'rate': 1.0, 'lsf_after_frames': 5, 'lsf_from': 'I', 'first_play_frame': 5, 'options': {'lsf...</msg>
+<var>${r}</var>
+<arg>${FRAMES}</arg>
+<arg>lsf=False</arg>
+<arg>&amp;{level}</arg>
+<doc>Send one M17 stream of `frames` random payloads and score what the
+radio's trace reported: frames decoded, missed, garbled (decoded
+wrong) and repeated (rejected, the decoder keeping the frame
+before), frames played and garbled frames played, and after how
+many frames the link setup data became valid, and from where (F:
+the LSF frame, I: rebuilt from the LICH). Takes Start Transmitting
+M17 Stream's options, lsf=False among them.</doc>
+<status status="PASS" start="2026-11-18T09:19:55.769093" elapsed="12.599228"/>
+</kw>
+<kw name="Set Test Message" owner="BuiltIn">
+<msg time="2026-11-18T09:20:08.370424" level="INFO">Set test message to:
+LSF after 5 frames, 245 of 250 played (0 garbled)</msg>
+<arg>LSF after ${r}[lsf_after_frames] frames, ${r}[played] of ${r}[sent] played (${r}[played_garbled] garbled)</arg>
+<doc>Sets message of the current test case.</doc>
+<status status="PASS" start="2026-11-18T09:20:08.369086" elapsed="0.001404"/>
+</kw>
+<doc>M17-TRACE-3: the same at WEAK_LEVEL: how many frames until the
+link setup data is rebuilt, and how much plays. A measurement for
+comparing firmware; no limit.</doc>
+<tag>band:2m</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:19:55.767215" elapsed="12.603486">LSF after 5 frames, 245 of 250 played (0 garbled)</status>
+</test>
+<test id="s1-t4" name="2m: M17 Trace Back-To-Back Transmissions" line="111">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:20:08.376554" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-11-18T09:20:08.376912" level="INFO">${FREQUENCY_MHZ} = 146.537</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:20:08.371913" elapsed="0.005053"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-18T09:20:08.377851" elapsed="0.000015"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="NOT RUN" start="2026-11-18T09:20:08.377918" elapsed="0.000011"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:20:08.377985" elapsed="0.000008"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:20:08.377573" elapsed="0.000439"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:20:08.377549" elapsed="0.000479"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:20:08.377344" elapsed="0.000712"/>
+</kw>
+<kw name="Score M17 Back To Back" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:20:15.622302" level="INFO">5/5 transmissions heard, frames decoded [25, 25, 25, 25, 25], LSF after [0, 0, 0, 0, 0] frames</msg>
+<msg time="2026-11-18T09:20:15.622777" level="INFO">${r} = {'overs': 5, 'frames': 25, 'gap_s': 0.1, 'heard_overs': 5, 'decoded': [25, 25, 25, 25, 25], 'lsf_after_frames': [0, 0, 0, 0, 0]}</msg>
+<var>${r}</var>
+<arg>${BACK_TO_BACK}</arg>
+<arg>gap_s=${BACK_TO_BACK_GAP_S}</arg>
+<doc>Send `overs` voice transmissions of `frames` random payloads, gap_s
+apart, and score each one from the trace separately: the frames it
+decoded and after how many frames its link setup data was valid.</doc>
+<status status="PASS" start="2026-11-18T09:20:08.378125" elapsed="7.244698"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-11-18T09:20:15.624108" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${r}[heard_overs]</arg>
+<arg>${BACK_TO_BACK}</arg>
+<arg>transmissions heard</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:20:15.623357" elapsed="0.000837"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${decoded}</arg>
+<arg>${r}[frames]</arg>
+<arg>frames decoded per transmission</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:20:15.624618" elapsed="0.000235"/>
+</kw>
+<var name="${decoded}">25</var>
+<status status="PASS" start="2026-11-18T09:20:15.624529" elapsed="0.000355"/>
+</iter>
+<iter>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${decoded}</arg>
+<arg>${r}[frames]</arg>
+<arg>frames decoded per transmission</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:20:15.625025" elapsed="0.000200"/>
+</kw>
+<var name="${decoded}">25</var>
+<status status="PASS" start="2026-11-18T09:20:15.624957" elapsed="0.000296"/>
+</iter>
+<iter>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${decoded}</arg>
+<arg>${r}[frames]</arg>
+<arg>frames decoded per transmission</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:20:15.625373" elapsed="0.000182"/>
+</kw>
+<var name="${decoded}">25</var>
+<status status="PASS" start="2026-11-18T09:20:15.625311" elapsed="0.000270"/>
+</iter>
+<iter>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${decoded}</arg>
+<arg>${r}[frames]</arg>
+<arg>frames decoded per transmission</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:20:15.625699" elapsed="0.000187"/>
+</kw>
+<var name="${decoded}">25</var>
+<status status="PASS" start="2026-11-18T09:20:15.625635" elapsed="0.000282"/>
+</iter>
+<iter>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${decoded}</arg>
+<arg>${r}[frames]</arg>
+<arg>frames decoded per transmission</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:20:15.626029" elapsed="0.000185"/>
+</kw>
+<var name="${decoded}">25</var>
+<status status="PASS" start="2026-11-18T09:20:15.625969" elapsed="0.000271"/>
+</iter>
+<var>${decoded}</var>
+<value>@{r}[decoded]</value>
+<status status="PASS" start="2026-11-18T09:20:15.624324" elapsed="0.001938"/>
+</for>
+<doc>M17-TRACE-4: 5 transmissions 0.1 s
+apart are each heard whole, with their link setup data from the
+start: the radio lets go of one and locks onto the next in time.</doc>
+<tag>band:2m</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:20:08.371069" elapsed="7.255299"/>
+</test>
+<test id="s1-t5" name="2m: M17 Trace Stream Sensitivity" line="122">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:20:15.627612" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-11-18T09:20:15.627829" level="INFO">${FREQUENCY_MHZ} = 146.537</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:20:15.627228" elapsed="0.000634"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-18T09:20:15.628450" elapsed="0.000012"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="NOT RUN" start="2026-11-18T09:20:15.628512" elapsed="0.000011"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:20:15.628585" elapsed="0.000075"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:20:15.628262" elapsed="0.000418"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:20:15.628243" elapsed="0.000454"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:20:15.628085" elapsed="0.000645"/>
+</kw>
+<kw name="Find M17 Trace Sensitivity" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:20:23.030692" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:20:30.474887" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:20:37.911754" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:20:45.355558" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:20:52.779975" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:21:00.220719" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:21:07.656293" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:21:15.089334" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:21:22.535829" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:21:29.973656" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:21:37.419565" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:21:44.851449" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:21:52.257500" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:21:59.675368" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:22:07.109868" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:22:14.545336" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:22:21.969091" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:22:29.395507" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:22:36.815833" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:22:44.217486" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:22:51.640399" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:22:59.066931" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:23:06.492356" level="INFO">123/125 decoded, 1 garbled, 0 repeated, 118 played (1 garbled), LSF after 6 frames from I</msg>
+<msg time="2026-11-18T09:23:13.909403" level="INFO">113/125 decoded, 5 garbled, 7 repeated, 125 played (5 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:23:21.348452" level="INFO">58/125 decoded, 12 garbled, 48 repeated, 99 played (15 garbled), LSF after 8 frames from I</msg>
+<msg time="2026-11-18T09:23:21.348951" level="INFO" html="true">&lt;table&gt;&lt;tr&gt;&lt;th&gt;level (dB re bench)&lt;/th&gt;&lt;th&gt;decoded&lt;/th&gt;&lt;th&gt;garbled played&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-10.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-11.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-12.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-13.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-14.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-15.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-16.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-17.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-18.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-19.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-20.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-21.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-22.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-23.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-24.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-25.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-26.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-27.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-28.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-29.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-30.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-31.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-32.0&lt;/td&gt;&lt;td&gt;98.4%&lt;/td&gt;&lt;td&gt;1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-33.0&lt;/td&gt;&lt;td&gt;90.4%&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-34.0&lt;/td&gt;&lt;td&gt;46.4%&lt;/td&gt;&lt;td&gt;15&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-11-18T09:23:21.349028" level="INFO">Set test message to:
+90% at -33.0, 50% at -33.9 dB re bench</msg>
+<arg>${SWEEP_START}</arg>
+<arg>${SWEEP_STOP}</arg>
+<arg>${SWEEP_STEP}</arg>
+<arg>frames=${SWEEP_FRAMES}</arg>
+<arg>absolute=${ABSOLUTE_LEVELS}</arg>
+<doc>Step the level down from `start` to `stop` until fewer than half
+get through: for kind=stream a `frames`-long stream at each level,
+counting frames decoded (and garbled frames played); for kind=sms
+`frames` SMS, counting those intact. The result has the curve and
+the levels where 90% and 50% still got through, interpolated.
+Levels are dBm at the radio with a transmitter level table (or
+absolute: true), otherwise dB relative to the bench's gain: compare
+relative results only within one session, on one bench. Takes
+Score M17 Stream's or Score M17 SMS's options.</doc>
+<status status="PASS" start="2026-11-18T09:20:15.628801" elapsed="185.720379"/>
+</kw>
+<doc>M17-TRACE-5: stream frames decoded, and garbled frames played,
+as the level falls: the levels where 90% and 50% still decode.
+A measurement for comparing firmware; no limit.</doc>
+<tag>band:2m</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:20:15.626606" elapsed="185.722968">90% at -33.0, 50% at -33.9 dB re bench</status>
+</test>
+<test id="s1-t6" name="2m: M17 Trace SMS At The Bench Level" line="130">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:23:21.355843" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-11-18T09:23:21.356181" level="INFO">${FREQUENCY_MHZ} = 146.537</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:23:21.354787" elapsed="0.001476"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-18T09:23:21.357671" elapsed="0.000025"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="NOT RUN" start="2026-11-18T09:23:21.357803" elapsed="0.000018"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:23:21.357942" elapsed="0.000018"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:23:21.357274" elapsed="0.000718"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:23:21.357233" elapsed="0.000790"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:23:21.356877" elapsed="0.001200"/>
+</kw>
+<kw name="Score M17 Sms" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:23:35.040777" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:23:35.041169" level="INFO">${r} = {'sent': 10, 'length': 60, 'heard': 10, 'missing': [], 'crc_failed': 0, 'rate': 1.0, 'options': {}}</msg>
+<var>${r}</var>
+<arg>${SMS_COUNT}</arg>
+<arg>${SMS_LENGTH}</arg>
+<doc>Send `count` numbered SMS of `length` characters, one transmission
+each, and count the packets the radio's trace reported intact (its
+packet frames in order, the CRC holding, the text ours): heard,
+missing, failed CRC. Takes Start Transmitting M17 SMS's options.</doc>
+<status status="PASS" start="2026-11-18T09:23:21.358209" elapsed="13.682999"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${r}[heard]</arg>
+<arg>${r}[sent]</arg>
+<arg>SMS intact</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:23:35.041918" elapsed="0.000894"/>
+</kw>
+<doc>M17-TRACE-6: every SMS arrives intact at the bench's level: its
+packet frames in order and its CRC holding.</doc>
+<tag>band:2m</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:23:21.353474" elapsed="13.689571"/>
+</test>
+<test id="s1-t7" name="2m: M17 Trace SMS Sensitivity" line="137">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:23:35.045215" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-11-18T09:23:35.045558" level="INFO">${FREQUENCY_MHZ} = 146.537</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:23:35.044416" elapsed="0.001198"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-18T09:23:35.046679" elapsed="0.000021"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="NOT RUN" start="2026-11-18T09:23:35.046792" elapsed="0.000016"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:23:35.046924" elapsed="0.000014"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:23:35.046378" elapsed="0.000587"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:23:35.046349" elapsed="0.000652"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:23:35.046090" elapsed="0.000960"/>
+</kw>
+<kw name="Find M17 Trace Sensitivity" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:23:48.719885" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:24:02.374555" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:24:16.027939" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:24:29.709042" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:24:43.353420" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:24:57.010659" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:25:10.672701" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:25:24.336889" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:25:38.011464" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:25:51.680189" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:26:05.336934" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:26:18.990481" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:26:32.657828" level="INFO">9/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:26:46.339311" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:26:59.995433" level="INFO">9/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:27:13.673713" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:27:27.340391" level="INFO">9/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:27:41.001044" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:27:54.652673" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:28:08.297508" level="INFO">8/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:28:21.941949" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:28:35.593016" level="INFO">8/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:28:49.245689" level="INFO">5/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:29:02.908607" level="INFO">5/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:29:16.565217" level="INFO">1/10 SMS intact, 3 failed their CRC</msg>
+<msg time="2026-11-18T09:29:16.565475" level="INFO" html="true">&lt;table&gt;&lt;tr&gt;&lt;th&gt;level (dB re bench)&lt;/th&gt;&lt;th&gt;intact&lt;/th&gt;&lt;th&gt;CRC failed&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-10.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-11.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-12.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-13.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-14.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-15.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-16.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-17.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-18.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-19.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-20.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-21.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-22.0&lt;/td&gt;&lt;td&gt;90.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-23.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-24.0&lt;/td&gt;&lt;td&gt;90.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-25.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-26.0&lt;/td&gt;&lt;td&gt;90.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-27.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-28.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-29.0&lt;/td&gt;&lt;td&gt;80.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-30.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-31.0&lt;/td&gt;&lt;td&gt;80.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-32.0&lt;/td&gt;&lt;td&gt;50.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-33.0&lt;/td&gt;&lt;td&gt;50.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-34.0&lt;/td&gt;&lt;td&gt;10.0%&lt;/td&gt;&lt;td&gt;3&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-11-18T09:29:16.568635" level="INFO">Set test message to:
+90% at -28.5, 50% at -33.0 dB re bench</msg>
+<arg>${SWEEP_START}</arg>
+<arg>${SWEEP_STOP}</arg>
+<arg>${SWEEP_STEP}</arg>
+<arg>frames=${SMS_SWEEP_COUNT}</arg>
+<arg>absolute=${ABSOLUTE_LEVELS}</arg>
+<arg>kind=sms</arg>
+<arg>length=${SMS_LENGTH}</arg>
+<doc>Step the level down from `start` to `stop` until fewer than half
+get through: for kind=stream a `frames`-long stream at each level,
+counting frames decoded (and garbled frames played); for kind=sms
+`frames` SMS, counting those intact. The result has the curve and
+the levels where 90% and 50% still got through, interpolated.
+Levels are dBm at the radio with a transmitter level table (or
+absolute: true), otherwise dB relative to the bench's gain: compare
+relative results only within one session, on one bench. Takes
+Score M17 Stream's or Score M17 SMS's options.</doc>
+<status status="PASS" start="2026-11-18T09:23:35.047166" elapsed="341.521637"/>
+</kw>
+<doc>M17-TRACE-7: SMS intact as the level falls: the levels where 90%
+and 50% still arrive. A measurement for comparing firmware; no
+limit.</doc>
+<tag>band:2m</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:23:35.043489" elapsed="341.525675">90% at -28.5, 50% at -33.0 dB re bench</status>
+</test>
+<test id="s1-t8" name="2m: M17 Trace Receive Stack Has Headroom" line="157">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:29:16.571609" level="INFO">${BAND} = 2m</msg>
+<msg time="2026-11-18T09:29:16.571742" level="INFO">${FREQUENCY_MHZ} = 146.537</msg>
+<arg>2m</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:29:16.571251" elapsed="0.000516"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-18T09:29:16.572212" elapsed="0.000008"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="NOT RUN" start="2026-11-18T09:29:16.572251" elapsed="0.000006"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:29:16.572297" elapsed="0.000005"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:29:16.572083" elapsed="0.000231"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:29:16.572069" elapsed="0.000257"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:29:16.571960" elapsed="0.000385"/>
+</kw>
+<kw name="M17 Trace Stack Should Have Headroom" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:29:16.573098" level="INFO">Set test message to:
+stack 1024 B, least free 292 B, 0 lines dropped</msg>
+<arg>${MIN_FREE_STACK}</arg>
+<doc>Over the whole run so far, the receive thread never had less than
+min_free_bytes of stack left, the radio didn't reset, and the trace
+dropped no lines (dropped lines make every score uncertain).</doc>
+<status status="PASS" start="2026-11-18T09:29:16.572383" elapsed="0.000769"/>
+</kw>
+<doc>M17-TRACE-9: over everything this run received, the receive
+thread kept at least 128 B of stack free, the radio
+didn't reset and the trace dropped no lines. Runs last.</doc>
+<tag>band:2m</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:29:16.570645" elapsed="0.002584">stack 1024 B, least free 292 B, 0 lines dropped</status>
+</test>
+<test id="s1-t9" name="70cm: M17 Trace Every Frame At The Bench Level" line="79">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:29:16.573754" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-18T09:29:16.573861" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:29:16.573586" elapsed="0.000292"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="PASS" start="2026-11-18T09:29:16.574120" elapsed="51.139227"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:30:07.713729" level="INFO">Set test message to:
+trace build pr524-643ad793</msg>
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="PASS" start="2026-11-18T09:30:07.713559" elapsed="0.000206"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="PASS" start="2026-11-18T09:30:07.713866" elapsed="0.000255"/>
+</kw>
+<status status="PASS" start="2026-11-18T09:29:16.574039" elapsed="51.140110"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:29:16.574031" elapsed="51.140149"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:29:16.573969" elapsed="51.140253"/>
+</kw>
+<kw name="Score M17 Stream" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:30:20.357843" level="INFO">250/250 decoded, 0 garbled, 0 repeated, 250 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:30:20.358483" level="INFO">${r} = {'sent': 250, 'decoded': 250, 'missed': 0, 'garbled': 0, 'repeated': 0, 'played': 250, 'played_garbled': 0, 'rate': 1.0, 'lsf_after_frames': 0, 'lsf_from': 'F', 'first_play_frame': 0, 'options': {}}</msg>
+<var>${r}</var>
+<arg>${FRAMES}</arg>
+<doc>Send one M17 stream of `frames` random payloads and score what the
+radio's trace reported: frames decoded, missed, garbled (decoded
+wrong) and repeated (rejected, the decoder keeping the frame
+before), frames played and garbled frames played, and after how
+many frames the link setup data became valid, and from where (F:
+the LSF frame, I: rebuilt from the LICH). Takes Start Transmitting
+M17 Stream's options, lsf=False among them.</doc>
+<status status="PASS" start="2026-11-18T09:30:07.714362" elapsed="12.644184"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${r}[decoded]</arg>
+<arg>${r}[sent]</arg>
+<arg>frames decoded</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:30:20.359304" elapsed="0.000875"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-11-18T09:30:20.360676" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${r}[garbled]</arg>
+<arg>0</arg>
+<arg>frames garbled</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:30:20.360394" elapsed="0.000341"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${r}[played]</arg>
+<arg>${r}[sent]</arg>
+<arg>frames played</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:30:20.361102" elapsed="0.000238"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${r}[lsf_from]</arg>
+<arg>F</arg>
+<arg>link setup from</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" start="2026-11-18T09:30:20.361475" elapsed="0.000203"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-11-18T09:30:20.361905" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${r}[lsf_after_frames]</arg>
+<arg>0</arg>
+<arg>LSF after frames</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:30:20.361766" elapsed="0.000175"/>
+</kw>
+<doc>M17-TRACE-1: at the bench's level every stream frame decodes as
+sent, none garbled, every one played, and the link setup data
+comes from the LSF frame before the first stream frame.</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:29:16.573366" elapsed="63.788710">trace build pr524-643ad793</status>
+</test>
+<test id="s1-t10" name="70cm: M17 Trace Joins A Transmission Late" line="91">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:30:20.363536" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-18T09:30:20.363861" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:30:20.363108" elapsed="0.000813"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-18T09:30:20.365144" elapsed="0.000021"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="NOT RUN" start="2026-11-18T09:30:20.365248" elapsed="0.000018"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:30:20.365366" elapsed="0.000014"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:30:20.364756" elapsed="0.000652"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:30:20.364714" elapsed="0.000724"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:30:20.364409" elapsed="0.001077"/>
+</kw>
+<kw name="Score M17 Stream" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:30:24.603602" level="INFO">50/50 decoded, 0 garbled, 0 repeated, 45 played (0 garbled), LSF after 5 frames from I</msg>
+<msg time="2026-11-18T09:30:24.604284" level="INFO">${r} = {'sent': 50, 'decoded': 50, 'missed': 0, 'garbled': 0, 'repeated': 0, 'played': 45, 'played_garbled': 0, 'rate': 1.0, 'lsf_after_frames': 5, 'lsf_from': 'I', 'first_play_frame': 5, 'options': {'lsf': ...</msg>
+<var>${r}</var>
+<arg>${LATE_FRAMES}</arg>
+<arg>lsf=False</arg>
+<doc>Send one M17 stream of `frames` random payloads and score what the
+radio's trace reported: frames decoded, missed, garbled (decoded
+wrong) and repeated (rejected, the decoder keeping the frame
+before), frames played and garbled frames played, and after how
+many frames the link setup data became valid, and from where (F:
+the LSF frame, I: rebuilt from the LICH). Takes Start Transmitting
+M17 Stream's options, lsf=False among them.</doc>
+<status status="PASS" start="2026-11-18T09:30:20.365597" elapsed="4.238739"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${r}[lsf_from]</arg>
+<arg>I</arg>
+<arg>link setup from</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" start="2026-11-18T09:30:24.605164" elapsed="0.001130"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>$r['lsf_after_frames'] is not None and $r['lsf_after_frames'] &lt;= ${LATE_LSF_FRAMES}</arg>
+<arg>LSF rebuilt after ${r}[lsf_after_frames] frames</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-11-18T09:30:24.606548" elapsed="0.000806"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${r}[decoded]</arg>
+<arg>${r}[sent]</arg>
+<arg>frames decoded</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:30:24.607566" elapsed="0.000348"/>
+</kw>
+<doc>M17-TRACE-2: without the LSF frame, as when joining a
+transmission late, the radio rebuilds the link setup data from
+the LICH within 12 frames and then plays.</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:30:20.362402" elapsed="4.245697"/>
+</test>
+<test id="s1-t11" name="70cm: M17 Trace Joins Late Through A Weak Signal" line="102">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:30:24.609985" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-18T09:30:24.610288" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:30:24.609468" elapsed="0.000864"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-18T09:30:24.611171" elapsed="0.000019"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="NOT RUN" start="2026-11-18T09:30:24.611288" elapsed="0.000016"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:30:24.611403" elapsed="0.000015"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:30:24.610966" elapsed="0.000477"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:30:24.610935" elapsed="0.000536"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:30:24.610700" elapsed="0.000819"/>
+</kw>
+<kw name="Level">
+<if>
+<branch type="IF" condition="'${ABSOLUTE_LEVELS}'.lower() == 'true'">
+<kw name="Create Dictionary" owner="BuiltIn">
+<var>${option}</var>
+<arg>level_dbm=${level}</arg>
+<doc>Creates and returns a dictionary based on the given `items`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:30:24.612511" elapsed="0.000019"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:30:24.612283" elapsed="0.000435"/>
+</branch>
+<branch type="ELSE">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2026-11-18T09:30:24.613266" level="INFO">${option} = {'level_db': '-21'}</msg>
+<var>${option}</var>
+<arg>level_db=${level}</arg>
+<doc>Creates and returns a dictionary based on the given `items`.</doc>
+<status status="PASS" start="2026-11-18T09:30:24.612858" elapsed="0.000435"/>
+</kw>
+<status status="PASS" start="2026-11-18T09:30:24.612744" elapsed="0.000581"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:30:24.612266" elapsed="0.001080"/>
+</if>
+<return>
+<value>${option}</value>
+<status status="PASS" start="2026-11-18T09:30:24.613385" elapsed="0.000067"/>
+</return>
+<msg time="2026-11-18T09:30:24.613557" level="INFO">${level} = {'level_db': '-21'}</msg>
+<var>${level}</var>
+<arg>${WEAK_LEVEL}</arg>
+<doc>The option that sets a level in the sweep's units, to pass
+as &amp;{level}.</doc>
+<status status="PASS" start="2026-11-18T09:30:24.612067" elapsed="0.001507"/>
+</kw>
+<kw name="Score M17 Stream" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:30:37.252970" level="INFO">250/250 decoded, 0 garbled, 0 repeated, 245 played (0 garbled), LSF after 5 frames from I</msg>
+<msg time="2026-11-18T09:30:37.253623" level="INFO">${r} = {'sent': 250, 'decoded': 250, 'missed': 0, 'garbled': 0, 'repeated': 0, 'played': 245, 'played_garbled': 0, 'rate': 1.0, 'lsf_after_frames': 5, 'lsf_from': 'I', 'first_play_frame': 5, 'options': {'lsf...</msg>
+<var>${r}</var>
+<arg>${FRAMES}</arg>
+<arg>lsf=False</arg>
+<arg>&amp;{level}</arg>
+<doc>Send one M17 stream of `frames` random payloads and score what the
+radio's trace reported: frames decoded, missed, garbled (decoded
+wrong) and repeated (rejected, the decoder keeping the frame
+before), frames played and garbled frames played, and after how
+many frames the link setup data became valid, and from where (F:
+the LSF frame, I: rebuilt from the LICH). Takes Start Transmitting
+M17 Stream's options, lsf=False among them.</doc>
+<status status="PASS" start="2026-11-18T09:30:24.613674" elapsed="12.640003"/>
+</kw>
+<kw name="Set Test Message" owner="BuiltIn">
+<msg time="2026-11-18T09:30:37.255492" level="INFO">Set test message to:
+LSF after 5 frames, 245 of 250 played (0 garbled)</msg>
+<arg>LSF after ${r}[lsf_after_frames] frames, ${r}[played] of ${r}[sent] played (${r}[played_garbled] garbled)</arg>
+<doc>Sets message of the current test case.</doc>
+<status status="PASS" start="2026-11-18T09:30:37.254536" elapsed="0.001035"/>
+</kw>
+<doc>M17-TRACE-3: the same at WEAK_LEVEL: how many frames until the
+link setup data is rebuilt, and how much plays. A measurement for
+comparing firmware; no limit.</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:30:24.608504" elapsed="12.647315">LSF after 5 frames, 245 of 250 played (0 garbled)</status>
+</test>
+<test id="s1-t12" name="70cm: M17 Trace Back-To-Back Transmissions" line="111">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:30:37.257925" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-18T09:30:37.258326" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:30:37.257275" elapsed="0.001121"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-18T09:30:37.260208" elapsed="0.000025"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="NOT RUN" start="2026-11-18T09:30:37.260322" elapsed="0.000018"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:30:37.260456" elapsed="0.000016"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:30:37.259193" elapsed="0.001307"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:30:37.259159" elapsed="0.001372"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:30:37.258873" elapsed="0.001711"/>
+</kw>
+<kw name="Score M17 Back To Back" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:30:44.518177" level="INFO">5/5 transmissions heard, frames decoded [25, 25, 25, 25, 25], LSF after [0, 0, 0, 1, 0] frames</msg>
+<msg time="2026-11-18T09:30:44.518892" level="INFO">${r} = {'overs': 5, 'frames': 25, 'gap_s': 0.1, 'heard_overs': 5, 'decoded': [25, 25, 25, 25, 25], 'lsf_after_frames': [0, 0, 0, 1, 0]}</msg>
+<var>${r}</var>
+<arg>${BACK_TO_BACK}</arg>
+<arg>gap_s=${BACK_TO_BACK_GAP_S}</arg>
+<doc>Send `overs` voice transmissions of `frames` random payloads, gap_s
+apart, and score each one from the trace separately: the frames it
+decoded and after how many frames its link setup data was valid.</doc>
+<status status="PASS" start="2026-11-18T09:30:37.260710" elapsed="7.258224"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2026-11-18T09:30:44.520359" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${r}[heard_overs]</arg>
+<arg>${BACK_TO_BACK}</arg>
+<arg>transmissions heard</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:30:44.519646" elapsed="0.000785"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${decoded}</arg>
+<arg>${r}[frames]</arg>
+<arg>frames decoded per transmission</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:30:44.520886" elapsed="0.000235"/>
+</kw>
+<var name="${decoded}">25</var>
+<status status="PASS" start="2026-11-18T09:30:44.520790" elapsed="0.000370"/>
+</iter>
+<iter>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${decoded}</arg>
+<arg>${r}[frames]</arg>
+<arg>frames decoded per transmission</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:30:44.521298" elapsed="0.000265"/>
+</kw>
+<var name="${decoded}">25</var>
+<status status="PASS" start="2026-11-18T09:30:44.521228" elapsed="0.000385"/>
+</iter>
+<iter>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${decoded}</arg>
+<arg>${r}[frames]</arg>
+<arg>frames decoded per transmission</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:30:44.521792" elapsed="0.000280"/>
+</kw>
+<var name="${decoded}">25</var>
+<status status="PASS" start="2026-11-18T09:30:44.521699" elapsed="0.000418"/>
+</iter>
+<iter>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${decoded}</arg>
+<arg>${r}[frames]</arg>
+<arg>frames decoded per transmission</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:30:44.522220" elapsed="0.000164"/>
+</kw>
+<var name="${decoded}">25</var>
+<status status="PASS" start="2026-11-18T09:30:44.522167" elapsed="0.000247"/>
+</iter>
+<iter>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${decoded}</arg>
+<arg>${r}[frames]</arg>
+<arg>frames decoded per transmission</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:30:44.522511" elapsed="0.000158"/>
+</kw>
+<var name="${decoded}">25</var>
+<status status="PASS" start="2026-11-18T09:30:44.522459" elapsed="0.000372"/>
+</iter>
+<var>${decoded}</var>
+<value>@{r}[decoded]</value>
+<status status="PASS" start="2026-11-18T09:30:44.520572" elapsed="0.002278"/>
+</for>
+<doc>M17-TRACE-4: 5 transmissions 0.1 s
+apart are each heard whole, with their link setup data from the
+start: the radio lets go of one and locks onto the next in time.</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:30:37.256273" elapsed="7.266744"/>
+</test>
+<test id="s1-t13" name="70cm: M17 Trace Stream Sensitivity" line="122">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:30:44.524537" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-18T09:30:44.524839" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:30:44.524091" elapsed="0.000792"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-18T09:30:44.525615" elapsed="0.000018"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="NOT RUN" start="2026-11-18T09:30:44.525714" elapsed="0.000018"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:30:44.525830" elapsed="0.000016"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:30:44.525366" elapsed="0.000507"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:30:44.525336" elapsed="0.000561"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:30:44.525139" elapsed="0.000801"/>
+</kw>
+<kw name="Find M17 Trace Sensitivity" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:30:51.945923" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:30:59.395787" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:31:06.828232" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:31:14.299103" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:31:21.733127" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:31:29.174075" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:31:36.609174" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:31:44.044492" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:31:51.484853" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:31:58.909634" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:32:06.352964" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:32:13.790869" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:32:21.214432" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:32:28.633066" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:32:36.039884" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:32:43.464065" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:32:50.871302" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:32:58.272918" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:33:05.683227" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:33:13.107941" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:33:20.527496" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 120 played (0 garbled), LSF after 5 frames from I</msg>
+<msg time="2026-11-18T09:33:27.953767" level="INFO">125/125 decoded, 0 garbled, 0 repeated, 125 played (0 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:33:35.389615" level="INFO">123/125 decoded, 1 garbled, 1 repeated, 120 played (1 garbled), LSF after 5 frames from I</msg>
+<msg time="2026-11-18T09:33:42.817575" level="INFO">105/125 decoded, 4 garbled, 16 repeated, 125 played (4 garbled), LSF after 0 frames from F</msg>
+<msg time="2026-11-18T09:33:50.235497" level="INFO">62/125 decoded, 6 garbled, 55 repeated, 107 played (4 garbled), LSF after 16 frames from I</msg>
+<msg time="2026-11-18T09:33:50.236041" level="INFO" html="true">&lt;table&gt;&lt;tr&gt;&lt;th&gt;level (dB re bench)&lt;/th&gt;&lt;th&gt;decoded&lt;/th&gt;&lt;th&gt;garbled played&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-10.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-11.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-12.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-13.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-14.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-15.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-16.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-17.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-18.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-19.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-20.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-21.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-22.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-23.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-24.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-25.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-26.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-27.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-28.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-29.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-30.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-31.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-32.0&lt;/td&gt;&lt;td&gt;98.4%&lt;/td&gt;&lt;td&gt;1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-33.0&lt;/td&gt;&lt;td&gt;84.0%&lt;/td&gt;&lt;td&gt;4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-34.0&lt;/td&gt;&lt;td&gt;49.6%&lt;/td&gt;&lt;td&gt;4&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-11-18T09:33:50.236739" level="INFO">Set test message to:
+90% at -32.6, 50% at -34.0 dB re bench</msg>
+<arg>${SWEEP_START}</arg>
+<arg>${SWEEP_STOP}</arg>
+<arg>${SWEEP_STEP}</arg>
+<arg>frames=${SWEEP_FRAMES}</arg>
+<arg>absolute=${ABSOLUTE_LEVELS}</arg>
+<doc>Step the level down from `start` to `stop` until fewer than half
+get through: for kind=stream a `frames`-long stream at each level,
+counting frames decoded (and garbled frames played); for kind=sms
+`frames` SMS, counting those intact. The result has the curve and
+the levels where 90% and 50% still got through, interpolated.
+Levels are dBm at the radio with a transmitter level table (or
+absolute: true), otherwise dB relative to the bench's gain: compare
+relative results only within one session, on one bench. Takes
+Score M17 Stream's or Score M17 SMS's options.</doc>
+<status status="PASS" start="2026-11-18T09:30:44.526044" elapsed="185.710901"/>
+</kw>
+<doc>M17-TRACE-5: stream frames decoded, and garbled frames played,
+as the level falls: the levels where 90% and 50% still decode.
+A measurement for comparing firmware; no limit.</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:30:44.523388" elapsed="185.713941">90% at -32.6, 50% at -34.0 dB re bench</status>
+</test>
+<test id="s1-t14" name="70cm: M17 Trace SMS At The Bench Level" line="130">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:33:50.239733" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-18T09:33:50.240128" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:33:50.238836" elapsed="0.001363"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-18T09:33:50.241564" elapsed="0.000022"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="NOT RUN" start="2026-11-18T09:33:50.241666" elapsed="0.000015"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:33:50.241768" elapsed="0.000013"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:33:50.241216" elapsed="0.000588"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:33:50.241153" elapsed="0.000692"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:33:50.240912" elapsed="0.001007"/>
+</kw>
+<kw name="Score M17 Sms" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:34:03.925018" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:34:03.925540" level="INFO">${r} = {'sent': 10, 'length': 60, 'heard': 10, 'missing': [], 'crc_failed': 0, 'rate': 1.0, 'options': {}}</msg>
+<var>${r}</var>
+<arg>${SMS_COUNT}</arg>
+<arg>${SMS_LENGTH}</arg>
+<doc>Send `count` numbered SMS of `length` characters, one transmission
+each, and count the packets the radio's trace reported intact (its
+packet frames in order, the CRC holding, the text ours): heard,
+missing, failed CRC. Takes Start Transmitting M17 SMS's options.</doc>
+<status status="PASS" start="2026-11-18T09:33:50.242045" elapsed="13.683534"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${r}[heard]</arg>
+<arg>${r}[sent]</arg>
+<arg>SMS intact</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2026-11-18T09:34:03.926248" elapsed="0.000794"/>
+</kw>
+<doc>M17-TRACE-6: every SMS arrives intact at the bench's level: its
+packet frames in order and its CRC holding.</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:33:50.237867" elapsed="13.689358"/>
+</test>
+<test id="s1-t15" name="70cm: M17 Trace SMS Sensitivity" line="137">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:34:03.928490" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-18T09:34:03.928684" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:34:03.928112" elapsed="0.000603"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-18T09:34:03.929497" elapsed="0.000014"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="NOT RUN" start="2026-11-18T09:34:03.929571" elapsed="0.000009"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:34:03.929654" elapsed="0.000008"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:34:03.929228" elapsed="0.000450"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:34:03.929200" elapsed="0.000500"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:34:03.929016" elapsed="0.000723"/>
+</kw>
+<kw name="Find M17 Trace Sensitivity" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:34:17.586948" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:34:31.250925" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:34:44.927615" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:34:58.593380" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:35:12.262175" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:35:25.921316" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:35:39.584263" level="INFO">9/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:35:53.248281" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:36:06.910617" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:36:20.569832" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:36:34.227502" level="INFO">9/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:36:47.901428" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:37:01.565422" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:37:15.238679" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:37:28.901116" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:37:42.563166" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:37:56.226210" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:38:09.891912" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:38:23.551223" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:38:37.235724" level="INFO">10/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:38:50.887866" level="INFO">8/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:39:04.552134" level="INFO">5/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:39:18.217120" level="INFO">6/10 SMS intact, 0 failed their CRC</msg>
+<msg time="2026-11-18T09:39:31.877956" level="INFO">6/10 SMS intact, 1 failed their CRC</msg>
+<msg time="2026-11-18T09:39:45.538353" level="INFO">1/10 SMS intact, 1 failed their CRC</msg>
+<msg time="2026-11-18T09:39:45.539077" level="INFO" html="true">&lt;table&gt;&lt;tr&gt;&lt;th&gt;level (dB re bench)&lt;/th&gt;&lt;th&gt;intact&lt;/th&gt;&lt;th&gt;CRC failed&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-10.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-11.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-12.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-13.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-14.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-15.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-16.0&lt;/td&gt;&lt;td&gt;90.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-17.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-18.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-19.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-20.0&lt;/td&gt;&lt;td&gt;90.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-21.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-22.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-23.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-24.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-25.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-26.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-27.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-28.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-29.0&lt;/td&gt;&lt;td&gt;100.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-30.0&lt;/td&gt;&lt;td&gt;80.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-31.0&lt;/td&gt;&lt;td&gt;50.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-32.0&lt;/td&gt;&lt;td&gt;60.0%&lt;/td&gt;&lt;td&gt;0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-33.0&lt;/td&gt;&lt;td&gt;60.0%&lt;/td&gt;&lt;td&gt;1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;-34.0&lt;/td&gt;&lt;td&gt;10.0%&lt;/td&gt;&lt;td&gt;1&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-11-18T09:39:45.539221" level="INFO">Set test message to:
+90% at -29.5, 50% at -33.2 dB re bench</msg>
+<arg>${SWEEP_START}</arg>
+<arg>${SWEEP_STOP}</arg>
+<arg>${SWEEP_STEP}</arg>
+<arg>frames=${SMS_SWEEP_COUNT}</arg>
+<arg>absolute=${ABSOLUTE_LEVELS}</arg>
+<arg>kind=sms</arg>
+<arg>length=${SMS_LENGTH}</arg>
+<doc>Step the level down from `start` to `stop` until fewer than half
+get through: for kind=stream a `frames`-long stream at each level,
+counting frames decoded (and garbled frames played); for kind=sms
+`frames` SMS, counting those intact. The result has the curve and
+the levels where 90% and 50% still got through, interpolated.
+Levels are dBm at the radio with a transmitter level table (or
+absolute: true), otherwise dB relative to the bench's gain: compare
+relative results only within one session, on one bench. Takes
+Score M17 Stream's or Score M17 SMS's options.</doc>
+<status status="PASS" start="2026-11-18T09:34:03.929822" elapsed="341.609624"/>
+</kw>
+<doc>M17-TRACE-7: SMS intact as the level falls: the levels where 90%
+and 50% still arrive. A measurement for comparing firmware; no
+limit.</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:34:03.927500" elapsed="341.612384">90% at -29.5, 50% at -33.2 dB re bench</status>
+</test>
+<test id="s1-t16" name="70cm: M17 Trace Receive Stack Has Headroom" line="157">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-18T09:39:45.542248" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-18T09:39:45.542503" level="INFO">${FREQUENCY_MHZ} = 445.975</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-18T09:39:45.541515" elapsed="0.001043"/>
+</kw>
+<kw name="Set Up M17 Trace">
+<if>
+<branch type="IF" condition="$BAND not in $BANDS_SET_UP">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-18T09:39:45.543723" elapsed="0.000020"/>
+</kw>
+<kw name="M17 Trace Should Be Running" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>The radio answered with its trace build's label: it runs a trace
+build (firmware/m17-trace) and the bench's trace port is its port.</doc>
+<status status="NOT RUN" start="2026-11-18T09:39:45.543837" elapsed="0.000021"/>
+</kw>
+<kw name="Set To Dictionary" owner="Collections">
+<arg>${BANDS_SET_UP}</arg>
+<arg>${BAND}=${True}</arg>
+<doc>Adds the given `key_value_pairs` and/or `items` to the `dictionary`.</doc>
+<status status="NOT RUN" start="2026-11-18T09:39:45.543960" elapsed="0.000013"/>
+</kw>
+<status status="NOT RUN" start="2026-11-18T09:39:45.543351" elapsed="0.000644"/>
+</branch>
+<status status="PASS" start="2026-11-18T09:39:45.543317" elapsed="0.000710"/>
+</if>
+<doc>Once per band: the radio receiving M17 on the band's frequency,
+its USB port on the bench's trace port.</doc>
+<status status="PASS" start="2026-11-18T09:39:45.543048" elapsed="0.001028"/>
+</kw>
+<kw name="M17 Trace Stack Should Have Headroom" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-18T09:39:45.548036" level="INFO">Set test message to:
+stack 1024 B, least free 292 B, 0 lines dropped</msg>
+<arg>${MIN_FREE_STACK}</arg>
+<doc>Over the whole run so far, the receive thread never had less than
+min_free_bytes of stack left, the radio didn't reset, and the trace
+dropped no lines (dropped lines make every score uncertain).</doc>
+<status status="PASS" start="2026-11-18T09:39:45.544193" elapsed="0.003937"/>
+</kw>
+<doc>M17-TRACE-9: over everything this run received, the receive
+thread kept at least 128 B of stack free, the radio
+didn't reset and the trace dropped no lines. Runs last.</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>needs:trace</tag>
+<tag>per-band</tag>
+<tag>rx</tag>
+<status status="PASS" start="2026-11-18T09:39:45.540411" elapsed="0.007872">stack 1024 B, least free 292 B, 0 lines dropped</status>
+</test>
+<kw name="Close Bench" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the instruments and write measurements.json: every capture,
+check and operator answer, with the run's provenance. Absolute paths
+are made relative, so the file can be published as it is.</doc>
+<status status="PASS" start="2026-11-18T09:39:45.548983" elapsed="0.057966"/>
+</kw>
+<doc>M17 receive, read from the radio's own trace: a trace build of OpenRTX
+(firmware/m17-trace) reports every frame it decodes on its USB serial
+port (the bench's trace section), so each frame the transmitter sends
+is accounted for without an operator: decoded, missed, garbled or
+repeated, when the link setup data arrived and from where, which
+frames went to the speaker, and the receive thread's stack.
+
+Flash a trace build of the firmware under test. The measurements are
+of the radio's ordinary M17 receive: the trace only copies out what
+the decoder hands on. Levels are relative to the bench's gain unless
+ABSOLUTE_LEVELS is true and the calibration has a transmitter level
+table; relative results compare firmware only within one session on
+one bench. Tag "long" marks the soak.</doc>
+<meta name="Calibration">assumed, measured 2026-10-20 (d55ce4aa0a3c)</meta>
+<meta name="Firmware">trace-pr524-643ad793</meta>
+<meta name="Hardware">TYT MD-UV390</meta>
+<meta name="Radio">TYT MD-UV3x0 (uv390-m17-radio.local)</meta>
+<meta name="Station">k0ret</meta>
+<meta name="Suite commit">570c8cb3f8</meta>
+<meta name="Trace">serial</meta>
+<status status="FAIL" start="2026-11-18T09:18:35.158050" elapsed="1270.449393"/>
+</suite>
+<statistics>
+<total>
+<stat pass="15" fail="1" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="7" fail="1" skip="0">band:2m</stat>
+<stat pass="8" fail="0" skip="0">band:70cm</stat>
+<stat pass="15" fail="1" skip="0">mode:m17</stat>
+<stat pass="15" fail="1" skip="0">needs:trace</stat>
+<stat pass="15" fail="1" skip="0">per-band</stat>
+<stat pass="15" fail="1" skip="0">rx</stat>
+</tag>
+<suite>
+<stat name="Trace" id="s1" pass="15" fail="1" skip="0">Trace</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
