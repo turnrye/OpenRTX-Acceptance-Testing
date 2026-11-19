@@ -1,0 +1,1122 @@
+{
+  "schema": 1,
+  "suite": "Trace",
+  "started": "2026-11-18T16:36:11+00:00",
+  "station": "k0ret",
+  "radio": "TYT MD-UV3x0",
+  "radio_file": "uv390-m17-radio.local",
+  "firmware": "trace-master-20b4088d",
+  "hardware": "TYT MD-UV390",
+  "suite_commit": "5a413632fb",
+  "bands": {
+    "2m": 146537500,
+    "70cm": 445975000
+  },
+  "calibration": {
+    "method": "assumed",
+    "measured": "2026-10-20",
+    "expires": "2026-12-31",
+    "sha256": "d55ce4aa0a3c"
+  },
+  "records": [
+    {
+      "test": "2m: M17 Trace Joins Late Through A Weak Signal",
+      "band": "2m",
+      "kind": "operator",
+      "text": "Set the radio to M17 on 146.537 MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it",
+      "answer": ""
+    },
+    {
+      "test": "2m: M17 Trace Joins Late Through A Weak Signal",
+      "band": "2m",
+      "kind": "m17-trace",
+      "build": "master-20b4088d"
+    },
+    {
+      "test": "2m: M17 Trace Joins Late Through A Weak Signal",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 250,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": false,
+      "relative_level_db": -32.0,
+      "tx_gain_offset_db": -32.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Joins Late Through A Weak Signal",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 250,
+      "decoded": 133,
+      "missed": 117,
+      "garbled": 23,
+      "repeated": 93,
+      "played": 244,
+      "played_garbled": 39,
+      "rate": 0.532,
+      "lsf_after_frames": 5,
+      "lsf_from": "I",
+      "first_play_frame": 5,
+      "options": {
+        "lsf": "False",
+        "level_db": "-32"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -10.0,
+      "tx_gain_offset_db": -10.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-10.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -11.0,
+      "tx_gain_offset_db": -11.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-11.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -12.0,
+      "tx_gain_offset_db": -12.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-12.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -13.0,
+      "tx_gain_offset_db": -13.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-13.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -14.0,
+      "tx_gain_offset_db": -14.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-14.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -15.0,
+      "tx_gain_offset_db": -15.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-15.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -16.0,
+      "tx_gain_offset_db": -16.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-16.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -17.0,
+      "tx_gain_offset_db": -17.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-17.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -18.0,
+      "tx_gain_offset_db": -18.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-18.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -19.0,
+      "tx_gain_offset_db": -19.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-19.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -20.0,
+      "tx_gain_offset_db": -20.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-20.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -21.0,
+      "tx_gain_offset_db": -21.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-21.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -22.0,
+      "tx_gain_offset_db": -22.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-22.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -23.0,
+      "tx_gain_offset_db": -23.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-23.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -24.0,
+      "tx_gain_offset_db": -24.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-24.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -25.0,
+      "tx_gain_offset_db": -25.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-25.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -26.0,
+      "tx_gain_offset_db": -26.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-26.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -27.0,
+      "tx_gain_offset_db": -27.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-27.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -28.0,
+      "tx_gain_offset_db": -28.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-28.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -29.0,
+      "tx_gain_offset_db": -29.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 120,
+      "missed": 5,
+      "garbled": 4,
+      "repeated": 1,
+      "played": 120,
+      "played_garbled": 3,
+      "rate": 0.96,
+      "lsf_after_frames": 5,
+      "lsf_from": "I",
+      "first_play_frame": 5,
+      "options": {
+        "level_db": "-29.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -30.0,
+      "tx_gain_offset_db": -30.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 113,
+      "missed": 12,
+      "garbled": 8,
+      "repeated": 4,
+      "played": 125,
+      "played_garbled": 8,
+      "rate": 0.904,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-30.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -31.0,
+      "tx_gain_offset_db": -31.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 90,
+      "missed": 35,
+      "garbled": 15,
+      "repeated": 20,
+      "played": 118,
+      "played_garbled": 13,
+      "rate": 0.72,
+      "lsf_after_frames": 7,
+      "lsf_from": "I",
+      "first_play_frame": 7,
+      "options": {
+        "level_db": "-31.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -32.0,
+      "tx_gain_offset_db": -32.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 27,
+      "missed": 98,
+      "garbled": 4,
+      "repeated": 93,
+      "played": 119,
+      "played_garbled": 34,
+      "rate": 0.216,
+      "lsf_after_frames": 5,
+      "lsf_from": "I",
+      "first_play_frame": 5,
+      "options": {
+        "level_db": "-32.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sensitivity",
+      "unit": "dB re bench",
+      "traffic": "stream",
+      "points": [
+        [
+          -10.0,
+          1.0,
+          0
+        ],
+        [
+          -11.0,
+          1.0,
+          0
+        ],
+        [
+          -12.0,
+          1.0,
+          0
+        ],
+        [
+          -13.0,
+          1.0,
+          0
+        ],
+        [
+          -14.0,
+          1.0,
+          0
+        ],
+        [
+          -15.0,
+          1.0,
+          0
+        ],
+        [
+          -16.0,
+          1.0,
+          0
+        ],
+        [
+          -17.0,
+          1.0,
+          0
+        ],
+        [
+          -18.0,
+          1.0,
+          0
+        ],
+        [
+          -19.0,
+          1.0,
+          0
+        ],
+        [
+          -20.0,
+          1.0,
+          0
+        ],
+        [
+          -21.0,
+          1.0,
+          0
+        ],
+        [
+          -22.0,
+          1.0,
+          0
+        ],
+        [
+          -23.0,
+          1.0,
+          0
+        ],
+        [
+          -24.0,
+          1.0,
+          0
+        ],
+        [
+          -25.0,
+          1.0,
+          0
+        ],
+        [
+          -26.0,
+          1.0,
+          0
+        ],
+        [
+          -27.0,
+          1.0,
+          0
+        ],
+        [
+          -28.0,
+          1.0,
+          0
+        ],
+        [
+          -29.0,
+          0.96,
+          3
+        ],
+        [
+          -30.0,
+          0.904,
+          8
+        ],
+        [
+          -31.0,
+          0.72,
+          13
+        ],
+        [
+          -32.0,
+          0.216,
+          34
+        ]
+      ],
+      "count": 125,
+      "level_90": -30.02173913043478,
+      "level_50": -31.436507936507937,
+      "options": {}
+    },
+    {
+      "test": "70cm: M17 Trace Joins Late Through A Weak Signal",
+      "band": "70cm",
+      "kind": "operator",
+      "text": "Set the radio to M17 on 445.975 MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it",
+      "answer": ""
+    },
+    {
+      "test": "70cm: M17 Trace Joins Late Through A Weak Signal",
+      "band": "70cm",
+      "kind": "m17-trace",
+      "build": "master-20b4088d"
+    },
+    {
+      "test": "70cm: M17 Trace Joins Late Through A Weak Signal",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 250,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": false,
+      "relative_level_db": -32.0,
+      "tx_gain_offset_db": -32.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Joins Late Through A Weak Signal",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 250,
+      "decoded": 227,
+      "missed": 23,
+      "garbled": 17,
+      "repeated": 5,
+      "played": 244,
+      "played_garbled": 18,
+      "rate": 0.908,
+      "lsf_after_frames": 5,
+      "lsf_from": "I",
+      "first_play_frame": 5,
+      "options": {
+        "lsf": "False",
+        "level_db": "-32"
+      }
+    }
+  ],
+  "trace_build": "master-20b4088d",
+  "operator": [
+    {
+      "kind": "instruct",
+      "text": "Plan for Trace:\n  Radio: TYT MD-UV390 as TYT MD-UV3x0 (bench/uv390-m17-radio.local.yaml), firmware trace-master-20b4088d\n  Bench: k0ret, receiver hackrf, transmitter hackrf, calibration assumed of 2026-10-20\n  2m: 146.537 MHz (to receiver 58.4 dB, from transmitter 58.4 dB)\n  70cm: 445.975 MHz (to receiver 58.0 dB, from transmitter 58.3 dB)\n  Modes: m17\n  Every test: attenuator chain between the radio and the hackrf, where it stays\n  Tests (3):\n    - 2m: M17 Trace Joins Late Through A Weak Signal\n    - 2m: M17 Trace Stream Sensitivity\n    - 70cm: M17 Trace Joins Late Through A Weak Signal\nCheck the setup, then continue to begin.",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to M17 on 146.537 MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it",
+      "answer": ""
+    },
+    {
+      "kind": "instruct",
+      "text": "Set the radio to M17 on 445.975 MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it",
+      "answer": ""
+    }
+  ]
+}
