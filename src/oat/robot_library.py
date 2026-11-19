@@ -149,6 +149,7 @@ class OpenRTXAcceptance:
         self._audio_files = 0
         self.suite = None
         self.started = None
+        self.commit = None
         self.output_dir = None
         self.receiver = None
         self.transmitter = None
@@ -238,6 +239,8 @@ class OpenRTXAcceptance:
             shutil.rmtree(self.run_dir)
         self.run_dir.mkdir(parents=True)
         self.started = datetime.datetime.now(datetime.timezone.utc)
+        # Read once: a commit made while the run is going doesn't describe it
+        self.commit = suite_commit()
         logger.info(f"Results in {self.run_dir}")
         # Listening from the start, so no frame the radio reports is missed;
         # every byte from the port goes to tnc.log
@@ -264,7 +267,7 @@ class OpenRTXAcceptance:
                 *((("Audio mixer", "; ".join(
                     f"{k}: {v}" for k, v in self.audio_mixer.items())),)
                   if self.audio_mixer else ()),
-                ("Suite commit", suite_commit())):
+                ("Suite commit", self.commit)):
             BuiltIn().set_suite_metadata(name, value, top=True)
         self.operator.instruct(self._plan_summary())
 
@@ -444,7 +447,7 @@ class OpenRTXAcceptance:
             "firmware": self.firmware,
             "hardware": self.hardware,
             **({"dsp": self.dsp} if self.dsp else {}),
-            "suite_commit": suite_commit(),
+            "suite_commit": self.commit,
             "bands": {name: band["frequency_hz"]
                       for name, band in self.radio["bands"].items()},
             "calibration": self.calibration.summary(),
