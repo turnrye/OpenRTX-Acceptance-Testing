@@ -1420,6 +1420,7 @@ class OpenRTXAcceptance:
         """
         Over the bench console: the mode, both frequencies on the current
         band's, the callsign when given, and the power (power_mw, else the
+        RADIO_POWER_MW variable, for a unit that needs its own, else the
         radio file's console_power_mw, else left as it is).
         """
         frequency = int(self._frequency())
@@ -1427,7 +1428,9 @@ class OpenRTXAcceptance:
         self.radio_console(f"FREQ {frequency} {frequency}")
         if callsign:
             self.radio_console(f"CALL {callsign}")
-        power = power_mw or self.radio.get("console_power_mw")
+        power = (power_mw
+                 or BuiltIn().get_variable_value("${RADIO_POWER_MW}", None)
+                 or self.radio.get("console_power_mw"))
         if power:
             self.radio_console(f"POWER {int(power)}")
         state = self.radio_console("STAT")
