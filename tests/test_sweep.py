@@ -32,6 +32,13 @@ def test_pick_takes_the_lowest_evm_inside_the_limits():
     assert (best["mod1"], best["mod2"]) == (105, 20)
 
 
+def test_pick_prefers_the_nominal_deviation_when_evm_is_flat():
+    points = [point(100, 0, 3.4, outer=2300), point(110, 0, 3.6, outer=2405),
+              point(120, 0, 3.5, outer=2500)]
+    best = sweep.pick_modulation(points, (2280, 2520), (2.85, 3.15))
+    assert best["mod1"] == 110
+
+
 def test_pick_is_none_when_nothing_qualifies():
     assert sweep.pick_modulation([point(100, 0, 2.0, outer=3000)],
                                  (2280, 2520), None) is None

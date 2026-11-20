@@ -40,15 +40,20 @@ def modulation_grid(cal_mod1: int, mod1_from: float, mod1_to: float,
 
 def pick_modulation(points: list[dict],
                     deviation_limits: tuple[float, float] | None,
-                    ratio_limits: tuple[float, float] | None) -> dict | None:
+                    ratio_limits: tuple[float, float] | None,
+                    evm_margin_percent: float = 0.5) -> dict | None:
     """
-    The point with the lowest EVM among those decoded with their outer
-    deviation and deviation ratio inside the limits.
+    Among the points decoded with their outer deviation and deviation ratio
+    inside the limits, those within evm_margin_percent of the lowest EVM, and
+    of them the one whose outer deviation is nearest the middle of the
+    limits: EVM is often flat over a wide range, where its noise shouldn't
+    pick the deviation.
 
     @param points: measured points (mod1, mod2, evm_percent,
     outer_deviation_hz, deviation_ratio, decoded).
     @param deviation_limits: the outer deviation's acceptance range.
     @param ratio_limits: the deviation ratio's acceptance range.
+    @param evm_margin_percent: how far above the lowest EVM still counts.
     @return the point, or None when none qualifies.
     """
     def inside(value, limits):
@@ -59,4 +64,11 @@ def pick_modulation(points: list[dict],
             if p.get("decoded") and p.get("evm_percent") is not None
             and inside(p.get("outer_deviation_hz"), deviation_limits)
             and inside(p.get("deviation_ratio"), ratio_limits)]
-    return min(good, key=lambda p: p["evm_percent"]) if good else None
+    if not good:
+        return None
+    lowest = min(p["evm_percent"] for p in good)
+    close = [p for p in good if p["evm_percent"] <= lowest + evm_margin_percent]
+    if deviation_limits is None:
+        return min(close, key=lambda p: p["evm_percent"])
+    middle = (deviation_limits[0] + deviation_limits[1]) / 2
+    return min(close, key=lambda p: abs(p["outer_deviation_hz"] - middle))
