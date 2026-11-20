@@ -1,0 +1,1193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Rebot 7.5 (Python 3.13.13 on darwin)" generated="2026-11-20T03:36:24.823575" rpa="false" schemaversion="5">
+<suite id="s1" name="Tx" source="acceptance/m17/tx.robot">
+<kw name="Open Bench" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-19T22:44:08.200183" level="INFO">Results in runs/full-tx-chip/bench-Tx</msg>
+<msg time="2026-11-19T22:44:08.218074" level="INFO">Set suite metadata 'Firmware' to value 'c6000-bench-0066f6e2'.</msg>
+<msg time="2026-11-19T22:44:08.218158" level="INFO">Set suite metadata 'Radio' to value 'Connect Systems CS7000-PLUS (cs7000p)'.</msg>
+<msg time="2026-11-19T22:44:08.218187" level="INFO">Set suite metadata 'Hardware' to value 'Connect Systems CS7000-PLUS'.</msg>
+<msg time="2026-11-19T22:44:08.218211" level="INFO">Set suite metadata 'Station' to value 'k0ret'.</msg>
+<msg time="2026-11-19T22:44:08.218227" level="INFO">Set suite metadata 'Trace' to value 'serial'.</msg>
+<msg time="2026-11-19T22:44:08.218244" level="INFO">Set suite metadata 'Calibration' to value 'assumed, measured 2026-10-20 (d55ce4aa0a3c)'.</msg>
+<msg time="2026-11-19T22:44:08.218271" level="INFO">Set suite metadata 'Suite commit' to value '640a40ac39'.</msg>
+<arg>${BENCH}</arg>
+<arg>${CALIBRATION}</arg>
+<arg>${RADIO}</arg>
+<arg>${FIRMWARE}</arg>
+<arg>${HARDWARE}</arg>
+<arg>dsp=${DSP}</arg>
+<doc>Load the bench, its calibration and the radio file, and prepare the
+instruments. All five are mandatory and differ from tester to tester,
+so suites take them from the command line (-v BENCH:... and so on).
+`firmware` names what the radio runs, such as a git describe;
+`hardware` names the unit, by model and serial number, since units of
+one model measure differently. `dsp` names the DSP image the radio's
+audio processor runs, such as its sha256; it is mandatory for radio
+files with dsp_image: true, whose firmware states can differ in it
+alone.</doc>
+<status status="PASS" start="2026-11-19T22:44:08.169478" elapsed="1.060522"/>
+</kw>
+<test id="s1-t1" name="70cm: M17 TX Deviation And Ratio Meet The Specification" line="73">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-19T22:44:09.231188" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-19T22:44:09.231301" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-19T22:44:09.230891" elapsed="0.000433"/>
+</kw>
+<kw name="Set Up M17">
+<kw name="Bench Has Radio Console" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:44:09.231717" level="INFO">${console} = True</msg>
+<var>${console}</var>
+<doc>Whether the radio takes commands on its trace port (the bench file's
+trace section has console: true): then the bench sets the radio up
+and keys it itself.</doc>
+<status status="PASS" start="2026-11-19T22:44:09.231668" elapsed="0.000058"/>
+</kw>
+<if>
+<branch type="IF" condition="${console}">
+<kw name="Set Up Radio Over Console" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:44:09.279006" level="INFO">MODE M17 -&gt; MODE 107740 M17</msg>
+<msg time="2026-11-19T22:44:09.304139" level="INFO">FREQ 445925000 445925000 -&gt; FREQ 107792 445925000 445925000</msg>
+<msg time="2026-11-19T22:44:09.346320" level="INFO">CALL K0RET -&gt; CALL 107817 K0RET</msg>
+<msg time="2026-11-19T22:44:09.394965" level="INFO">POWER 2500 -&gt; POWER 107842 2500</msg>
+<msg time="2026-11-19T22:44:09.419382" level="INFO">STAT -&gt; STAT 107894 M17 445925000 445925000 2500 ANALOG CAL 149 118 0</msg>
+<arg>M17</arg>
+<arg>callsign=${CALLSIGN}</arg>
+<doc>Over the bench console: the mode, both frequencies on the current
+band's, the callsign when given, and the power (power_mw, else the
+RADIO_POWER_MW variable, for a unit that needs its own, else the
+radio file's console_power_mw, else left as it is).</doc>
+<status status="PASS" start="2026-11-19T22:44:09.231825" elapsed="0.187701"/>
+</kw>
+<if>
+<branch type="IF" condition="$M17_MODEM">
+<kw name="Set M17 Modem" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:44:09.444467" level="INFO">MODEM CHIP -&gt; MODEM 107919 CHIP</msg>
+<msg time="2026-11-19T22:44:09.950679" level="INFO">Set suite metadata 'M17 modem' to value 'CHIP'.</msg>
+<arg>${M17_MODEM}</arg>
+<doc>The M17 modem setting over the bench console, ANALOG or CHIP (the
+HR_C6000's), recorded in the run's metadata.</doc>
+<status status="PASS" start="2026-11-19T22:44:09.419886" elapsed="0.530882"/>
+</kw>
+<status status="PASS" start="2026-11-19T22:44:09.419660" elapsed="0.531143"/>
+</branch>
+<status status="PASS" start="2026-11-19T22:44:09.419618" elapsed="0.531203"/>
+</if>
+<status status="PASS" start="2026-11-19T22:44:09.231778" elapsed="0.719053"/>
+</branch>
+<branch type="ELSE">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17, ${FREQUENCY_MHZ} MHz, callsign ${CALLSIGN}, destination @ALL or empty, low power, no encryption</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-19T22:44:09.950903" elapsed="0.000008"/>
+</kw>
+<status status="NOT RUN" start="2026-11-19T22:44:09.950839" elapsed="0.000086"/>
+</branch>
+<status status="PASS" start="2026-11-19T22:44:09.231763" elapsed="0.719168"/>
+</if>
+<status status="PASS" start="2026-11-19T22:44:09.231544" elapsed="0.719414"/>
+</kw>
+<kw name="Capture Keyed M17 Transmissions" owner="keyed">
+<kw name="Bench Keys The Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:44:09.951445" level="INFO">${keys} = True</msg>
+<var>${keys}</var>
+<doc>Whether Key Radio keys the radio itself, through the audio
+interface's PTT line (or the simulated interface), rather than by
+asking the operator.</doc>
+<status status="PASS" start="2026-11-19T22:44:09.951392" elapsed="0.000063"/>
+</kw>
+<if>
+<branch type="IF" condition="${keys}">
+<kw name="Start Capture" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Start recording on the test frequency, for a capture that keywords
+rather than the operator time: Stop Capture And Measure FM or M17
+ends it.</doc>
+<status status="PASS" start="2026-11-19T22:44:09.951514" elapsed="0.006562"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>1</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:09.958952" elapsed="1.005998"/>
+</kw>
+<for flavor="IN RANGE">
+<iter>
+<kw name="Key Up" owner="keyed">
+<kw name="Key Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Key the radio: through the audio interface's PTT line when the bench
+has one, otherwise by asking the operator to hold PTT.</doc>
+<status status="PASS" start="2026-11-19T22:44:10.966789" elapsed="0.044445"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${seconds}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:11.011353" elapsed="5.005194"/>
+</kw>
+<kw name="Release Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Release PTT, as Key Radio keyed it.</doc>
+<status status="PASS" start="2026-11-19T22:44:16.016676" elapsed="0.064301"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${gap}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:16.081062" elapsed="2.000561"/>
+</kw>
+<arg>${seconds}</arg>
+<doc>Key the radio for 5 s through Key Radio, then wait
+${gap} s so the next transmission is a separate one.</doc>
+<status status="PASS" start="2026-11-19T22:44:10.966405" elapsed="7.115281"/>
+</kw>
+<var name="${i}">0</var>
+<status status="PASS" start="2026-11-19T22:44:10.965798" elapsed="7.115904"/>
+</iter>
+<var>${i}</var>
+<value>${count}</value>
+<status status="PASS" start="2026-11-19T22:44:10.965183" elapsed="7.116588"/>
+</for>
+<kw name="Stop Capture And Measure M17" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:44:18.766301" level="INFO" html="true">&lt;b&gt;capture01&lt;/b&gt;&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;outer Hz&lt;/th&gt;&lt;th&gt;inner Hz&lt;/th&gt;&lt;th&gt;ratio&lt;/th&gt;&lt;th&gt;EVM %&lt;/th&gt;&lt;th&gt;symbols ppm&lt;/th&gt;&lt;th&gt;freq error Hz&lt;/th&gt;&lt;th&gt;preamble s&lt;/th&gt;&lt;th&gt;frames&lt;/th&gt;&lt;th&gt;source&lt;/th&gt;&lt;th&gt;LSF CRC&lt;/th&gt;&lt;th&gt;polarity&lt;/th&gt;&lt;th&gt;voice&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx1&lt;/td&gt;&lt;td&gt;2357&lt;/td&gt;&lt;td&gt;778&lt;/td&gt;&lt;td&gt;3.03&lt;/td&gt;&lt;td&gt;3.6&lt;/td&gt;&lt;td&gt;0.2&lt;/td&gt;&lt;td&gt;183&lt;/td&gt;&lt;td&gt;0.200&lt;/td&gt;&lt;td&gt;123&lt;/td&gt;&lt;td&gt;K0RET&lt;/td&gt;&lt;td&gt;True&lt;/td&gt;&lt;td&gt;normal&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Tx/capture01/tx1-voice.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-11-19T22:44:18.766518" level="INFO">${tx} = [{'start_s': 1.027564, 'duration_s': 5.253724, 'carrier_offset_hz': 250182.66321724033, 'outer_deviation_hz': 2356.673709870979, 'inner_deviation_hz': 778.4082018768952, 'deviation_ratio': 3.027555085...</msg>
+<var>${tx}</var>
+<arg>expected=${count}</arg>
+<doc>End a capture from Start Capture and measure its M17 transmissions.</doc>
+<status status="PASS" start="2026-11-19T22:44:18.081838" elapsed="0.684696"/>
+</kw>
+<status status="PASS" start="2026-11-19T22:44:09.951483" elapsed="8.815098"/>
+</branch>
+<branch type="ELSE">
+<kw name="Keyed Instruction" owner="keyed">
+<var>${instruction}</var>
+<arg>${seconds}</arg>
+<arg>${count}</arg>
+<doc>The operator's instruction for 1 key-ups of 5 s.</doc>
+<status status="NOT RUN" start="2026-11-19T22:44:18.766813" elapsed="0.000011"/>
+</kw>
+<kw name="Capture Radio M17 Transmissions" owner="oat.robot_library.OpenRTXAcceptance">
+<var>${tx}</var>
+<arg>${instruction}</arg>
+<arg>expected=${count}</arg>
+<doc>Record while the operator follows the instruction, then measure and
+decode each M17 transmission (oat.m17.phy). Fails unless exactly
+`expected` are found. Each one's demodulated baseband is saved as a
+48 kHz WAV, and its voice, through c2dec when Codec2 is installed.</doc>
+<status status="NOT RUN" start="2026-11-19T22:44:18.766878" elapsed="0.000006"/>
+</kw>
+<status status="NOT RUN" start="2026-11-19T22:44:18.766601" elapsed="0.000294"/>
+</branch>
+<status status="PASS" start="2026-11-19T22:44:09.951475" elapsed="8.815429"/>
+</if>
+<return>
+<value>${tx}</value>
+<status status="PASS" start="2026-11-19T22:44:18.766921" elapsed="0.000030"/>
+</return>
+<msg time="2026-11-19T22:44:18.767013" level="INFO">${tx} = [{'start_s': 1.027564, 'duration_s': 5.253724, 'carrier_offset_hz': 250182.66321724033, 'outer_deviation_hz': 2356.673709870979, 'inner_deviation_hz': 778.4082018768952, 'deviation_ratio': 3.027555085...</msg>
+<var>${tx}</var>
+<arg>5</arg>
+<doc>${count} M17 transmissions of ${seconds} s with nothing at the mic,
+in one capture. Returns their measurements, oldest first.</doc>
+<status status="PASS" start="2026-11-19T22:44:09.951245" elapsed="8.815778"/>
+</kw>
+<kw name="Remember Result" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>m17 take</arg>
+<arg>${tx}[0]</arg>
+<doc>Keep a result for later tests on the same band.</doc>
+<status status="PASS" start="2026-11-19T22:44:18.767057" elapsed="0.000154"/>
+</kw>
+<kw name="M17 Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${tx}[0]</arg>
+<arg>deviation,ratio</arg>
+<doc>Check an M17 transmission against the radio file's m17 limits.
+`checks` names some of deviation, ratio, symbol_rate, frequency,
+evm, bandwidth, preamble and polarity, comma-separated, or all.</doc>
+<status status="PASS" start="2026-11-19T22:44:18.767239" elapsed="0.000081"/>
+</kw>
+<doc>M17-TX-1 and 2: outer and inner deviation (nominally 2400 and
+800 Hz) and their ratio (3).</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-11-19T22:44:09.230270" elapsed="9.537099"/>
+</test>
+<test id="s1-t2" name="70cm: M17 TX Symbol Rate And Carrier Are On Frequency" line="81">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-19T22:44:18.767851" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-19T22:44:18.767939" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-19T22:44:18.767706" elapsed="0.000245"/>
+</kw>
+<kw name="Recall Result" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:44:18.768026" level="INFO">${tx} = {'start_s': 1.027564, 'duration_s': 5.253724, 'carrier_offset_hz': 250182.66321724033, 'outer_deviation_hz': 2356.673709870979, 'inner_deviation_hz': 778.4082018768952, 'deviation_ratio': 3.0275550850...</msg>
+<var>${tx}</var>
+<arg>m17 take</arg>
+<doc>A result remembered earlier on the current band, or None.</doc>
+<status status="PASS" start="2026-11-19T22:44:18.767983" elapsed="0.000050"/>
+</kw>
+<kw name="Skip If" owner="BuiltIn">
+<arg>$tx is None</arg>
+<arg>Needs the M17 take of the deviation test on this band</arg>
+<doc>Conditionally stops the current test or task and sets its status to SKIP.</doc>
+<status status="PASS" start="2026-11-19T22:44:18.768064" elapsed="0.000235"/>
+</kw>
+<kw name="M17 Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${tx}</arg>
+<arg>symbol_rate,frequency</arg>
+<doc>Check an M17 transmission against the radio file's m17 limits.
+`checks` names some of deviation, ratio, symbol_rate, frequency,
+evm, bandwidth, preamble and polarity, comma-separated, or all.</doc>
+<status status="PASS" start="2026-11-19T22:44:18.768329" elapsed="0.000059"/>
+</kw>
+<doc>M17-TX-3, on the take of the previous test.</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-11-19T22:44:18.767517" elapsed="0.000896"/>
+</test>
+<test id="s1-t3" name="70cm: M17 TX Bandwidth And EVM" line="87">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-19T22:44:18.768699" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-19T22:44:18.768774" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-19T22:44:18.768596" elapsed="0.000189"/>
+</kw>
+<kw name="Recall Result" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:44:18.768852" level="INFO">${tx} = {'start_s': 1.027564, 'duration_s': 5.253724, 'carrier_offset_hz': 250182.66321724033, 'outer_deviation_hz': 2356.673709870979, 'inner_deviation_hz': 778.4082018768952, 'deviation_ratio': 3.0275550850...</msg>
+<var>${tx}</var>
+<arg>m17 take</arg>
+<doc>A result remembered earlier on the current band, or None.</doc>
+<status status="PASS" start="2026-11-19T22:44:18.768814" elapsed="0.000045"/>
+</kw>
+<kw name="Skip If" owner="BuiltIn">
+<arg>$tx is None</arg>
+<arg>Needs the M17 take of the deviation test on this band</arg>
+<doc>Conditionally stops the current test or task and sets its status to SKIP.</doc>
+<status status="PASS" start="2026-11-19T22:44:18.768882" elapsed="0.000088"/>
+</kw>
+<kw name="M17 Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${tx}</arg>
+<arg>bandwidth,evm</arg>
+<doc>Check an M17 transmission against the radio file's m17 limits.
+`checks` names some of deviation, ratio, symbol_rate, frequency,
+evm, bandwidth, preamble and polarity, comma-separated, or all.</doc>
+<status status="PASS" start="2026-11-19T22:44:18.768998" elapsed="0.000054"/>
+</kw>
+<doc>M17-TX-4: 99% occupied bandwidth, and EVM after the receive RRC
+filter, on the same take.</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-11-19T22:44:18.768479" elapsed="0.000614"/>
+</test>
+<test id="s1-t4" name="70cm: M17 TX Decodes Every Time" line="94">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-19T22:44:18.769372" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-19T22:44:18.769446" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-19T22:44:18.769277" elapsed="0.000180"/>
+</kw>
+<kw name="Set Up M17">
+<kw name="Bench Has Radio Console" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:44:18.769630" level="INFO">${console} = True</msg>
+<var>${console}</var>
+<doc>Whether the radio takes commands on its trace port (the bench file's
+trace section has console: true): then the bench sets the radio up
+and keys it itself.</doc>
+<status status="PASS" start="2026-11-19T22:44:18.769600" elapsed="0.000037"/>
+</kw>
+<if>
+<branch type="IF" condition="${console}">
+<kw name="Set Up Radio Over Console" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:44:18.819531" level="INFO">MODE M17 -&gt; MODE 117307 M17</msg>
+<msg time="2026-11-19T22:44:18.844616" level="INFO">FREQ 445925000 445925000 -&gt; FREQ 117332 445925000 445925000</msg>
+<msg time="2026-11-19T22:44:18.919637" level="INFO">CALL K0RET -&gt; CALL 117357 K0RET</msg>
+<msg time="2026-11-19T22:44:18.969795" level="INFO">POWER 2500 -&gt; POWER 117435 2500</msg>
+<msg time="2026-11-19T22:44:19.044602" level="INFO">STAT -&gt; STAT 117513 M17 445925000 445925000 2500 CHIP CAL 123 86 0</msg>
+<arg>M17</arg>
+<arg>callsign=${CALLSIGN}</arg>
+<doc>Over the bench console: the mode, both frequencies on the current
+band's, the callsign when given, and the power (power_mw, else the
+RADIO_POWER_MW variable, for a unit that needs its own, else the
+radio file's console_power_mw, else left as it is).</doc>
+<status status="PASS" start="2026-11-19T22:44:18.769688" elapsed="0.275027"/>
+</kw>
+<if>
+<branch type="IF" condition="$M17_MODEM">
+<kw name="Set M17 Modem" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:44:19.119211" level="INFO">MODEM CHIP -&gt; MODEM 117563 CHIP</msg>
+<msg time="2026-11-19T22:44:19.622099" level="INFO">Set suite metadata 'M17 modem' to value 'CHIP'.</msg>
+<arg>${M17_MODEM}</arg>
+<doc>The M17 modem setting over the bench console, ANALOG or CHIP (the
+HR_C6000's), recorded in the run's metadata.</doc>
+<status status="PASS" start="2026-11-19T22:44:19.044892" elapsed="0.577286"/>
+</kw>
+<status status="PASS" start="2026-11-19T22:44:19.044780" elapsed="0.577426"/>
+</branch>
+<status status="PASS" start="2026-11-19T22:44:19.044767" elapsed="0.577453"/>
+</if>
+<status status="PASS" start="2026-11-19T22:44:18.769659" elapsed="0.852568"/>
+</branch>
+<branch type="ELSE">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17, ${FREQUENCY_MHZ} MHz, callsign ${CALLSIGN}, destination @ALL or empty, low power, no encryption</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-19T22:44:19.622294" elapsed="0.000008"/>
+</kw>
+<status status="NOT RUN" start="2026-11-19T22:44:19.622235" elapsed="0.000076"/>
+</branch>
+<status status="PASS" start="2026-11-19T22:44:18.769650" elapsed="0.852667"/>
+</if>
+<status status="PASS" start="2026-11-19T22:44:18.769529" elapsed="0.852807"/>
+</kw>
+<kw name="Capture Keyed M17 Transmissions" owner="keyed">
+<kw name="Bench Keys The Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:44:19.622792" level="INFO">${keys} = True</msg>
+<var>${keys}</var>
+<doc>Whether Key Radio keys the radio itself, through the audio
+interface's PTT line (or the simulated interface), rather than by
+asking the operator.</doc>
+<status status="PASS" start="2026-11-19T22:44:19.622744" elapsed="0.000056"/>
+</kw>
+<if>
+<branch type="IF" condition="${keys}">
+<kw name="Start Capture" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Start recording on the test frequency, for a capture that keywords
+rather than the operator time: Stop Capture And Measure FM or M17
+ends it.</doc>
+<status status="PASS" start="2026-11-19T22:44:19.622855" elapsed="0.004178"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>1</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:19.627226" elapsed="1.005362"/>
+</kw>
+<for flavor="IN RANGE">
+<iter>
+<kw name="Key Up" owner="keyed">
+<kw name="Key Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Key the radio: through the audio interface's PTT line when the bench
+has one, otherwise by asking the operator to hold PTT.</doc>
+<status status="PASS" start="2026-11-19T22:44:20.634005" elapsed="0.025289"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${seconds}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:20.659489" elapsed="2.001386"/>
+</kw>
+<kw name="Release Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Release PTT, as Key Radio keyed it.</doc>
+<status status="PASS" start="2026-11-19T22:44:22.661208" elapsed="0.020987"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${gap}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:22.682474" elapsed="2.003980"/>
+</kw>
+<arg>${seconds}</arg>
+<doc>Key the radio for 2 s through Key Radio, then wait
+${gap} s so the next transmission is a separate one.</doc>
+<status status="PASS" start="2026-11-19T22:44:20.633694" elapsed="4.052860"/>
+</kw>
+<var name="${i}">0</var>
+<status status="PASS" start="2026-11-19T22:44:20.633187" elapsed="4.053392"/>
+</iter>
+<iter>
+<kw name="Key Up" owner="keyed">
+<kw name="Key Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Key the radio: through the audio interface's PTT line when the bench
+has one, otherwise by asking the operator to hold PTT.</doc>
+<status status="PASS" start="2026-11-19T22:44:24.687390" elapsed="0.043760"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${seconds}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:24.731315" elapsed="2.005325"/>
+</kw>
+<kw name="Release Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Release PTT, as Key Radio keyed it.</doc>
+<status status="PASS" start="2026-11-19T22:44:26.736881" elapsed="0.025340"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${gap}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:26.762427" elapsed="2.005371"/>
+</kw>
+<arg>${seconds}</arg>
+<doc>Key the radio for 2 s through Key Radio, then wait
+${gap} s so the next transmission is a separate one.</doc>
+<status status="PASS" start="2026-11-19T22:44:24.687127" elapsed="4.080852"/>
+</kw>
+<var name="${i}">1</var>
+<status status="PASS" start="2026-11-19T22:44:24.686750" elapsed="4.081259"/>
+</iter>
+<iter>
+<kw name="Key Up" owner="keyed">
+<kw name="Key Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Key the radio: through the audio interface's PTT line when the bench
+has one, otherwise by asking the operator to hold PTT.</doc>
+<status status="PASS" start="2026-11-19T22:44:28.768880" elapsed="0.023265"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${seconds}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:28.792385" elapsed="2.002499"/>
+</kw>
+<kw name="Release Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Release PTT, as Key Radio keyed it.</doc>
+<status status="PASS" start="2026-11-19T22:44:30.795028" elapsed="0.025252"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${gap}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:30.820392" elapsed="2.002756"/>
+</kw>
+<arg>${seconds}</arg>
+<doc>Key the radio for 2 s through Key Radio, then wait
+${gap} s so the next transmission is a separate one.</doc>
+<status status="PASS" start="2026-11-19T22:44:28.768583" elapsed="4.054700"/>
+</kw>
+<var name="${i}">2</var>
+<status status="PASS" start="2026-11-19T22:44:28.768172" elapsed="4.055145"/>
+</iter>
+<iter>
+<kw name="Key Up" owner="keyed">
+<kw name="Key Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Key the radio: through the audio interface's PTT line when the bench
+has one, otherwise by asking the operator to hold PTT.</doc>
+<status status="PASS" start="2026-11-19T22:44:32.824325" elapsed="0.025254"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${seconds}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:32.849782" elapsed="2.001322"/>
+</kw>
+<kw name="Release Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Release PTT, as Key Radio keyed it.</doc>
+<status status="PASS" start="2026-11-19T22:44:34.851201" elapsed="0.023470"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${gap}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:34.874793" elapsed="2.001720"/>
+</kw>
+<arg>${seconds}</arg>
+<doc>Key the radio for 2 s through Key Radio, then wait
+${gap} s so the next transmission is a separate one.</doc>
+<status status="PASS" start="2026-11-19T22:44:32.823890" elapsed="4.052804"/>
+</kw>
+<var name="${i}">3</var>
+<status status="PASS" start="2026-11-19T22:44:32.823470" elapsed="4.053255"/>
+</iter>
+<iter>
+<kw name="Key Up" owner="keyed">
+<kw name="Key Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Key the radio: through the audio interface's PTT line when the bench
+has one, otherwise by asking the operator to hold PTT.</doc>
+<status status="PASS" start="2026-11-19T22:44:36.877625" elapsed="0.025115"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${seconds}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:36.903041" elapsed="2.002473"/>
+</kw>
+<kw name="Release Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Release PTT, as Key Radio keyed it.</doc>
+<status status="PASS" start="2026-11-19T22:44:38.905736" elapsed="0.025313"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${gap}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:38.931307" elapsed="2.004921"/>
+</kw>
+<arg>${seconds}</arg>
+<doc>Key the radio for 2 s through Key Radio, then wait
+${gap} s so the next transmission is a separate one.</doc>
+<status status="PASS" start="2026-11-19T22:44:36.877326" elapsed="4.059125"/>
+</kw>
+<var name="${i}">4</var>
+<status status="PASS" start="2026-11-19T22:44:36.876898" elapsed="4.059618"/>
+</iter>
+<iter>
+<kw name="Key Up" owner="keyed">
+<kw name="Key Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Key the radio: through the audio interface's PTT line when the bench
+has one, otherwise by asking the operator to hold PTT.</doc>
+<status status="PASS" start="2026-11-19T22:44:40.937792" elapsed="0.023358"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${seconds}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:40.961341" elapsed="2.003205"/>
+</kw>
+<kw name="Release Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Release PTT, as Key Radio keyed it.</doc>
+<status status="PASS" start="2026-11-19T22:44:42.964698" elapsed="0.022059"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${gap}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:42.986889" elapsed="2.004342"/>
+</kw>
+<arg>${seconds}</arg>
+<doc>Key the radio for 2 s through Key Radio, then wait
+${gap} s so the next transmission is a separate one.</doc>
+<status status="PASS" start="2026-11-19T22:44:40.937310" elapsed="4.054071"/>
+</kw>
+<var name="${i}">5</var>
+<status status="PASS" start="2026-11-19T22:44:40.936728" elapsed="4.054680"/>
+</iter>
+<iter>
+<kw name="Key Up" owner="keyed">
+<kw name="Key Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Key the radio: through the audio interface's PTT line when the bench
+has one, otherwise by asking the operator to hold PTT.</doc>
+<status status="PASS" start="2026-11-19T22:44:44.992288" elapsed="0.025316"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${seconds}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:45.017847" elapsed="2.001563"/>
+</kw>
+<kw name="Release Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Release PTT, as Key Radio keyed it.</doc>
+<status status="PASS" start="2026-11-19T22:44:47.019664" elapsed="0.021667"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${gap}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:47.041544" elapsed="2.005405"/>
+</kw>
+<arg>${seconds}</arg>
+<doc>Key the radio for 2 s through Key Radio, then wait
+${gap} s so the next transmission is a separate one.</doc>
+<status status="PASS" start="2026-11-19T22:44:44.991976" elapsed="4.055131"/>
+</kw>
+<var name="${i}">6</var>
+<status status="PASS" start="2026-11-19T22:44:44.991561" elapsed="4.055572"/>
+</iter>
+<iter>
+<kw name="Key Up" owner="keyed">
+<kw name="Key Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Key the radio: through the audio interface's PTT line when the bench
+has one, otherwise by asking the operator to hold PTT.</doc>
+<status status="PASS" start="2026-11-19T22:44:49.048406" elapsed="0.025299"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${seconds}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:49.073996" elapsed="2.001225"/>
+</kw>
+<kw name="Release Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Release PTT, as Key Radio keyed it.</doc>
+<status status="PASS" start="2026-11-19T22:44:51.075474" elapsed="0.022185"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${gap}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:51.097802" elapsed="2.002228"/>
+</kw>
+<arg>${seconds}</arg>
+<doc>Key the radio for 2 s through Key Radio, then wait
+${gap} s so the next transmission is a separate one.</doc>
+<status status="PASS" start="2026-11-19T22:44:49.048026" elapsed="4.052199"/>
+</kw>
+<var name="${i}">7</var>
+<status status="PASS" start="2026-11-19T22:44:49.047317" elapsed="4.052968"/>
+</iter>
+<iter>
+<kw name="Key Up" owner="keyed">
+<kw name="Key Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Key the radio: through the audio interface's PTT line when the bench
+has one, otherwise by asking the operator to hold PTT.</doc>
+<status status="PASS" start="2026-11-19T22:44:53.101718" elapsed="0.025367"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${seconds}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:53.127302" elapsed="2.005297"/>
+</kw>
+<kw name="Release Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Release PTT, as Key Radio keyed it.</doc>
+<status status="PASS" start="2026-11-19T22:44:55.132750" elapsed="0.067482"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${gap}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:55.200452" elapsed="2.002654"/>
+</kw>
+<arg>${seconds}</arg>
+<doc>Key the radio for 2 s through Key Radio, then wait
+${gap} s so the next transmission is a separate one.</doc>
+<status status="PASS" start="2026-11-19T22:44:53.101191" elapsed="4.102009"/>
+</kw>
+<var name="${i}">8</var>
+<status status="PASS" start="2026-11-19T22:44:53.100567" elapsed="4.102654"/>
+</iter>
+<iter>
+<kw name="Key Up" owner="keyed">
+<kw name="Key Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Key the radio: through the audio interface's PTT line when the bench
+has one, otherwise by asking the operator to hold PTT.</doc>
+<status status="PASS" start="2026-11-19T22:44:57.203886" elapsed="0.050199"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${seconds}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:57.254233" elapsed="2.005342"/>
+</kw>
+<kw name="Release Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Release PTT, as Key Radio keyed it.</doc>
+<status status="PASS" start="2026-11-19T22:44:59.259900" elapsed="0.046142"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${gap}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:44:59.306274" elapsed="2.005328"/>
+</kw>
+<arg>${seconds}</arg>
+<doc>Key the radio for 2 s through Key Radio, then wait
+${gap} s so the next transmission is a separate one.</doc>
+<status status="PASS" start="2026-11-19T22:44:57.203657" elapsed="4.108038"/>
+</kw>
+<var name="${i}">9</var>
+<status status="PASS" start="2026-11-19T22:44:57.203342" elapsed="4.108381"/>
+</iter>
+<var>${i}</var>
+<value>${count}</value>
+<status status="PASS" start="2026-11-19T22:44:20.632762" elapsed="40.678989"/>
+</for>
+<kw name="Stop Capture And Measure M17" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:45:04.519288" level="INFO" html="true">&lt;b&gt;capture02&lt;/b&gt;&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;outer Hz&lt;/th&gt;&lt;th&gt;inner Hz&lt;/th&gt;&lt;th&gt;ratio&lt;/th&gt;&lt;th&gt;EVM %&lt;/th&gt;&lt;th&gt;symbols ppm&lt;/th&gt;&lt;th&gt;freq error Hz&lt;/th&gt;&lt;th&gt;preamble s&lt;/th&gt;&lt;th&gt;frames&lt;/th&gt;&lt;th&gt;source&lt;/th&gt;&lt;th&gt;LSF CRC&lt;/th&gt;&lt;th&gt;polarity&lt;/th&gt;&lt;th&gt;voice&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx1&lt;/td&gt;&lt;td&gt;2354&lt;/td&gt;&lt;td&gt;751&lt;/td&gt;&lt;td&gt;3.14&lt;/td&gt;&lt;td&gt;5.4&lt;/td&gt;&lt;td&gt;0.0&lt;/td&gt;&lt;td&gt;171&lt;/td&gt;&lt;td&gt;0.200&lt;/td&gt;&lt;td&gt;47&lt;/td&gt;&lt;td&gt;K0RET&lt;/td&gt;&lt;td&gt;True&lt;/td&gt;&lt;td&gt;normal&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Tx/capture02/tx1-voice.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx2&lt;/td&gt;&lt;td&gt;2353&lt;/td&gt;&lt;td&gt;747&lt;/td&gt;&lt;td&gt;3.15&lt;/td&gt;&lt;td&gt;5.7&lt;/td&gt;&lt;td&gt;-0.1&lt;/td&gt;&lt;td&gt;166&lt;/td&gt;&lt;td&gt;0.200&lt;/td&gt;&lt;td&gt;46&lt;/td&gt;&lt;td&gt;K0RET&lt;/td&gt;&lt;td&gt;True&lt;/td&gt;&lt;td&gt;normal&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Tx/capture02/tx2-voice.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx3&lt;/td&gt;&lt;td&gt;2353&lt;/td&gt;&lt;td&gt;746&lt;/td&gt;&lt;td&gt;3.16&lt;/td&gt;&lt;td&gt;5.8&lt;/td&gt;&lt;td&gt;-0.1&lt;/td&gt;&lt;td&gt;167&lt;/td&gt;&lt;td&gt;0.200&lt;/td&gt;&lt;td&gt;47&lt;/td&gt;&lt;td&gt;K0RET&lt;/td&gt;&lt;td&gt;True&lt;/td&gt;&lt;td&gt;normal&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Tx/capture02/tx3-voice.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx4&lt;/td&gt;&lt;td&gt;2351&lt;/td&gt;&lt;td&gt;766&lt;/td&gt;&lt;td&gt;3.07&lt;/td&gt;&lt;td&gt;4.4&lt;/td&gt;&lt;td&gt;0.1&lt;/td&gt;&lt;td&gt;179&lt;/td&gt;&lt;td&gt;0.200&lt;/td&gt;&lt;td&gt;48&lt;/td&gt;&lt;td&gt;K0RET&lt;/td&gt;&lt;td&gt;True&lt;/td&gt;&lt;td&gt;normal&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Tx/capture02/tx4-voice.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx5&lt;/td&gt;&lt;td&gt;2351&lt;/td&gt;&lt;td&gt;744&lt;/td&gt;&lt;td&gt;3.16&lt;/td&gt;&lt;td&gt;5.8&lt;/td&gt;&lt;td&gt;-0.0&lt;/td&gt;&lt;td&gt;167&lt;/td&gt;&lt;td&gt;0.200&lt;/td&gt;&lt;td&gt;46&lt;/td&gt;&lt;td&gt;K0RET&lt;/td&gt;&lt;td&gt;True&lt;/td&gt;&lt;td&gt;normal&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Tx/capture02/tx5-voice.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx6&lt;/td&gt;&lt;td&gt;2352&lt;/td&gt;&lt;td&gt;746&lt;/td&gt;&lt;td&gt;3.15&lt;/td&gt;&lt;td&gt;5.8&lt;/td&gt;&lt;td&gt;-0.0&lt;/td&gt;&lt;td&gt;168&lt;/td&gt;&lt;td&gt;0.200&lt;/td&gt;&lt;td&gt;46&lt;/td&gt;&lt;td&gt;K0RET&lt;/td&gt;&lt;td&gt;True&lt;/td&gt;&lt;td&gt;normal&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Tx/capture02/tx6-voice.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx7&lt;/td&gt;&lt;td&gt;2352&lt;/td&gt;&lt;td&gt;766&lt;/td&gt;&lt;td&gt;3.07&lt;/td&gt;&lt;td&gt;4.5&lt;/td&gt;&lt;td&gt;0.0&lt;/td&gt;&lt;td&gt;179&lt;/td&gt;&lt;td&gt;0.200&lt;/td&gt;&lt;td&gt;48&lt;/td&gt;&lt;td&gt;K0RET&lt;/td&gt;&lt;td&gt;True&lt;/td&gt;&lt;td&gt;normal&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Tx/capture02/tx7-voice.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx8&lt;/td&gt;&lt;td&gt;2351&lt;/td&gt;&lt;td&gt;763&lt;/td&gt;&lt;td&gt;3.08&lt;/td&gt;&lt;td&gt;4.6&lt;/td&gt;&lt;td&gt;0.0&lt;/td&gt;&lt;td&gt;176&lt;/td&gt;&lt;td&gt;0.200&lt;/td&gt;&lt;td&gt;48&lt;/td&gt;&lt;td&gt;K0RET&lt;/td&gt;&lt;td&gt;True&lt;/td&gt;&lt;td&gt;normal&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Tx/capture02/tx8-voice.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx9&lt;/td&gt;&lt;td&gt;2353&lt;/td&gt;&lt;td&gt;766&lt;/td&gt;&lt;td&gt;3.07&lt;/td&gt;&lt;td&gt;4.6&lt;/td&gt;&lt;td&gt;0.1&lt;/td&gt;&lt;td&gt;177&lt;/td&gt;&lt;td&gt;0.200&lt;/td&gt;&lt;td&gt;47&lt;/td&gt;&lt;td&gt;K0RET&lt;/td&gt;&lt;td&gt;True&lt;/td&gt;&lt;td&gt;normal&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Tx/capture02/tx9-voice.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx10&lt;/td&gt;&lt;td&gt;2353&lt;/td&gt;&lt;td&gt;746&lt;/td&gt;&lt;td&gt;3.15&lt;/td&gt;&lt;td&gt;5.7&lt;/td&gt;&lt;td&gt;-0.1&lt;/td&gt;&lt;td&gt;166&lt;/td&gt;&lt;td&gt;0.200&lt;/td&gt;&lt;td&gt;48&lt;/td&gt;&lt;td&gt;K0RET&lt;/td&gt;&lt;td&gt;True&lt;/td&gt;&lt;td&gt;normal&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Tx/capture02/tx10-voice.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-11-19T22:45:04.519567" level="INFO">${tx} = [{'start_s': 1.006032, 'duration_s': 2.210704, 'carrier_offset_hz': 250170.5910659266, 'outer_deviation_hz': 2353.75378082384, 'inner_deviation_hz': 750.7043753693803, 'deviation_ratio': 3.13539371562...</msg>
+<var>${tx}</var>
+<arg>expected=${count}</arg>
+<doc>End a capture from Start Capture and measure its M17 transmissions.</doc>
+<status status="PASS" start="2026-11-19T22:45:01.311865" elapsed="3.207716"/>
+</kw>
+<status status="PASS" start="2026-11-19T22:44:19.622825" elapsed="44.896797"/>
+</branch>
+<branch type="ELSE">
+<kw name="Keyed Instruction" owner="keyed">
+<var>${instruction}</var>
+<arg>${seconds}</arg>
+<arg>${count}</arg>
+<doc>The operator's instruction for 10 key-ups of 2 s.</doc>
+<status status="NOT RUN" start="2026-11-19T22:45:04.519844" elapsed="0.000011"/>
+</kw>
+<kw name="Capture Radio M17 Transmissions" owner="oat.robot_library.OpenRTXAcceptance">
+<var>${tx}</var>
+<arg>${instruction}</arg>
+<arg>expected=${count}</arg>
+<doc>Record while the operator follows the instruction, then measure and
+decode each M17 transmission (oat.m17.phy). Fails unless exactly
+`expected` are found. Each one's demodulated baseband is saved as a
+48 kHz WAV, and its voice, through c2dec when Codec2 is installed.</doc>
+<status status="NOT RUN" start="2026-11-19T22:45:04.519903" elapsed="0.000006"/>
+</kw>
+<status status="NOT RUN" start="2026-11-19T22:45:04.519642" elapsed="0.000277"/>
+</branch>
+<status status="PASS" start="2026-11-19T22:44:19.622817" elapsed="44.897142"/>
+</if>
+<return>
+<value>${tx}</value>
+<status status="PASS" start="2026-11-19T22:45:04.519973" elapsed="0.000024"/>
+</return>
+<msg time="2026-11-19T22:45:04.520099" level="INFO">${tx} = [{'start_s': 1.006032, 'duration_s': 2.210704, 'carrier_offset_hz': 250170.5910659266, 'outer_deviation_hz': 2353.75378082384, 'inner_deviation_hz': 750.7043753693803, 'deviation_ratio': 3.13539371562...</msg>
+<var>${tx}</var>
+<arg>2</arg>
+<arg>${DECODE_RUNS}</arg>
+<doc>${count} M17 transmissions of ${seconds} s with nothing at the mic,
+in one capture. Returns their measurements, oldest first.</doc>
+<status status="PASS" start="2026-11-19T22:44:19.622610" elapsed="44.897498"/>
+</kw>
+<kw name="M17 Transmissions Should Decode" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:45:04.520245" level="INFO">Set test message to:
+10/10 M17 transmissions decode</msg>
+<arg>${tx}</arg>
+<arg>${CALLSIGN}</arg>
+<doc>Check that every M17 transmission decodes: an LSF that passes its
+CRC, from `source` when given, stream frames numbered in sequence
+with the last one flagged, and an EOT. Reports the decode rate.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.520144" elapsed="0.000114"/>
+</kw>
+<for flavor="IN">
+<iter>
+<kw name="M17 Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${m}</arg>
+<arg>polarity</arg>
+<doc>Check an M17 transmission against the radio file's m17 limits.
+`checks` names some of deviation, ratio, symbol_rate, frequency,
+evm, bandwidth, preamble and polarity, comma-separated, or all.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.520350" elapsed="0.000055"/>
+</kw>
+<var name="${m}">{'start_s': 1.006032, 'duration_s': 2.210704, 'carrier_offset_hz': 250170.5910659266, 'outer_deviation_hz': 2353.75378082384, 'inner_deviation_hz': 750.7043753693803, 'deviation_ratio': 3.135393715622...</var>
+<status status="PASS" start="2026-11-19T22:45:04.520328" elapsed="0.000087"/>
+</iter>
+<iter>
+<kw name="M17 Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${m}</arg>
+<arg>polarity</arg>
+<doc>Check an M17 transmission against the radio file's m17 limits.
+`checks` names some of deviation, ratio, symbol_rate, frequency,
+evm, bandwidth, preamble and polarity, comma-separated, or all.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.520460" elapsed="0.000046"/>
+</kw>
+<var name="${m}">{'start_s': 5.108984, 'duration_s': 2.187732, 'carrier_offset_hz': 250166.4493353611, 'outer_deviation_hz': 2352.989947454689, 'inner_deviation_hz': 746.9712166183319, 'deviation_ratio': 3.15004098565...</var>
+<status status="PASS" start="2026-11-19T22:45:04.520442" elapsed="0.000073"/>
+</iter>
+<iter>
+<kw name="M17 Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${m}</arg>
+<arg>polarity</arg>
+<doc>Check an M17 transmission against the radio file's m17 limits.
+`checks` names some of deviation, ratio, symbol_rate, frequency,
+evm, bandwidth, preamble and polarity, comma-separated, or all.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.520555" elapsed="0.000041"/>
+</kw>
+<var name="${m}">{'start_s': 9.15696, 'duration_s': 2.21974, 'carrier_offset_hz': 250167.0218160031, 'outer_deviation_hz': 2352.671337599032, 'inner_deviation_hz': 745.5082689528685, 'deviation_ratio': 3.1557950938673...</var>
+<status status="PASS" start="2026-11-19T22:45:04.520538" elapsed="0.000068"/>
+</iter>
+<iter>
+<kw name="M17 Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${m}</arg>
+<arg>polarity</arg>
+<doc>Check an M17 transmission against the radio file's m17 limits.
+`checks` names some of deviation, ratio, symbol_rate, frequency,
+evm, bandwidth, preamble and polarity, comma-separated, or all.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.520648" elapsed="0.000039"/>
+</kw>
+<var name="${m}">{'start_s': 13.20584, 'duration_s': 2.25084, 'carrier_offset_hz': 250179.0843872014, 'outer_deviation_hz': 2351.137168791445, 'inner_deviation_hz': 766.019068322393, 'deviation_ratio': 3.0692932669946...</var>
+<status status="PASS" start="2026-11-19T22:45:04.520632" elapsed="0.000063"/>
+</iter>
+<iter>
+<kw name="M17 Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${m}</arg>
+<arg>polarity</arg>
+<doc>Check an M17 transmission against the radio file's m17 limits.
+`checks` names some of deviation, ratio, symbol_rate, frequency,
+evm, bandwidth, preamble and polarity, comma-separated, or all.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.520734" elapsed="0.000039"/>
+</kw>
+<var name="${m}">{'start_s': 17.285932, 'duration_s': 2.190724, 'carrier_offset_hz': 250167.05330217024, 'outer_deviation_hz': 2350.942546687843, 'inner_deviation_hz': 744.0927568351038, 'deviation_ratio': 3.159475112...</var>
+<status status="PASS" start="2026-11-19T22:45:04.520718" elapsed="0.000062"/>
+</iter>
+<iter>
+<kw name="M17 Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${m}</arg>
+<arg>polarity</arg>
+<doc>Check an M17 transmission against the radio file's m17 limits.
+`checks` names some of deviation, ratio, symbol_rate, frequency,
+evm, bandwidth, preamble and polarity, comma-separated, or all.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.520821" elapsed="0.000038"/>
+</kw>
+<var name="${m}">{'start_s': 21.3369, 'duration_s': 2.18774, 'carrier_offset_hz': 250167.90595484021, 'outer_deviation_hz': 2352.155611550139, 'inner_deviation_hz': 746.1567111790775, 'deviation_ratio': 3.152361395816...</var>
+<status status="PASS" start="2026-11-19T22:45:04.520804" elapsed="0.000064"/>
+</iter>
+<iter>
+<kw name="M17 Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${m}</arg>
+<arg>polarity</arg>
+<doc>Check an M17 transmission against the radio file's m17 limits.
+`checks` names some of deviation, ratio, symbol_rate, frequency,
+evm, bandwidth, preamble and polarity, comma-separated, or all.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.520908" elapsed="0.000036"/>
+</kw>
+<var name="${m}">{'start_s': 25.384892, 'duration_s': 2.251728, 'carrier_offset_hz': 250178.58040384995, 'outer_deviation_hz': 2351.53100540685, 'inner_deviation_hz': 765.9638252657329, 'deviation_ratio': 3.0700288027...</var>
+<status status="PASS" start="2026-11-19T22:45:04.520893" elapsed="0.000060"/>
+</iter>
+<iter>
+<kw name="M17 Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${m}</arg>
+<arg>polarity</arg>
+<doc>Check an M17 transmission against the radio file's m17 limits.
+`checks` names some of deviation, ratio, symbol_rate, frequency,
+evm, bandwidth, preamble and polarity, comma-separated, or all.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.520990" elapsed="0.000033"/>
+</kw>
+<var name="${m}">{'start_s': 29.432872, 'duration_s': 2.251728, 'carrier_offset_hz': 250176.31082147243, 'outer_deviation_hz': 2351.216724072984, 'inner_deviation_hz': 763.1158300856788, 'deviation_ratio': 3.081074499...</var>
+<status status="PASS" start="2026-11-19T22:45:04.520974" elapsed="0.000056"/>
+</iter>
+<iter>
+<kw name="M17 Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${m}</arg>
+<arg>polarity</arg>
+<doc>Check an M17 transmission against the radio file's m17 limits.
+`checks` names some of deviation, ratio, symbol_rate, frequency,
+evm, bandwidth, preamble and polarity, comma-separated, or all.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.521068" elapsed="0.000037"/>
+</kw>
+<var name="${m}">{'start_s': 33.51388, 'duration_s': 2.1907, 'carrier_offset_hz': 250177.29737996045, 'outer_deviation_hz': 2352.9692698040726, 'inner_deviation_hz': 766.2941360316382, 'deviation_ratio': 3.07058237713...</var>
+<status status="PASS" start="2026-11-19T22:45:04.521052" elapsed="0.000062"/>
+</iter>
+<iter>
+<kw name="M17 Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${m}</arg>
+<arg>polarity</arg>
+<doc>Check an M17 transmission against the radio file's m17 limits.
+`checks` names some of deviation, ratio, symbol_rate, frequency,
+evm, bandwidth, preamble and polarity, comma-separated, or all.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.521150" elapsed="0.000035"/>
+</kw>
+<var name="${m}">{'start_s': 37.596864, 'duration_s': 2.279696, 'carrier_offset_hz': 250166.29190220794, 'outer_deviation_hz': 2352.9079198027594, 'inner_deviation_hz': 745.9488037103089, 'deviation_ratio': 3.15424853...</var>
+<status status="PASS" start="2026-11-19T22:45:04.521135" elapsed="0.000072"/>
+</iter>
+<var>${m}</var>
+<value>@{tx}</value>
+<status status="PASS" start="2026-11-19T22:45:04.520281" elapsed="0.000933"/>
+</for>
+<doc>M17-TX-5: 10 key-ups, each with an LSF that passes its
+CRC and names K0RET, stream frames in sequence, an EOT, and
+the right polarity.</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-11-19T22:44:18.769154" elapsed="45.752096">10/10 M17 transmissions decode</status>
+</test>
+<test id="s1-t5" name="70cm: M17 TX Preamble And First LSF" line="105">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-19T22:45:04.521672" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-19T22:45:04.521755" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.521543" elapsed="0.000223"/>
+</kw>
+<kw name="Recall Result" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:45:04.521834" level="INFO">${tx} = {'start_s': 1.027564, 'duration_s': 5.253724, 'carrier_offset_hz': 250182.66321724033, 'outer_deviation_hz': 2356.673709870979, 'inner_deviation_hz': 778.4082018768952, 'deviation_ratio': 3.0275550850...</msg>
+<var>${tx}</var>
+<arg>m17 take</arg>
+<doc>A result remembered earlier on the current band, or None.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.521795" elapsed="0.000046"/>
+</kw>
+<kw name="Skip If" owner="BuiltIn">
+<arg>$tx is None</arg>
+<arg>Needs the M17 take of the deviation test on this band</arg>
+<doc>Conditionally stops the current test or task and sets its status to SKIP.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.521867" elapsed="0.000188"/>
+</kw>
+<kw name="M17 Transmission Should Meet Limits" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${tx}</arg>
+<arg>preamble</arg>
+<doc>Check an M17 transmission against the radio file's m17 limits.
+`checks` names some of deviation, ratio, symbol_rate, frequency,
+evm, bandwidth, preamble and polarity, comma-separated, or all.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.522082" elapsed="0.000044"/>
+</kw>
+<kw name="Set Test Message" owner="BuiltIn">
+<msg time="2026-11-19T22:45:04.522223" level="INFO">Set test message to:
+preamble 0.19979166666666667 s, LSF 0.2307585129973708 s after key-up</msg>
+<arg>preamble ${tx}[preamble_s] s, LSF ${tx}[lsf_latency_s] s after key-up</arg>
+<doc>Sets message of the current test case.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.522156" elapsed="0.000077"/>
+</kw>
+<doc>M17-TX-6: the preamble (40 ms or more; OpenRTX sends 80 ms, 160 ms
+after master's dccf32f85) and the time from key-up to the LSF.</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-11-19T22:45:04.521355" elapsed="0.000900">preamble 0.19979166666666667 s, LSF 0.2307585129973708 s after key-up</status>
+</test>
+<test id="s1-t6" name="70cm: M17 TX Holds A Long Transmission" line="113">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-19T22:45:04.522521" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-19T22:45:04.522592" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.522429" elapsed="0.000173"/>
+</kw>
+<kw name="Set Up M17">
+<kw name="Bench Has Radio Console" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:45:04.522760" level="INFO">${console} = True</msg>
+<var>${console}</var>
+<doc>Whether the radio takes commands on its trace port (the bench file's
+trace section has console: true): then the bench sets the radio up
+and keys it itself.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.522732" elapsed="0.000034"/>
+</kw>
+<if>
+<branch type="IF" condition="${console}">
+<kw name="Set Up Radio Over Console" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:45:04.595805" level="INFO">MODE M17 -&gt; MODE 163062 M17</msg>
+<msg time="2026-11-19T22:45:04.667540" level="INFO">FREQ 445925000 445925000 -&gt; FREQ 163112 445925000 445925000</msg>
+<msg time="2026-11-19T22:45:04.689537" level="INFO">CALL K0RET -&gt; CALL 163165 K0RET</msg>
+<msg time="2026-11-19T22:45:04.714671" level="INFO">POWER 2500 -&gt; POWER 163193 2500</msg>
+<msg time="2026-11-19T22:45:04.764803" level="INFO">STAT -&gt; STAT 163218 M17 445925000 445925000 2500 CHIP CAL 123 86 0</msg>
+<arg>M17</arg>
+<arg>callsign=${CALLSIGN}</arg>
+<doc>Over the bench console: the mode, both frequencies on the current
+band's, the callsign when given, and the power (power_mw, else the
+RADIO_POWER_MW variable, for a unit that needs its own, else the
+radio file's console_power_mw, else left as it is).</doc>
+<status status="PASS" start="2026-11-19T22:45:04.522812" elapsed="0.242172"/>
+</kw>
+<if>
+<branch type="IF" condition="$M17_MODEM">
+<kw name="Set M17 Modem" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:45:04.786411" level="INFO">MODEM CHIP -&gt; MODEM 163271 CHIP</msg>
+<msg time="2026-11-19T22:45:05.287936" level="INFO">Set suite metadata 'M17 modem' to value 'CHIP'.</msg>
+<arg>${M17_MODEM}</arg>
+<doc>The M17 modem setting over the bench console, ANALOG or CHIP (the
+HR_C6000's), recorded in the run's metadata.</doc>
+<status status="PASS" start="2026-11-19T22:45:04.765242" elapsed="0.522792"/>
+</kw>
+<status status="PASS" start="2026-11-19T22:45:04.765078" elapsed="0.522990"/>
+</branch>
+<status status="PASS" start="2026-11-19T22:45:04.765058" elapsed="0.523029"/>
+</if>
+<status status="PASS" start="2026-11-19T22:45:04.522785" elapsed="0.765313"/>
+</branch>
+<branch type="ELSE">
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the radio to M17, ${FREQUENCY_MHZ} MHz, callsign ${CALLSIGN}, destination @ALL or empty, low power, no encryption</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-19T22:45:05.288187" elapsed="0.000012"/>
+</kw>
+<status status="NOT RUN" start="2026-11-19T22:45:05.288108" elapsed="0.000106"/>
+</branch>
+<status status="PASS" start="2026-11-19T22:45:04.522779" elapsed="0.765444"/>
+</if>
+<status status="PASS" start="2026-11-19T22:45:04.522666" elapsed="0.765585"/>
+</kw>
+<kw name="Capture Keyed M17 Transmissions" owner="keyed">
+<kw name="Bench Keys The Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:45:05.288959" level="INFO">${keys} = True</msg>
+<var>${keys}</var>
+<doc>Whether Key Radio keys the radio itself, through the audio
+interface's PTT line (or the simulated interface), rather than by
+asking the operator.</doc>
+<status status="PASS" start="2026-11-19T22:45:05.288888" elapsed="0.000084"/>
+</kw>
+<if>
+<branch type="IF" condition="${keys}">
+<kw name="Start Capture" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Start recording on the test frequency, for a capture that keywords
+rather than the operator time: Stop Capture And Measure FM or M17
+ends it.</doc>
+<status status="PASS" start="2026-11-19T22:45:05.289055" elapsed="0.006691"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>1</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:45:05.296080" elapsed="1.004570"/>
+</kw>
+<for flavor="IN RANGE">
+<iter>
+<kw name="Key Up" owner="keyed">
+<kw name="Key Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Key the radio: through the audio interface's PTT line when the bench
+has one, otherwise by asking the operator to hold PTT.</doc>
+<status status="PASS" start="2026-11-19T22:45:06.303391" elapsed="0.020878"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${seconds}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:45:06.324557" elapsed="22.001638"/>
+</kw>
+<kw name="Release Radio" owner="oat.robot_library.OpenRTXAcceptance">
+<doc>Release PTT, as Key Radio keyed it.</doc>
+<status status="PASS" start="2026-11-19T22:45:28.326502" elapsed="0.048121"/>
+</kw>
+<kw name="Wait Seconds" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${gap}</arg>
+<doc>Let time pass on the bench (at once on the simulated one).</doc>
+<status status="PASS" start="2026-11-19T22:45:28.374945" elapsed="2.004797"/>
+</kw>
+<arg>${seconds}</arg>
+<doc>Key the radio for 22 s through Key Radio, then wait
+${gap} s so the next transmission is a separate one.</doc>
+<status status="PASS" start="2026-11-19T22:45:06.302838" elapsed="24.077078"/>
+</kw>
+<var name="${i}">0</var>
+<status status="PASS" start="2026-11-19T22:45:06.301776" elapsed="24.078199"/>
+</iter>
+<var>${i}</var>
+<value>${count}</value>
+<status status="PASS" start="2026-11-19T22:45:06.300816" elapsed="24.079221"/>
+</for>
+<kw name="Stop Capture And Measure M17" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:45:32.810142" level="INFO" html="true">&lt;b&gt;capture03&lt;/b&gt;&lt;table border=1&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;&lt;th&gt;outer Hz&lt;/th&gt;&lt;th&gt;inner Hz&lt;/th&gt;&lt;th&gt;ratio&lt;/th&gt;&lt;th&gt;EVM %&lt;/th&gt;&lt;th&gt;symbols ppm&lt;/th&gt;&lt;th&gt;freq error Hz&lt;/th&gt;&lt;th&gt;preamble s&lt;/th&gt;&lt;th&gt;frames&lt;/th&gt;&lt;th&gt;source&lt;/th&gt;&lt;th&gt;LSF CRC&lt;/th&gt;&lt;th&gt;polarity&lt;/th&gt;&lt;th&gt;voice&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;tx1&lt;/td&gt;&lt;td&gt;2352&lt;/td&gt;&lt;td&gt;782&lt;/td&gt;&lt;td&gt;3.01&lt;/td&gt;&lt;td&gt;3.2&lt;/td&gt;&lt;td&gt;0.1&lt;/td&gt;&lt;td&gt;185&lt;/td&gt;&lt;td&gt;0.200&lt;/td&gt;&lt;td&gt;548&lt;/td&gt;&lt;td&gt;K0RET&lt;/td&gt;&lt;td&gt;True&lt;/td&gt;&lt;td&gt;normal&lt;/td&gt;&lt;td&gt;&lt;audio controls src="bench-Tx/capture03/tx1-voice.wav"&gt;&lt;/audio&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</msg>
+<msg time="2026-11-19T22:45:32.810362" level="INFO">${tx} = [{'start_s': 1.026128, 'duration_s': 22.246656, 'carrier_offset_hz': 250185.1324341416, 'outer_deviation_hz': 2352.1037576472927, 'inner_deviation_hz': 782.3871454502, 'deviation_ratio': 3.00631697660...</msg>
+<var>${tx}</var>
+<arg>expected=${count}</arg>
+<doc>End a capture from Start Capture and measure its M17 transmissions.</doc>
+<status status="PASS" start="2026-11-19T22:45:30.380247" elapsed="2.430128"/>
+</kw>
+<status status="PASS" start="2026-11-19T22:45:05.289007" elapsed="27.521413"/>
+</branch>
+<branch type="ELSE">
+<kw name="Keyed Instruction" owner="keyed">
+<var>${instruction}</var>
+<arg>${seconds}</arg>
+<arg>${count}</arg>
+<doc>The operator's instruction for 1 key-ups of 22 s.</doc>
+<status status="NOT RUN" start="2026-11-19T22:45:32.810646" elapsed="0.000011"/>
+</kw>
+<kw name="Capture Radio M17 Transmissions" owner="oat.robot_library.OpenRTXAcceptance">
+<var>${tx}</var>
+<arg>${instruction}</arg>
+<arg>expected=${count}</arg>
+<doc>Record while the operator follows the instruction, then measure and
+decode each M17 transmission (oat.m17.phy). Fails unless exactly
+`expected` are found. Each one's demodulated baseband is saved as a
+48 kHz WAV, and its voice, through c2dec when Codec2 is installed.</doc>
+<status status="NOT RUN" start="2026-11-19T22:45:32.810713" elapsed="0.000005"/>
+</kw>
+<status status="NOT RUN" start="2026-11-19T22:45:32.810443" elapsed="0.000286"/>
+</branch>
+<status status="PASS" start="2026-11-19T22:45:05.288997" elapsed="27.521740"/>
+</if>
+<return>
+<value>${tx}</value>
+<status status="PASS" start="2026-11-19T22:45:32.810751" elapsed="0.000025"/>
+</return>
+<msg time="2026-11-19T22:45:32.810833" level="INFO">${tx} = [{'start_s': 1.026128, 'duration_s': 22.246656, 'carrier_offset_hz': 250185.1324341416, 'outer_deviation_hz': 2352.1037576472927, 'inner_deviation_hz': 782.3871454502, 'deviation_ratio': 3.00631697660...</msg>
+<var>${tx}</var>
+<arg>${{${LONG_S} + 2}}</arg>
+<doc>${count} M17 transmissions of ${seconds} s with nothing at the mic,
+in one capture. Returns their measurements, oldest first.</doc>
+<status status="PASS" start="2026-11-19T22:45:05.288647" elapsed="27.522194"/>
+</kw>
+<kw name="M17 Transmissions Should Decode" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:45:32.810966" level="INFO">Set test message to:
+1/1 M17 transmissions decode</msg>
+<arg>${tx}</arg>
+<arg>${CALLSIGN}</arg>
+<doc>Check that every M17 transmission decodes: an LSF that passes its
+CRC, from `source` when given, stream frames numbered in sequence
+with the last one flagged, and an EOT. Reports the decode rate.</doc>
+<status status="PASS" start="2026-11-19T22:45:32.810873" elapsed="0.000106"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${tx}[0][stream_frames] &gt;= ${LONG_S} / 0.04</arg>
+<arg>Only ${tx}[0][stream_frames] frames in ${LONG_S} s</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="PASS" start="2026-11-19T22:45:32.811022" elapsed="0.000223"/>
+</kw>
+<doc>M17-TX-7: 20 s keyed without a reset: one transmission whose
+frames run in sequence to the end.</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>per-band</tag>
+<tag>tx</tag>
+<status status="PASS" start="2026-11-19T22:45:04.522316" elapsed="28.288971">1/1 M17 transmissions decode</status>
+</test>
+<test id="s1-t7" name="70cm: M17 TX Power Rises With Each Setting" line="122">
+<kw name="Use Band" owner="oat.robot_library.OpenRTXAcceptance" type="SETUP">
+<msg time="2026-11-19T22:45:32.811717" level="INFO">${BAND} = 70cm</msg>
+<msg time="2026-11-19T22:45:32.811800" level="INFO">${FREQUENCY_MHZ} = 445.925</msg>
+<arg>70cm</arg>
+<doc>Make a band from the radio file current: captures and transmissions
+use its frequency. Sets ${BAND} and ${FREQUENCY_MHZ} for the test.
+oat.expand calls it in each per-band test's setup.</doc>
+<status status="PASS" start="2026-11-19T22:45:32.811589" elapsed="0.000222"/>
+</kw>
+<kw name="Power Settings" owner="oat.robot_library.OpenRTXAcceptance">
+<msg time="2026-11-19T22:45:32.812014" level="SKIP">No power settings: list power_settings in the radio file or pass -v POWER_SETTINGS:Low,High</msg>
+<var>${settings}</var>
+<doc>The radio's TX power settings, lowest first: ${POWER_SETTINGS}
+(comma-separated, e.g. for stock firmware: Low,High) or the radio
+file's power_settings. Skips the test when neither lists any.</doc>
+<status status="SKIP" start="2026-11-19T22:45:32.811840" elapsed="0.001107">No power settings: list power_settings in the radio file or pass -v POWER_SETTINGS:Low,High</status>
+</kw>
+<kw name="Set Up M17">
+<status status="NOT RUN" start="2026-11-19T22:45:32.813026" elapsed="0.000007"/>
+</kw>
+<kw name="Operator Does" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>Set the power to ${settings}[0]</arg>
+<doc>Ask the operator to do something and wait until it's done.</doc>
+<status status="NOT RUN" start="2026-11-19T22:45:32.813057" elapsed="0.000005"/>
+</kw>
+<kw name="Capture Keyed Power Steps" owner="keyed">
+<var>${tx}</var>
+<arg>${settings}</arg>
+<arg>M17</arg>
+<doc>A 3 s transmission at each power setting in turn, in one capture,
+with the first setting already set. ${mode} is FM or M17.</doc>
+<status status="NOT RUN" start="2026-11-19T22:45:32.813225" elapsed="0.000007"/>
+</kw>
+<kw name="Tx Power Should Rise With Setting" owner="oat.robot_library.OpenRTXAcceptance">
+<arg>${settings}</arg>
+<arg>${tx}</arg>
+<doc>Check that each power setting, lowest first, transmits at least the
+radio file's power_min_step_db (default 1 dB) above the one before,
+as received through the bench: relative levels, so no power meter is
+needed. Fails if the receiver clipped, which hides the top settings.</doc>
+<status status="NOT RUN" start="2026-11-19T22:45:32.813258" elapsed="0.000005"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn" type="TEARDOWN">
+<arg>$TEST_STATUS != 'SKIP'</arg>
+<arg>Operator Does</arg>
+<arg>Set the power back to ${settings}[0]</arg>
+<doc>Runs the given keyword with the given arguments, if `condition` is true.</doc>
+<status status="PASS" start="2026-11-19T22:45:32.813351" elapsed="0.000176"/>
+</kw>
+<doc>M17-TX-7: relative levels through the bench, as for FM.</doc>
+<tag>band:70cm</tag>
+<tag>mode:m17</tag>
+<tag>per-band</tag>
+<tag>power</tag>
+<tag>tx</tag>
+<status status="SKIP" start="2026-11-19T22:45:32.811420" elapsed="0.002120">No power settings: list power_settings in the radio file or pass -v POWER_SETTINGS:Low,High</status>
+</test>
+<kw name="Close Bench" owner="oat.robot_library.OpenRTXAcceptance" type="TEARDOWN">
+<doc>Stop the instruments and write measurements.json: every capture,
+check and operator answer, with the run's provenance. Absolute paths
+are made relative, so the file can be published as it is.</doc>
+<status status="PASS" start="2026-11-19T22:45:32.813720" elapsed="0.243221"/>
+</kw>
+<doc>M17 on transmit, measured and decoded from the SDR capture
+(oat.m17): the 4FSK deviations and their ratio, symbol rate and
+carrier, bandwidth and EVM, decoding, preamble, long transmissions,
+power, and the Codec2 input through the audio interface.
+
+Limits are the radio file's m17 block: nominal values from the M17
+specification, tolerances as acceptance criteria. Decoding uses
+this library's own decoder; with m17-demod installed each capture
+is also run through it, and with Codec2 the voice is decoded to a
+WAV. Set the radio's M17 callsign to K0RET first, or pass
+-v CALLSIGN:&lt;yours&gt;.</doc>
+<meta name="Calibration">assumed, measured 2026-10-20 (d55ce4aa0a3c)</meta>
+<meta name="Firmware">c6000-bench-0066f6e2</meta>
+<meta name="Hardware">Connect Systems CS7000-PLUS</meta>
+<meta name="M17 modem">CHIP</meta>
+<meta name="Radio">Connect Systems CS7000-PLUS (cs7000p)</meta>
+<meta name="Station">k0ret</meta>
+<meta name="Suite commit">640a40ac39</meta>
+<meta name="Trace">serial</meta>
+<status status="PASS" start="2026-11-19T22:44:08.115367" elapsed="84.941688"/>
+</suite>
+<statistics>
+<total>
+<stat pass="6" fail="0" skip="1">All Tests</stat>
+</total>
+<tag>
+<stat pass="6" fail="0" skip="1">band:70cm</stat>
+<stat pass="6" fail="0" skip="1">mode:m17</stat>
+<stat pass="6" fail="0" skip="1">per-band</stat>
+<stat pass="0" fail="0" skip="1">power</stat>
+<stat pass="6" fail="0" skip="1">tx</stat>
+</tag>
+<suite>
+<stat name="Tx" id="s1" pass="6" fail="0" skip="1">Tx</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

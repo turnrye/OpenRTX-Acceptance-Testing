@@ -1,0 +1,2362 @@
+{
+  "schema": 1,
+  "suite": "Modulation",
+  "started": "2026-11-20T04:45:33+00:00",
+  "station": "k0ret",
+  "radio": "Connect Systems CS7000-PLUS",
+  "radio_file": "cs7000p",
+  "firmware": "c6000-bench-0066f6e2",
+  "hardware": "Connect Systems CS7000-PLUS",
+  "suite_commit": "640a40ac39",
+  "bands": {
+    "70cm": 445925000
+  },
+  "calibration": {
+    "method": "assumed",
+    "measured": "2026-10-20",
+    "expires": "2026-12-31",
+    "sha256": "d55ce4aa0a3c"
+  },
+  "records": [
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "radio-console-setup",
+      "state": [
+        "M17",
+        "445925000",
+        "445925000",
+        "2500",
+        "CHIP",
+        "CAL",
+        "123",
+        "86",
+        "0"
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-modem",
+      "modem": "CHIP"
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture01.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.033544,
+          "duration_s": 3.218752,
+          "carrier_offset_hz": 250271.1627309964,
+          "outer_deviation_hz": 3941.4050079621393,
+          "inner_deviation_hz": 1258.5610692972045,
+          "deviation_ratio": 3.1316756128195404,
+          "evm_percent": 21.16445299318527,
+          "symbol_rate_hz": 4800.001735029225,
+          "symbol_rate_error_ppm": 0.3614644217275753,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 24000.0,
+          "power_db": -6.441983699798584,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 271.16273099640966,
+          "baseband_file": "capture01/tx1-baseband.wav",
+          "m17_demod_sources": []
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture02.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.023204,
+          "duration_s": 3.215652,
+          "carrier_offset_hz": 250111.15794855315,
+          "outer_deviation_hz": 3797.2619291303304,
+          "inner_deviation_hz": 1187.1243458273875,
+          "deviation_ratio": 3.1987061359471665,
+          "evm_percent": 21.56426932275733,
+          "symbol_rate_hz": 4800.00122205499,
+          "symbol_rate_error_ppm": 0.2545947894727618,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 23900.0,
+          "power_db": -6.4461870193481445,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 111.15794855315471,
+          "baseband_file": "capture02/tx1-baseband.wav",
+          "m17_demod_sources": []
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture03.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.056752,
+          "duration_s": 3.17964,
+          "carrier_offset_hz": 249884.66864150862,
+          "outer_deviation_hz": 5216.735865430239,
+          "inner_deviation_hz": 1530.0344756612799,
+          "deviation_ratio": 3.4095544567226623,
+          "evm_percent": 22.5247484401557,
+          "symbol_rate_hz": 4800.001994905739,
+          "symbol_rate_error_ppm": 0.41560536212514876,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 19700.0,
+          "power_db": -6.45494270324707,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -115.33135849138489,
+          "baseband_file": "capture03/tx1-baseband.wav",
+          "m17_demod_sources": []
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture04.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.01462,
+          "duration_s": 3.239696,
+          "carrier_offset_hz": 249862.4635007588,
+          "outer_deviation_hz": 5109.452069710504,
+          "inner_deviation_hz": 1531.3704998673181,
+          "deviation_ratio": 3.336522461516138,
+          "evm_percent": 22.447368278981557,
+          "symbol_rate_hz": 4800.001838236035,
+          "symbol_rate_error_ppm": 0.3829658405951619,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 19400.0,
+          "power_db": -6.456780433654785,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -137.53649924119236,
+          "baseband_file": "capture04/tx1-baseband.wav",
+          "m17_demod_sources": []
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture05.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.046576,
+          "duration_s": 3.211672,
+          "carrier_offset_hz": 249960.44023390804,
+          "outer_deviation_hz": 4876.827513460768,
+          "inner_deviation_hz": 1497.2003539251627,
+          "deviation_ratio": 3.257297863091833,
+          "evm_percent": 22.713442733910398,
+          "symbol_rate_hz": 4800.001921308114,
+          "symbol_rate_error_ppm": 0.40027252379282174,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 19300.0,
+          "power_db": -6.459316253662109,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -39.55976609195932,
+          "baseband_file": "capture05/tx1-baseband.wav",
+          "m17_demod_sources": []
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture06.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.050904,
+          "duration_s": 3.242692,
+          "carrier_offset_hz": 250014.68912687633,
+          "outer_deviation_hz": 4663.633319802655,
+          "inner_deviation_hz": 1461.860897573181,
+          "deviation_ratio": 3.1902032043846993,
+          "evm_percent": 22.777430125622317,
+          "symbol_rate_hz": 4800.001719265131,
+          "symbol_rate_error_ppm": 0.35818023569333945,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 19200.0,
+          "power_db": -6.4616241455078125,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 14.689126876328373,
+          "baseband_file": "capture06/tx1-baseband.wav",
+          "m17_demod_sources": []
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture07.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.018784,
+          "duration_s": 3.214704,
+          "carrier_offset_hz": 250083.5955965706,
+          "outer_deviation_hz": 4605.385880100261,
+          "inner_deviation_hz": 1477.4667537453713,
+          "deviation_ratio": 3.117082579642235,
+          "evm_percent": 22.62523225226547,
+          "symbol_rate_hz": 4800.001522174537,
+          "symbol_rate_error_ppm": 0.3171196951701205,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 19300.0,
+          "power_db": -6.465635299682617,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 83.5955965706089,
+          "baseband_file": "capture07/tx1-baseband.wav",
+          "m17_demod_sources": []
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture08.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.054348,
+          "duration_s": 3.23572,
+          "carrier_offset_hz": 250013.99893414305,
+          "outer_deviation_hz": 4491.811328763711,
+          "inner_deviation_hz": 1454.107565959352,
+          "deviation_ratio": 3.089050242167074,
+          "evm_percent": 22.555052176518636,
+          "symbol_rate_hz": 4800.001301944206,
+          "symbol_rate_error_ppm": 0.2712383762037973,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 19200.0,
+          "power_db": -6.467850685119629,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 13.998934143048245,
+          "baseband_file": "capture08/tx1-baseband.wav",
+          "m17_demod_sources": []
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture09.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.039508,
+          "duration_s": 3.238728,
+          "carrier_offset_hz": 250181.09808177326,
+          "outer_deviation_hz": 2084.016459950974,
+          "inner_deviation_hz": 663.72053510759,
+          "deviation_ratio": 3.139900529992118,
+          "evm_percent": 17.03190150242483,
+          "symbol_rate_hz": 4800.00286023553,
+          "symbol_rate_error_ppm": 0.5958824020879661,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 9400.0,
+          "power_db": -6.471874237060547,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 181.0980817732634,
+          "baseband_file": "capture09/tx1-baseband.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture10.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.035152,
+          "duration_s": 3.238744,
+          "carrier_offset_hz": 250264.8637657069,
+          "outer_deviation_hz": 2332.2741681503717,
+          "inner_deviation_hz": 764.6901118759167,
+          "deviation_ratio": 3.0499598882335497,
+          "evm_percent": 17.51744134669488,
+          "symbol_rate_hz": 4800.002916840047,
+          "symbol_rate_error_ppm": 0.6076750098671369,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 9600.0,
+          "power_db": -6.478323936462402,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 264.86376570689026,
+          "baseband_file": "capture10/tx1-baseband.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture11.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.030456,
+          "duration_s": 3.214716,
+          "carrier_offset_hz": 250277.53874393858,
+          "outer_deviation_hz": 2567.3458641724774,
+          "inner_deviation_hz": 846.0659280304646,
+          "deviation_ratio": 3.034451310607598,
+          "evm_percent": 17.566431998655197,
+          "symbol_rate_hz": 4800.003364306314,
+          "symbol_rate_error_ppm": 0.7008971487643123,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 10000.0,
+          "power_db": -6.479099273681641,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 277.5387439385813,
+          "baseband_file": "capture11/tx1-baseband.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture12.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.055864,
+          "duration_s": 3.178696,
+          "carrier_offset_hz": 250326.6792221003,
+          "outer_deviation_hz": 2785.240735709467,
+          "inner_deviation_hz": 899.2126313094918,
+          "deviation_ratio": 3.0974217206595718,
+          "evm_percent": 18.11530679377337,
+          "symbol_rate_hz": 4800.003424595011,
+          "symbol_rate_error_ppm": 0.71345729391048,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 10800.0,
+          "power_db": -6.480739593505859,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 326.6792221002979,
+          "baseband_file": "capture12/tx1-baseband.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture13.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.014468,
+          "duration_s": 3.243708,
+          "carrier_offset_hz": 250321.5645995783,
+          "outer_deviation_hz": 3002.8805467290963,
+          "inner_deviation_hz": 979.4978740777854,
+          "deviation_ratio": 3.0657346240351586,
+          "evm_percent": 18.17344552261674,
+          "symbol_rate_hz": 4800.004181624615,
+          "symbol_rate_error_ppm": 0.871171794702974,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 11700.0,
+          "power_db": -6.485028266906738,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 321.56459957829793,
+          "baseband_file": "capture13/tx1-baseband.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture14.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.008228,
+          "duration_s": 3.239676,
+          "carrier_offset_hz": 250379.31480834173,
+          "outer_deviation_hz": 3229.431317018102,
+          "inner_deviation_hz": 1057.4137030177967,
+          "deviation_ratio": 3.0540849884974013,
+          "evm_percent": 18.529870317844342,
+          "symbol_rate_hz": 4800.004142224709,
+          "symbol_rate_error_ppm": 0.8629634808965392,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 12700.0,
+          "power_db": -6.48897647857666,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 379.3148083417327,
+          "baseband_file": "capture14/tx1-baseband.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture15.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.016336,
+          "duration_s": 3.215692,
+          "carrier_offset_hz": 250387.4342815806,
+          "outer_deviation_hz": 3463.542387776919,
+          "inner_deviation_hz": 1141.105097888001,
+          "deviation_ratio": 3.035252751203522,
+          "evm_percent": 18.457387238495386,
+          "symbol_rate_hz": 4800.005268453457,
+          "symbol_rate_error_ppm": 1.0975944702007467,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 14000.0,
+          "power_db": -6.490185260772705,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 387.4342815805867,
+          "baseband_file": "capture15/tx1-baseband.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture16.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.02574,
+          "duration_s": 3.243692,
+          "carrier_offset_hz": 250396.45087526235,
+          "outer_deviation_hz": 3683.2482991051183,
+          "inner_deviation_hz": 1212.8802601561836,
+          "deviation_ratio": 3.036778171845936,
+          "evm_percent": 18.564616455728324,
+          "symbol_rate_hz": 4800.005972841014,
+          "symbol_rate_error_ppm": 1.244341877981725,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 14400.0,
+          "power_db": -6.458510398864746,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 396.4508752623515,
+          "baseband_file": "capture16/tx1-baseband.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture17.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.035372,
+          "duration_s": 3.210712,
+          "carrier_offset_hz": 250187.733405341,
+          "outer_deviation_hz": 1850.2891586669566,
+          "inner_deviation_hz": 610.9429773965536,
+          "deviation_ratio": 3.028579142609512,
+          "evm_percent": 7.614505687208797,
+          "symbol_rate_hz": 4800.002834567709,
+          "symbol_rate_error_ppm": 0.5905349393930948,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.22849414308774768,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 7900.0,
+          "power_db": -6.548736572265625,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 187.7334053409868,
+          "baseband_file": "capture17/tx1-baseband.wav",
+          "voice_peak_dbfs": -33.44407806087379,
+          "voice_rms_dbfs": -57.14440746890553,
+          "voice_clipped": 0.0,
+          "voice_file": "capture17/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture18.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.048492,
+          "duration_s": 3.179676,
+          "carrier_offset_hz": 250182.7948768251,
+          "outer_deviation_hz": 2068.7213042482435,
+          "inner_deviation_hz": 667.5120634996933,
+          "deviation_ratio": 3.0991519365240565,
+          "evm_percent": 9.858368774160313,
+          "symbol_rate_hz": 4800.00243243637,
+          "symbol_rate_error_ppm": 0.5067575772343957,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.2554795526182595,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 71,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 8600.0,
+          "power_db": -6.55730676651001,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 182.79487682509352,
+          "baseband_file": "capture18/tx1-baseband.wav",
+          "voice_peak_dbfs": -34.26694846519932,
+          "voice_rms_dbfs": -57.77618993459011,
+          "voice_clipped": 0.0,
+          "voice_file": "capture18/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture19.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.026052,
+          "duration_s": 3.234756,
+          "carrier_offset_hz": 250181.82308040053,
+          "outer_deviation_hz": 2286.5549204565255,
+          "inner_deviation_hz": 738.1932380668808,
+          "deviation_ratio": 3.0975018498467497,
+          "evm_percent": 11.04663595024983,
+          "symbol_rate_hz": 4800.002633326905,
+          "symbol_rate_error_ppm": 0.5486097718332417,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.25259074326966524,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 9500.0,
+          "power_db": -6.558111190795898,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 181.82308040052885,
+          "baseband_file": "capture19/tx1-baseband.wav",
+          "voice_peak_dbfs": -34.253259116994464,
+          "voice_rms_dbfs": -58.691880229724454,
+          "voice_clipped": 0.0,
+          "voice_file": "capture19/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture20.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.018888,
+          "duration_s": 3.2117,
+          "carrier_offset_hz": 250188.34360650752,
+          "outer_deviation_hz": 2508.683092790973,
+          "inner_deviation_hz": 827.8671843853277,
+          "deviation_ratio": 3.030296574267058,
+          "evm_percent": 11.890923883684664,
+          "symbol_rate_hz": 4800.003148205162,
+          "symbol_rate_error_ppm": 0.6558760754504789,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.22956429996465613,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 9700.0,
+          "power_db": -6.553469181060791,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 188.34360650752205,
+          "baseband_file": "capture20/tx1-baseband.wav",
+          "voice_peak_dbfs": -33.3080684690386,
+          "voice_rms_dbfs": -56.478232623509854,
+          "voice_clipped": 0.0,
+          "voice_file": "capture20/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture21.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.031372,
+          "duration_s": 3.243732,
+          "carrier_offset_hz": 250187.1067932262,
+          "outer_deviation_hz": 2708.783660118638,
+          "inner_deviation_hz": 890.543690958133,
+          "deviation_ratio": 3.0417189943867515,
+          "evm_percent": 12.919689591743495,
+          "symbol_rate_hz": 4800.0036740368005,
+          "symbol_rate_error_ppm": 0.7654243334709321,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 69,
+          "frame_number_errors": 69,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 10300.0,
+          "power_db": -6.483743190765381,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 187.10679322620854,
+          "baseband_file": "capture21/tx1-baseband.wav",
+          "voice_peak_dbfs": -28.28754652467167,
+          "voice_rms_dbfs": -49.50123745087991,
+          "voice_clipped": 0.0,
+          "voice_file": "capture21/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture22.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.008816,
+          "duration_s": 3.271644,
+          "carrier_offset_hz": 250175.83333821007,
+          "outer_deviation_hz": 2930.3372573566326,
+          "inner_deviation_hz": 938.4237081475386,
+          "deviation_ratio": 3.1226163958934485,
+          "evm_percent": 13.994371527037348,
+          "symbol_rate_hz": 4800.003341943922,
+          "symbol_rate_error_ppm": 0.6962383172215425,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 11100.0,
+          "power_db": -6.480741500854492,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 175.83333821006818,
+          "baseband_file": "capture22/tx1-baseband.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture23.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.026744,
+          "duration_s": 3.239724,
+          "carrier_offset_hz": 250213.01955846592,
+          "outer_deviation_hz": 3152.9579746901018,
+          "inner_deviation_hz": 1004.495455542243,
+          "deviation_ratio": 3.138847425634279,
+          "evm_percent": 14.559187673400235,
+          "symbol_rate_hz": 4800.003852148359,
+          "symbol_rate_error_ppm": 0.8025309081727272,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 12000.0,
+          "power_db": -6.486278533935547,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 213.01955846592318,
+          "baseband_file": "capture23/tx1-baseband.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture24.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.020076,
+          "duration_s": 3.215708,
+          "carrier_offset_hz": 250186.11807897664,
+          "outer_deviation_hz": 3377.4653224251724,
+          "inner_deviation_hz": 1098.5569519541596,
+          "deviation_ratio": 3.0744562823230916,
+          "evm_percent": 14.897773833062812,
+          "symbol_rate_hz": 4800.004954680687,
+          "symbol_rate_error_ppm": 1.0322251431382767,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "",
+          "destination": "",
+          "lsf_type": -1,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "last_frame_flagged": false,
+          "lich_lsf_ok": false,
+          "eot_found": false,
+          "occupied_bandwidth_hz": 12900.0,
+          "power_db": -6.494268417358398,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 186.11807897663675,
+          "baseband_file": "capture24/tx1-baseband.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture25.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.035724,
+          "duration_s": 3.210732,
+          "carrier_offset_hz": 250190.69832663302,
+          "outer_deviation_hz": 1729.8533000617147,
+          "inner_deviation_hz": 560.9341672965922,
+          "deviation_ratio": 3.083879358604055,
+          "evm_percent": 6.008070289267125,
+          "symbol_rate_hz": 4799.999356276571,
+          "symbol_rate_error_ppm": -0.13410904764477038,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.22863086437439312,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 7400.0,
+          "power_db": -6.492518424987793,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 190.69832663302077,
+          "baseband_file": "capture25/tx1-baseband.wav",
+          "voice_peak_dbfs": -33.01851200166614,
+          "voice_rms_dbfs": -56.83632749804279,
+          "voice_clipped": 0.0,
+          "voice_file": "capture25/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture26.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.022432,
+          "duration_s": 3.238736,
+          "carrier_offset_hz": 250184.82410241003,
+          "outer_deviation_hz": 1917.2444660134702,
+          "inner_deviation_hz": 614.5109451098244,
+          "deviation_ratio": 3.119951696988608,
+          "evm_percent": 5.279905714992512,
+          "symbol_rate_hz": 4799.9999938221945,
+          "symbol_rate_error_ppm": -0.0012870428056643846,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.2566654779304733,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 8000.0,
+          "power_db": -6.5052900314331055,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 184.824102410028,
+          "baseband_file": "capture26/tx1-baseband.wav",
+          "voice_peak_dbfs": -32.78437681100114,
+          "voice_rms_dbfs": -57.82260320406597,
+          "voice_clipped": 0.0,
+          "voice_file": "capture26/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture27.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.031636,
+          "duration_s": 3.238748,
+          "carrier_offset_hz": 250183.11851409802,
+          "outer_deviation_hz": 2112.0383889107775,
+          "inner_deviation_hz": 681.7354033414526,
+          "deviation_ratio": 3.0980324309972005,
+          "evm_percent": 5.088537329000136,
+          "symbol_rate_hz": 4800.000609309347,
+          "symbol_rate_error_ppm": 0.1269394473979446,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.2567252453164451,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 8700.0,
+          "power_db": -6.514266014099121,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 183.1185140980233,
+          "baseband_file": "capture27/tx1-baseband.wav",
+          "voice_peak_dbfs": -33.70979970400126,
+          "voice_rms_dbfs": -57.75737066803127,
+          "voice_clipped": 0.0,
+          "voice_file": "capture27/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture28.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.017852,
+          "duration_s": 3.239652,
+          "carrier_offset_hz": 250181.96481663868,
+          "outer_deviation_hz": 2315.6149927477236,
+          "inner_deviation_hz": 750.3259625010896,
+          "deviation_ratio": 3.0861453667803223,
+          "evm_percent": 5.816795153994865,
+          "symbol_rate_hz": 4800.00136690123,
+          "symbol_rate_error_ppm": 0.2847710895981237,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.2576311175770853,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 9400.0,
+          "power_db": -6.515445709228516,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 181.96481663867598,
+          "baseband_file": "capture28/tx1-baseband.wav",
+          "voice_peak_dbfs": -33.800211267477515,
+          "voice_rms_dbfs": -58.037753865620274,
+          "voice_clipped": 0.0,
+          "voice_file": "capture28/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture29.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.009296,
+          "duration_s": 3.211672,
+          "carrier_offset_hz": 250190.81667845018,
+          "outer_deviation_hz": 2499.5272219681415,
+          "inner_deviation_hz": 827.2023484872325,
+          "deviation_ratio": 3.0216635948135497,
+          "evm_percent": 6.049656453976076,
+          "symbol_rate_hz": 4800.00161406122,
+          "symbol_rate_error_ppm": 0.3362627540859364,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.2296821772207894,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 9600.0,
+          "power_db": -6.495110511779785,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 190.81667845018092,
+          "baseband_file": "capture29/tx1-baseband.wav",
+          "voice_peak_dbfs": -33.93102533095379,
+          "voice_rms_dbfs": -57.03934706429539,
+          "voice_clipped": 0.0,
+          "voice_file": "capture29/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture30.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.019916,
+          "duration_s": 3.23974,
+          "carrier_offset_hz": 250183.07175353047,
+          "outer_deviation_hz": 2710.939370196077,
+          "inner_deviation_hz": 879.7247465422931,
+          "deviation_ratio": 3.0815768009837923,
+          "evm_percent": 7.796307524453972,
+          "symbol_rate_hz": 4800.002872632452,
+          "symbol_rate_error_ppm": 0.5984650941481817,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.255780564462316,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 10000.0,
+          "power_db": -6.512202739715576,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 183.07175353047205,
+          "baseband_file": "capture30/tx1-baseband.wav",
+          "voice_peak_dbfs": -29.140213133693873,
+          "voice_rms_dbfs": -50.33290499274935,
+          "voice_clipped": 0.0,
+          "voice_file": "capture30/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture31.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.037376,
+          "duration_s": 3.179732,
+          "carrier_offset_hz": 250181.73466662515,
+          "outer_deviation_hz": 2923.019564424473,
+          "inner_deviation_hz": 947.7892840106945,
+          "deviation_ratio": 3.084039473473822,
+          "evm_percent": 8.863958193149502,
+          "symbol_rate_hz": 4800.003266204198,
+          "symbol_rate_error_ppm": 0.6804592078690774,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.2557863964669594,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 71,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 10800.0,
+          "power_db": -6.5085835456848145,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 181.7346666251542,
+          "baseband_file": "capture31/tx1-baseband.wav",
+          "voice_peak_dbfs": -28.819719243742156,
+          "voice_rms_dbfs": -55.86809850498281,
+          "voice_clipped": 0.0,
+          "voice_file": "capture31/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture32.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.030256,
+          "duration_s": 3.235732,
+          "carrier_offset_hz": 250182.33659421233,
+          "outer_deviation_hz": 3136.974371525269,
+          "inner_deviation_hz": 1019.1804920639863,
+          "deviation_ratio": 3.077938006027222,
+          "evm_percent": 9.82839305205656,
+          "symbol_rate_hz": 4800.0035469307,
+          "symbol_rate_error_ppm": 0.7389438958504968,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.25383100233110384,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 11600.0,
+          "power_db": -6.504570960998535,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 182.3365942123346,
+          "baseband_file": "capture32/tx1-baseband.wav",
+          "voice_peak_dbfs": -31.99018938889166,
+          "voice_rms_dbfs": -56.51807067983668,
+          "voice_clipped": 0.0,
+          "voice_file": "capture32/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture33.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.022856,
+          "duration_s": 3.239684,
+          "carrier_offset_hz": 250189.4010459487,
+          "outer_deviation_hz": 1763.6775317881606,
+          "inner_deviation_hz": 540.6620553648355,
+          "deviation_ratio": 3.262070112536456,
+          "evm_percent": 16.295306211598543,
+          "symbol_rate_hz": 4799.998471801133,
+          "symbol_rate_error_ppm": -0.3183747639967649,
+          "polarity": "normal",
+          "preamble_s": 0.0,
+          "lsf_latency_s": -1.0,
+          "lsf_found": false,
+          "lsf_crc_ok": false,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 8600.0,
+          "power_db": -6.510620594024658,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 189.40104594870354,
+          "baseband_file": "capture33/tx1-baseband.wav",
+          "voice_peak_dbfs": -17.935222845131182,
+          "voice_rms_dbfs": -51.47613414196453,
+          "voice_clipped": 0.0,
+          "voice_file": "capture33/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture34.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.051852,
+          "duration_s": 3.238756,
+          "carrier_offset_hz": 250187.7820566502,
+          "outer_deviation_hz": 1902.295563372117,
+          "inner_deviation_hz": 589.3875795375016,
+          "deviation_ratio": 3.227579998996361,
+          "evm_percent": 12.33105063776203,
+          "symbol_rate_hz": 4799.998078358907,
+          "symbol_rate_error_ppm": -0.4003418943021586,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.2548293873806098,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 8700.0,
+          "power_db": -6.511034965515137,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 187.78205665020505,
+          "baseband_file": "capture34/tx1-baseband.wav",
+          "voice_peak_dbfs": -32.53391440917613,
+          "voice_rms_dbfs": -57.56254434277458,
+          "voice_clipped": 0.0,
+          "voice_file": "capture34/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture35.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.055304,
+          "duration_s": 3.234696,
+          "carrier_offset_hz": 250187.5292483005,
+          "outer_deviation_hz": 2063.627257647268,
+          "inner_deviation_hz": 649.1392360017624,
+          "deviation_ratio": 3.1790209914867407,
+          "evm_percent": 9.266257470373812,
+          "symbol_rate_hz": 4799.998314440055,
+          "symbol_rate_error_ppm": -0.3511583218651637,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.2507962240191164,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 9100.0,
+          "power_db": -6.513223171234131,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 187.52924830050324,
+          "baseband_file": "capture35/tx1-baseband.wav",
+          "voice_peak_dbfs": -31.85422446296878,
+          "voice_rms_dbfs": -57.43670607043591,
+          "voice_clipped": 0.0,
+          "voice_file": "capture35/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture36.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.045324,
+          "duration_s": 3.178712,
+          "carrier_offset_hz": 250186.63651965297,
+          "outer_deviation_hz": 2228.601580495956,
+          "inner_deviation_hz": 711.4450610832519,
+          "deviation_ratio": 3.1324998969037323,
+          "evm_percent": 7.2167439728682865,
+          "symbol_rate_hz": 4799.998875500879,
+          "symbol_rate_error_ppm": -0.2342706502123093,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.2548203732235618,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 71,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 9500.0,
+          "power_db": -6.509716987609863,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 186.63651965296594,
+          "baseband_file": "capture36/tx1-baseband.wav",
+          "voice_peak_dbfs": -30.873941805078413,
+          "voice_rms_dbfs": -55.424506177139264,
+          "voice_clipped": 0.0,
+          "voice_file": "capture36/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture37.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.009268,
+          "duration_s": 3.23472,
+          "carrier_offset_hz": 250184.38866905624,
+          "outer_deviation_hz": 2389.7064801435104,
+          "inner_deviation_hz": 767.5172126927375,
+          "deviation_ratio": 3.113554250802436,
+          "evm_percent": 5.861728529541321,
+          "symbol_rate_hz": 4799.99885254089,
+          "symbol_rate_error_ppm": -0.23905398127688215,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.25285627536948996,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 9500.0,
+          "power_db": -6.51774787902832,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 184.3886690562358,
+          "baseband_file": "capture37/tx1-baseband.wav",
+          "voice_peak_dbfs": -26.407353693462174,
+          "voice_rms_dbfs": -49.960015426682915,
+          "voice_clipped": 0.0,
+          "voice_file": "capture37/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture38.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.0146,
+          "duration_s": 3.2387,
+          "carrier_offset_hz": 250183.9158629182,
+          "outer_deviation_hz": 2576.5569608046003,
+          "inner_deviation_hz": 830.2339230350653,
+          "deviation_ratio": 3.1034108452055844,
+          "evm_percent": 5.22395175400507,
+          "symbol_rate_hz": 4800.000565125981,
+          "symbol_rate_error_ppm": 0.11773457941899323,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.2568700038169749,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 9700.0,
+          "power_db": -6.521875381469727,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 183.91586291819112,
+          "baseband_file": "capture38/tx1-baseband.wav",
+          "voice_peak_dbfs": -34.5879094179829,
+          "voice_rms_dbfs": -57.132339692597384,
+          "voice_clipped": 0.0,
+          "voice_file": "capture38/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture39.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.010492,
+          "duration_s": 3.239724,
+          "carrier_offset_hz": 250184.1764421374,
+          "outer_deviation_hz": 2769.5360101382494,
+          "inner_deviation_hz": 896.0103554741612,
+          "deviation_ratio": 3.090964287653388,
+          "evm_percent": 5.170334219452138,
+          "symbol_rate_hz": 4800.000803823826,
+          "symbol_rate_error_ppm": 0.16746329700723095,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.25792875574875596,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 10100.0,
+          "power_db": -6.513219356536865,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 184.1764421373955,
+          "baseband_file": "capture39/tx1-baseband.wav",
+          "voice_peak_dbfs": -33.44407806087379,
+          "voice_rms_dbfs": -56.699387770550764,
+          "voice_clipped": 0.0,
+          "voice_file": "capture39/tx1-voice.wav",
+          "m17_demod_sources": []
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture40.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.04802,
+          "duration_s": 3.235672,
+          "carrier_offset_hz": 250183.20533057087,
+          "outer_deviation_hz": 2968.71388110027,
+          "inner_deviation_hz": 964.5372380887817,
+          "deviation_ratio": 3.07786341871335,
+          "evm_percent": 5.47661790878502,
+          "symbol_rate_hz": 4800.00183681283,
+          "symbol_rate_error_ppm": 0.3826693395492242,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.25390279467506227,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 10900.0,
+          "power_db": -6.513129234313965,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": 183.20533057086868,
+          "baseband_file": "capture40/tx1-baseband.wav",
+          "voice_peak_dbfs": -33.198350509477976,
+          "voice_rms_dbfs": -55.45691294848687,
+          "voice_clipped": 0.0,
+          "voice_file": "capture40/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 Chip Modem Modulation Sweep",
+      "band": "70cm",
+      "kind": "m17-modulation-sweep",
+      "calibration": [
+        123,
+        86
+      ],
+      "grid": {
+        "mod1_from": 0.75,
+        "mod1_to": 1.25,
+        "mod1_steps": 8,
+        "mod2_fractions": [
+          0.0,
+          0.2,
+          0.4,
+          0.6,
+          0.8
+        ],
+        "seconds": 3.0
+      },
+      "points": [
+        {
+          "mod1": 92,
+          "mod2": 0,
+          "outer_deviation_hz": 3941.4050079621393,
+          "inner_deviation_hz": 1258.5610692972045,
+          "deviation_ratio": 3.1316756128195404,
+          "evm_percent": 21.16445299318527,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 101,
+          "mod2": 0,
+          "outer_deviation_hz": 3797.2619291303304,
+          "inner_deviation_hz": 1187.1243458273875,
+          "deviation_ratio": 3.1987061359471665,
+          "evm_percent": 21.56426932275733,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 110,
+          "mod2": 0,
+          "outer_deviation_hz": 5216.735865430239,
+          "inner_deviation_hz": 1530.0344756612799,
+          "deviation_ratio": 3.4095544567226623,
+          "evm_percent": 22.5247484401557,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 119,
+          "mod2": 0,
+          "outer_deviation_hz": 5109.452069710504,
+          "inner_deviation_hz": 1531.3704998673181,
+          "deviation_ratio": 3.336522461516138,
+          "evm_percent": 22.447368278981557,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 127,
+          "mod2": 0,
+          "outer_deviation_hz": 4876.827513460768,
+          "inner_deviation_hz": 1497.2003539251627,
+          "deviation_ratio": 3.257297863091833,
+          "evm_percent": 22.713442733910398,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 136,
+          "mod2": 0,
+          "outer_deviation_hz": 4663.633319802655,
+          "inner_deviation_hz": 1461.860897573181,
+          "deviation_ratio": 3.1902032043846993,
+          "evm_percent": 22.777430125622317,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 145,
+          "mod2": 0,
+          "outer_deviation_hz": 4605.385880100261,
+          "inner_deviation_hz": 1477.4667537453713,
+          "deviation_ratio": 3.117082579642235,
+          "evm_percent": 22.62523225226547,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 154,
+          "mod2": 0,
+          "outer_deviation_hz": 4491.811328763711,
+          "inner_deviation_hz": 1454.107565959352,
+          "deviation_ratio": 3.089050242167074,
+          "evm_percent": 22.555052176518636,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 92,
+          "mod2": 25,
+          "outer_deviation_hz": 2084.016459950974,
+          "inner_deviation_hz": 663.72053510759,
+          "deviation_ratio": 3.139900529992118,
+          "evm_percent": 17.03190150242483,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 101,
+          "mod2": 25,
+          "outer_deviation_hz": 2332.2741681503717,
+          "inner_deviation_hz": 764.6901118759167,
+          "deviation_ratio": 3.0499598882335497,
+          "evm_percent": 17.51744134669488,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 110,
+          "mod2": 25,
+          "outer_deviation_hz": 2567.3458641724774,
+          "inner_deviation_hz": 846.0659280304646,
+          "deviation_ratio": 3.034451310607598,
+          "evm_percent": 17.566431998655197,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 119,
+          "mod2": 25,
+          "outer_deviation_hz": 2785.240735709467,
+          "inner_deviation_hz": 899.2126313094918,
+          "deviation_ratio": 3.0974217206595718,
+          "evm_percent": 18.11530679377337,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 127,
+          "mod2": 25,
+          "outer_deviation_hz": 3002.8805467290963,
+          "inner_deviation_hz": 979.4978740777854,
+          "deviation_ratio": 3.0657346240351586,
+          "evm_percent": 18.17344552261674,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 136,
+          "mod2": 25,
+          "outer_deviation_hz": 3229.431317018102,
+          "inner_deviation_hz": 1057.4137030177967,
+          "deviation_ratio": 3.0540849884974013,
+          "evm_percent": 18.529870317844342,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 145,
+          "mod2": 25,
+          "outer_deviation_hz": 3463.542387776919,
+          "inner_deviation_hz": 1141.105097888001,
+          "deviation_ratio": 3.035252751203522,
+          "evm_percent": 18.457387238495386,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 154,
+          "mod2": 25,
+          "outer_deviation_hz": 3683.2482991051183,
+          "inner_deviation_hz": 1212.8802601561836,
+          "deviation_ratio": 3.036778171845936,
+          "evm_percent": 18.564616455728324,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 92,
+          "mod2": 49,
+          "outer_deviation_hz": 1850.2891586669566,
+          "inner_deviation_hz": 610.9429773965536,
+          "deviation_ratio": 3.028579142609512,
+          "evm_percent": 7.614505687208797,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 101,
+          "mod2": 49,
+          "outer_deviation_hz": 2068.7213042482435,
+          "inner_deviation_hz": 667.5120634996933,
+          "deviation_ratio": 3.0991519365240565,
+          "evm_percent": 9.858368774160313,
+          "stream_frames": 71,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 110,
+          "mod2": 49,
+          "outer_deviation_hz": 2286.5549204565255,
+          "inner_deviation_hz": 738.1932380668808,
+          "deviation_ratio": 3.0975018498467497,
+          "evm_percent": 11.04663595024983,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 119,
+          "mod2": 49,
+          "outer_deviation_hz": 2508.683092790973,
+          "inner_deviation_hz": 827.8671843853277,
+          "deviation_ratio": 3.030296574267058,
+          "evm_percent": 11.890923883684664,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 127,
+          "mod2": 49,
+          "outer_deviation_hz": 2708.783660118638,
+          "inner_deviation_hz": 890.543690958133,
+          "deviation_ratio": 3.0417189943867515,
+          "evm_percent": 12.919689591743495,
+          "stream_frames": 69,
+          "frame_number_errors": 69,
+          "decoded": false
+        },
+        {
+          "mod1": 136,
+          "mod2": 49,
+          "outer_deviation_hz": 2930.3372573566326,
+          "inner_deviation_hz": 938.4237081475386,
+          "deviation_ratio": 3.1226163958934485,
+          "evm_percent": 13.994371527037348,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 145,
+          "mod2": 49,
+          "outer_deviation_hz": 3152.9579746901018,
+          "inner_deviation_hz": 1004.495455542243,
+          "deviation_ratio": 3.138847425634279,
+          "evm_percent": 14.559187673400235,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 154,
+          "mod2": 49,
+          "outer_deviation_hz": 3377.4653224251724,
+          "inner_deviation_hz": 1098.5569519541596,
+          "deviation_ratio": 3.0744562823230916,
+          "evm_percent": 14.897773833062812,
+          "stream_frames": 0,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 92,
+          "mod2": 74,
+          "outer_deviation_hz": 1729.8533000617147,
+          "inner_deviation_hz": 560.9341672965922,
+          "deviation_ratio": 3.083879358604055,
+          "evm_percent": 6.008070289267125,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 101,
+          "mod2": 74,
+          "outer_deviation_hz": 1917.2444660134702,
+          "inner_deviation_hz": 614.5109451098244,
+          "deviation_ratio": 3.119951696988608,
+          "evm_percent": 5.279905714992512,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 110,
+          "mod2": 74,
+          "outer_deviation_hz": 2112.0383889107775,
+          "inner_deviation_hz": 681.7354033414526,
+          "deviation_ratio": 3.0980324309972005,
+          "evm_percent": 5.088537329000136,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 119,
+          "mod2": 74,
+          "outer_deviation_hz": 2315.6149927477236,
+          "inner_deviation_hz": 750.3259625010896,
+          "deviation_ratio": 3.0861453667803223,
+          "evm_percent": 5.816795153994865,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 127,
+          "mod2": 74,
+          "outer_deviation_hz": 2499.5272219681415,
+          "inner_deviation_hz": 827.2023484872325,
+          "deviation_ratio": 3.0216635948135497,
+          "evm_percent": 6.049656453976076,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 136,
+          "mod2": 74,
+          "outer_deviation_hz": 2710.939370196077,
+          "inner_deviation_hz": 879.7247465422931,
+          "deviation_ratio": 3.0815768009837923,
+          "evm_percent": 7.796307524453972,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 145,
+          "mod2": 74,
+          "outer_deviation_hz": 2923.019564424473,
+          "inner_deviation_hz": 947.7892840106945,
+          "deviation_ratio": 3.084039473473822,
+          "evm_percent": 8.863958193149502,
+          "stream_frames": 71,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 154,
+          "mod2": 74,
+          "outer_deviation_hz": 3136.974371525269,
+          "inner_deviation_hz": 1019.1804920639863,
+          "deviation_ratio": 3.077938006027222,
+          "evm_percent": 9.82839305205656,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 92,
+          "mod2": 98,
+          "outer_deviation_hz": 1763.6775317881606,
+          "inner_deviation_hz": 540.6620553648355,
+          "deviation_ratio": 3.262070112536456,
+          "evm_percent": 16.295306211598543,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": false
+        },
+        {
+          "mod1": 101,
+          "mod2": 98,
+          "outer_deviation_hz": 1902.295563372117,
+          "inner_deviation_hz": 589.3875795375016,
+          "deviation_ratio": 3.227579998996361,
+          "evm_percent": 12.33105063776203,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 110,
+          "mod2": 98,
+          "outer_deviation_hz": 2063.627257647268,
+          "inner_deviation_hz": 649.1392360017624,
+          "deviation_ratio": 3.1790209914867407,
+          "evm_percent": 9.266257470373812,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 119,
+          "mod2": 98,
+          "outer_deviation_hz": 2228.601580495956,
+          "inner_deviation_hz": 711.4450610832519,
+          "deviation_ratio": 3.1324998969037323,
+          "evm_percent": 7.2167439728682865,
+          "stream_frames": 71,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 127,
+          "mod2": 98,
+          "outer_deviation_hz": 2389.7064801435104,
+          "inner_deviation_hz": 767.5172126927375,
+          "deviation_ratio": 3.113554250802436,
+          "evm_percent": 5.861728529541321,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 136,
+          "mod2": 98,
+          "outer_deviation_hz": 2576.5569608046003,
+          "inner_deviation_hz": 830.2339230350653,
+          "deviation_ratio": 3.1034108452055844,
+          "evm_percent": 5.22395175400507,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 145,
+          "mod2": 98,
+          "outer_deviation_hz": 2769.5360101382494,
+          "inner_deviation_hz": 896.0103554741612,
+          "deviation_ratio": 3.090964287653388,
+          "evm_percent": 5.170334219452138,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        },
+        {
+          "mod1": 154,
+          "mod2": 98,
+          "outer_deviation_hz": 2968.71388110027,
+          "inner_deviation_hz": 964.5372380887817,
+          "deviation_ratio": 3.07786341871335,
+          "evm_percent": 5.47661790878502,
+          "stream_frames": 72,
+          "frame_number_errors": 0,
+          "decoded": true
+        }
+      ],
+      "best": {
+        "mod1": 127,
+        "mod2": 98,
+        "outer_deviation_hz": 2389.7064801435104,
+        "inner_deviation_hz": 767.5172126927375,
+        "deviation_ratio": 3.113554250802436,
+        "evm_percent": 5.861728529541321,
+        "stream_frames": 72,
+        "frame_number_errors": 0,
+        "decoded": true
+      },
+      "best_ratios": {
+        "mod1": 1.032520325203252,
+        "mod2_of_cal_mod1": 0.7967479674796748,
+        "mod2_of_cal_mod2": 1.1395348837209303
+      },
+      "charts": [
+        "charts/m17-modulation-70cm.svg",
+        "charts/m17-modulation-70cm.png"
+      ]
+    }
+  ],
+  "trace_build": "192172 c6000-bench",
+  "operator": [
+    {
+      "kind": "instruct",
+      "text": "Plan for Modulation:\n  Radio: Connect Systems CS7000-PLUS as Connect Systems CS7000-PLUS (radios/cs7000p.yaml), firmware c6000-bench-0066f6e2\n  Bench: k0ret, receiver hackrf, transmitter hackrf, calibration assumed of 2026-10-20\n  70cm: 445.925 MHz (to receiver 58.0 dB, from transmitter 58.3 dB)\n  Modes: m17\n  Every test: attenuator chain between the radio and the hackrf, where it stays\n  Tests (1):\n    - 70cm: M17 Chip Modem Modulation Sweep\nCheck the setup, then continue to begin.",
+      "answer": "ok"
+    }
+  ]
+}

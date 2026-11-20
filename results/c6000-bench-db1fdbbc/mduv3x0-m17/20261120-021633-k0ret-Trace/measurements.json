@@ -1,0 +1,4654 @@
+{
+  "schema": 1,
+  "suite": "Trace",
+  "started": "2026-11-20T02:16:33+00:00",
+  "station": "k0ret",
+  "radio": "TYT MD-UV3x0",
+  "radio_file": "mduv3x0-m17",
+  "firmware": "c6000-bench-db1fdbbc",
+  "hardware": "TYT MD-UV390 2504BN02025",
+  "suite_commit": "640a40ac39",
+  "bands": {
+    "2m": 146537500,
+    "70cm": 445975000
+  },
+  "calibration": {
+    "method": "assumed",
+    "measured": "2026-10-20",
+    "expires": "2026-12-31",
+    "sha256": "d55ce4aa0a3c"
+  },
+  "records": [
+    {
+      "test": "2m: M17 Trace Every Frame At The Bench Level",
+      "band": "2m",
+      "kind": "radio-console-setup",
+      "state": [
+        "M17",
+        "146537500",
+        "146537500",
+        "2500",
+        "CHIP",
+        "CAL",
+        "211",
+        "0",
+        "0"
+      ]
+    },
+    {
+      "test": "2m: M17 Trace Every Frame At The Bench Level",
+      "band": "2m",
+      "kind": "m17-modem",
+      "modem": "ANALOG"
+    },
+    {
+      "test": "2m: M17 Trace Every Frame At The Bench Level",
+      "band": "2m",
+      "kind": "m17-trace",
+      "build": "139145 c6000-bench"
+    },
+    {
+      "test": "2m: M17 Trace Every Frame At The Bench Level",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 250,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true
+    },
+    {
+      "test": "2m: M17 Trace Every Frame At The Bench Level",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 250,
+      "decoded": 250,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 250,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {}
+    },
+    {
+      "test": "2m: M17 Trace Joins A Transmission Late",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 50,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": false
+    },
+    {
+      "test": "2m: M17 Trace Joins A Transmission Late",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 50,
+      "decoded": 50,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 45,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 5,
+      "lsf_from": "I",
+      "first_play_frame": 5,
+      "options": {
+        "lsf": "False"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Joins Late Through A Weak Signal",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 250,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": false,
+      "relative_level_db": -32.0,
+      "tx_gain_offset_db": -32.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Joins Late Through A Weak Signal",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 250,
+      "decoded": 220,
+      "missed": 30,
+      "garbled": 19,
+      "repeated": 11,
+      "played": 245,
+      "played_garbled": 20,
+      "rate": 0.88,
+      "lsf_after_frames": 5,
+      "lsf_from": "I",
+      "first_play_frame": 5,
+      "options": {
+        "lsf": "False",
+        "level_db": "-32"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Back-To-Back Transmissions",
+      "band": "2m",
+      "kind": "m17-trace-back-to-back",
+      "overs": 5,
+      "frames": 25,
+      "gap_s": 0.1,
+      "heard_overs": 5,
+      "decoded": [
+        25,
+        25,
+        25,
+        25,
+        25
+      ],
+      "lsf_after_frames": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -10.0,
+      "tx_gain_offset_db": -10.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-10.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -11.0,
+      "tx_gain_offset_db": -11.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-11.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -12.0,
+      "tx_gain_offset_db": -12.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-12.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -13.0,
+      "tx_gain_offset_db": -13.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-13.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -14.0,
+      "tx_gain_offset_db": -14.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-14.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -15.0,
+      "tx_gain_offset_db": -15.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-15.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -16.0,
+      "tx_gain_offset_db": -16.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-16.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -17.0,
+      "tx_gain_offset_db": -17.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-17.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -18.0,
+      "tx_gain_offset_db": -18.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-18.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -19.0,
+      "tx_gain_offset_db": -19.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-19.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -20.0,
+      "tx_gain_offset_db": -20.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-20.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -21.0,
+      "tx_gain_offset_db": -21.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-21.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -22.0,
+      "tx_gain_offset_db": -22.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-22.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -23.0,
+      "tx_gain_offset_db": -23.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-23.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -24.0,
+      "tx_gain_offset_db": -24.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-24.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -25.0,
+      "tx_gain_offset_db": -25.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-25.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -26.0,
+      "tx_gain_offset_db": -26.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-26.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -27.0,
+      "tx_gain_offset_db": -27.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-27.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -28.0,
+      "tx_gain_offset_db": -28.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 124,
+      "missed": 1,
+      "garbled": 1,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 1,
+      "rate": 0.992,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-28.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -29.0,
+      "tx_gain_offset_db": -29.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-29.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -30.0,
+      "tx_gain_offset_db": -30.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 124,
+      "missed": 1,
+      "garbled": 0,
+      "repeated": 1,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 0.992,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-30.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -31.0,
+      "tx_gain_offset_db": -31.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 120,
+      "missed": 5,
+      "garbled": 4,
+      "repeated": 1,
+      "played": 125,
+      "played_garbled": 4,
+      "rate": 0.96,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-31.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -32.0,
+      "tx_gain_offset_db": -32.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 104,
+      "missed": 21,
+      "garbled": 11,
+      "repeated": 10,
+      "played": 125,
+      "played_garbled": 11,
+      "rate": 0.832,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-32.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -33.0,
+      "tx_gain_offset_db": -33.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 68,
+      "missed": 57,
+      "garbled": 11,
+      "repeated": 46,
+      "played": 125,
+      "played_garbled": 17,
+      "rate": 0.544,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-33.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -34.0,
+      "tx_gain_offset_db": -34.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 12,
+      "missed": 113,
+      "garbled": 4,
+      "repeated": 107,
+      "played": 116,
+      "played_garbled": 24,
+      "rate": 0.096,
+      "lsf_after_frames": 7,
+      "lsf_from": "I",
+      "first_play_frame": 7,
+      "options": {
+        "level_db": "-34.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Stream Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sensitivity",
+      "unit": "dB re bench",
+      "traffic": "stream",
+      "points": [
+        [
+          -10.0,
+          1.0,
+          0
+        ],
+        [
+          -11.0,
+          1.0,
+          0
+        ],
+        [
+          -12.0,
+          1.0,
+          0
+        ],
+        [
+          -13.0,
+          1.0,
+          0
+        ],
+        [
+          -14.0,
+          1.0,
+          0
+        ],
+        [
+          -15.0,
+          1.0,
+          0
+        ],
+        [
+          -16.0,
+          1.0,
+          0
+        ],
+        [
+          -17.0,
+          1.0,
+          0
+        ],
+        [
+          -18.0,
+          1.0,
+          0
+        ],
+        [
+          -19.0,
+          1.0,
+          0
+        ],
+        [
+          -20.0,
+          1.0,
+          0
+        ],
+        [
+          -21.0,
+          1.0,
+          0
+        ],
+        [
+          -22.0,
+          1.0,
+          0
+        ],
+        [
+          -23.0,
+          1.0,
+          0
+        ],
+        [
+          -24.0,
+          1.0,
+          0
+        ],
+        [
+          -25.0,
+          1.0,
+          0
+        ],
+        [
+          -26.0,
+          1.0,
+          0
+        ],
+        [
+          -27.0,
+          1.0,
+          0
+        ],
+        [
+          -28.0,
+          0.992,
+          1
+        ],
+        [
+          -29.0,
+          1.0,
+          0
+        ],
+        [
+          -30.0,
+          0.992,
+          0
+        ],
+        [
+          -31.0,
+          0.96,
+          4
+        ],
+        [
+          -32.0,
+          0.832,
+          11
+        ],
+        [
+          -33.0,
+          0.544,
+          17
+        ],
+        [
+          -34.0,
+          0.096,
+          24
+        ]
+      ],
+      "count": 125,
+      "level_90": -31.46875,
+      "level_50": -33.098214285714285,
+      "options": {}
+    },
+    {
+      "test": "2m: M17 Trace SMS At The Bench Level",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.002.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.002.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.002.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.002.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.002.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.002.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.002.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.002.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.002.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.002.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ]
+    },
+    {
+      "test": "2m: M17 Trace SMS At The Bench Level",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {}
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.004.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.004.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.004.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.004.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.004.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.004.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.004.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.004.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.004.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.004.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -10.0,
+      "tx_gain_offset_db": -10.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-10.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.006.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.006.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.006.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.006.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.006.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.006.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.006.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.006.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.006.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.006.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -11.0,
+      "tx_gain_offset_db": -11.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-11.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.008.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.008.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.008.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.008.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.008.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.008.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.008.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.008.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.008.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.008.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -12.0,
+      "tx_gain_offset_db": -12.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-12.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.010.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.010.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.010.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.010.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.010.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.010.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.010.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.010.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.010.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.010.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -13.0,
+      "tx_gain_offset_db": -13.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-13.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.012.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.012.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.012.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.012.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.012.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.012.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.012.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.012.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.012.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.012.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -14.0,
+      "tx_gain_offset_db": -14.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-14.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.014.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.014.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.014.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.014.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.014.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.014.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.014.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.014.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.014.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.014.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -15.0,
+      "tx_gain_offset_db": -15.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-15.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.016.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.016.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.016.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.016.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.016.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.016.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.016.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.016.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.016.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.016.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -16.0,
+      "tx_gain_offset_db": -16.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-16.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.018.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.018.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.018.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.018.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.018.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.018.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.018.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.018.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.018.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.018.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -17.0,
+      "tx_gain_offset_db": -17.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-17.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.020.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.020.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.020.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.020.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.020.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.020.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.020.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.020.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.020.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.020.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -18.0,
+      "tx_gain_offset_db": -18.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-18.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.022.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.022.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.022.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.022.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.022.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.022.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.022.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.022.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.022.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.022.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -19.0,
+      "tx_gain_offset_db": -19.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-19.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.024.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.024.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.024.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.024.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.024.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.024.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.024.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.024.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.024.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.024.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -20.0,
+      "tx_gain_offset_db": -20.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-20.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.026.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.026.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.026.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.026.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.026.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.026.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.026.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.026.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.026.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.026.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -21.0,
+      "tx_gain_offset_db": -21.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-21.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.028.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.028.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.028.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.028.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.028.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.028.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.028.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.028.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.028.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.028.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -22.0,
+      "tx_gain_offset_db": -22.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-22.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.030.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.030.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.030.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.030.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.030.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.030.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.030.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.030.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.030.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.030.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -23.0,
+      "tx_gain_offset_db": -23.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-23.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.032.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.032.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.032.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.032.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.032.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.032.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.032.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.032.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.032.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.032.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -24.0,
+      "tx_gain_offset_db": -24.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-24.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.034.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.034.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.034.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.034.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.034.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.034.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.034.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.034.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.034.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.034.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -25.0,
+      "tx_gain_offset_db": -25.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-25.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.036.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.036.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.036.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.036.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.036.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.036.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.036.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.036.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.036.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.036.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -26.0,
+      "tx_gain_offset_db": -26.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-26.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.038.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.038.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.038.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.038.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.038.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.038.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.038.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.038.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.038.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.038.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -27.0,
+      "tx_gain_offset_db": -27.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-27.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.040.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.040.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.040.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.040.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.040.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.040.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.040.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.040.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.040.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.040.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -28.0,
+      "tx_gain_offset_db": -28.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-28.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.042.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.042.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.042.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.042.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.042.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.042.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.042.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.042.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.042.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.042.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -29.0,
+      "tx_gain_offset_db": -29.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 6,
+      "missing": [
+        0,
+        2,
+        5,
+        7
+      ],
+      "crc_failed": 1,
+      "rate": 0.6,
+      "options": {
+        "level_db": "-29.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.044.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.044.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.044.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.044.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.044.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.044.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.044.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.044.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.044.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.044.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -30.0,
+      "tx_gain_offset_db": -30.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 8,
+      "missing": [
+        2,
+        4
+      ],
+      "crc_failed": 1,
+      "rate": 0.8,
+      "options": {
+        "level_db": "-30.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.046.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.046.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.046.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.046.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.046.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.046.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.046.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.046.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.046.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.046.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -31.0,
+      "tx_gain_offset_db": -31.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 6,
+      "missing": [
+        1,
+        4,
+        5,
+        7
+      ],
+      "crc_failed": 1,
+      "rate": 0.6,
+      "options": {
+        "level_db": "-31.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.048.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.048.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.048.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.048.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.048.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.048.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.048.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.048.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.048.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.048.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -32.0,
+      "tx_gain_offset_db": -32.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 1,
+      "missing": [
+        0,
+        1,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "crc_failed": 5,
+      "rate": 0.1,
+      "options": {
+        "level_db": "-32.0"
+      }
+    },
+    {
+      "test": "2m: M17 Trace SMS Sensitivity",
+      "band": "2m",
+      "kind": "m17-trace-sensitivity",
+      "unit": "dB re bench",
+      "traffic": "sms",
+      "points": [
+        [
+          -10.0,
+          1.0,
+          0
+        ],
+        [
+          -11.0,
+          1.0,
+          0
+        ],
+        [
+          -12.0,
+          1.0,
+          0
+        ],
+        [
+          -13.0,
+          1.0,
+          0
+        ],
+        [
+          -14.0,
+          1.0,
+          0
+        ],
+        [
+          -15.0,
+          1.0,
+          0
+        ],
+        [
+          -16.0,
+          1.0,
+          0
+        ],
+        [
+          -17.0,
+          1.0,
+          0
+        ],
+        [
+          -18.0,
+          1.0,
+          0
+        ],
+        [
+          -19.0,
+          1.0,
+          0
+        ],
+        [
+          -20.0,
+          1.0,
+          0
+        ],
+        [
+          -21.0,
+          1.0,
+          0
+        ],
+        [
+          -22.0,
+          1.0,
+          0
+        ],
+        [
+          -23.0,
+          1.0,
+          0
+        ],
+        [
+          -24.0,
+          1.0,
+          0
+        ],
+        [
+          -25.0,
+          1.0,
+          0
+        ],
+        [
+          -26.0,
+          1.0,
+          0
+        ],
+        [
+          -27.0,
+          1.0,
+          0
+        ],
+        [
+          -28.0,
+          1.0,
+          0
+        ],
+        [
+          -29.0,
+          0.6,
+          1
+        ],
+        [
+          -30.0,
+          0.8,
+          1
+        ],
+        [
+          -31.0,
+          0.6,
+          1
+        ],
+        [
+          -32.0,
+          0.1,
+          5
+        ]
+      ],
+      "count": 10,
+      "level_90": -28.25,
+      "level_50": -31.2,
+      "options": {
+        "length": "60"
+      }
+    },
+    {
+      "test": "2m: M17 Trace Receive Stack Has Headroom",
+      "band": "2m",
+      "kind": "m17-trace-stack",
+      "min_free_bytes": 128,
+      "beats": 551,
+      "stack": 512,
+      "least_free": 0,
+      "dropped": 0,
+      "resets": 0
+    },
+    {
+      "test": "70cm: M17 Trace Every Frame At The Bench Level",
+      "band": "70cm",
+      "kind": "radio-console-setup",
+      "state": [
+        "M17",
+        "445975000",
+        "445975000",
+        "2500",
+        "ANALOG",
+        "CAL",
+        "57",
+        "0",
+        "0"
+      ]
+    },
+    {
+      "test": "70cm: M17 Trace Every Frame At The Bench Level",
+      "band": "70cm",
+      "kind": "m17-modem",
+      "modem": "ANALOG"
+    },
+    {
+      "test": "70cm: M17 Trace Every Frame At The Bench Level",
+      "band": "70cm",
+      "kind": "m17-trace",
+      "build": "139145 c6000-bench"
+    },
+    {
+      "test": "70cm: M17 Trace Every Frame At The Bench Level",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 250,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true
+    },
+    {
+      "test": "70cm: M17 Trace Every Frame At The Bench Level",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 250,
+      "decoded": 250,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 250,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {}
+    },
+    {
+      "test": "70cm: M17 Trace Joins A Transmission Late",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 50,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": false
+    },
+    {
+      "test": "70cm: M17 Trace Joins A Transmission Late",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 50,
+      "decoded": 50,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 45,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 5,
+      "lsf_from": "I",
+      "first_play_frame": 5,
+      "options": {
+        "lsf": "False"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Joins Late Through A Weak Signal",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 250,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": false,
+      "relative_level_db": -32.0,
+      "tx_gain_offset_db": -32.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Joins Late Through A Weak Signal",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 250,
+      "decoded": 240,
+      "missed": 10,
+      "garbled": 6,
+      "repeated": 4,
+      "played": 245,
+      "played_garbled": 6,
+      "rate": 0.96,
+      "lsf_after_frames": 5,
+      "lsf_from": "I",
+      "first_play_frame": 5,
+      "options": {
+        "lsf": "False",
+        "level_db": "-32"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Back-To-Back Transmissions",
+      "band": "70cm",
+      "kind": "m17-trace-back-to-back",
+      "overs": 5,
+      "frames": 25,
+      "gap_s": 0.1,
+      "heard_overs": 5,
+      "decoded": [
+        25,
+        25,
+        25,
+        25,
+        25
+      ],
+      "lsf_after_frames": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -10.0,
+      "tx_gain_offset_db": -10.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-10.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -11.0,
+      "tx_gain_offset_db": -11.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-11.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -12.0,
+      "tx_gain_offset_db": -12.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-12.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -13.0,
+      "tx_gain_offset_db": -13.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-13.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -14.0,
+      "tx_gain_offset_db": -14.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-14.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -15.0,
+      "tx_gain_offset_db": -15.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-15.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -16.0,
+      "tx_gain_offset_db": -16.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-16.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -17.0,
+      "tx_gain_offset_db": -17.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-17.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -18.0,
+      "tx_gain_offset_db": -18.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-18.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -19.0,
+      "tx_gain_offset_db": -19.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-19.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -20.0,
+      "tx_gain_offset_db": -20.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-20.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -21.0,
+      "tx_gain_offset_db": -21.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 1,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-21.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -22.0,
+      "tx_gain_offset_db": -22.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-22.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -23.0,
+      "tx_gain_offset_db": -23.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-23.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -24.0,
+      "tx_gain_offset_db": -24.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-24.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -25.0,
+      "tx_gain_offset_db": -25.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-25.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -26.0,
+      "tx_gain_offset_db": -26.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-26.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -27.0,
+      "tx_gain_offset_db": -27.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-27.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -28.0,
+      "tx_gain_offset_db": -28.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-28.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -29.0,
+      "tx_gain_offset_db": -29.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-29.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -30.0,
+      "tx_gain_offset_db": -30.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 125,
+      "missed": 0,
+      "garbled": 0,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 0,
+      "rate": 1.0,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-30.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -31.0,
+      "tx_gain_offset_db": -31.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 124,
+      "missed": 1,
+      "garbled": 1,
+      "repeated": 0,
+      "played": 125,
+      "played_garbled": 1,
+      "rate": 0.992,
+      "lsf_after_frames": 0,
+      "lsf_from": "F",
+      "first_play_frame": 0,
+      "options": {
+        "level_db": "-31.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -32.0,
+      "tx_gain_offset_db": -32.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 121,
+      "missed": 4,
+      "garbled": 2,
+      "repeated": 1,
+      "played": 119,
+      "played_garbled": 2,
+      "rate": 0.968,
+      "lsf_after_frames": 5,
+      "lsf_from": "I",
+      "first_play_frame": 5,
+      "options": {
+        "level_db": "-32.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -33.0,
+      "tx_gain_offset_db": -33.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 98,
+      "missed": 27,
+      "garbled": 15,
+      "repeated": 12,
+      "played": 120,
+      "played_garbled": 16,
+      "rate": 0.784,
+      "lsf_after_frames": 5,
+      "lsf_from": "I",
+      "first_play_frame": 5,
+      "options": {
+        "level_db": "-33.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -34.0,
+      "tx_gain_offset_db": -34.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 63,
+      "missed": 62,
+      "garbled": 17,
+      "repeated": 45,
+      "played": 115,
+      "played_garbled": 25,
+      "rate": 0.504,
+      "lsf_after_frames": 10,
+      "lsf_from": "I",
+      "first_play_frame": 10,
+      "options": {
+        "level_db": "-34.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "audio": "random",
+      "frames": 125,
+      "deviation_hz": 2400.0,
+      "offset_hz": 0.0,
+      "inverted": false,
+      "preamble_ms": 40.0,
+      "lsf": true,
+      "relative_level_db": -35.0,
+      "tx_gain_offset_db": -35.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-stream",
+      "sent": 125,
+      "decoded": 9,
+      "missed": 116,
+      "garbled": 7,
+      "repeated": 108,
+      "played": 119,
+      "played_garbled": 71,
+      "rate": 0.072,
+      "lsf_after_frames": 5,
+      "lsf_from": "I",
+      "first_play_frame": 5,
+      "options": {
+        "level_db": "-35.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Stream Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sensitivity",
+      "unit": "dB re bench",
+      "traffic": "stream",
+      "points": [
+        [
+          -10.0,
+          1.0,
+          0
+        ],
+        [
+          -11.0,
+          1.0,
+          0
+        ],
+        [
+          -12.0,
+          1.0,
+          0
+        ],
+        [
+          -13.0,
+          1.0,
+          0
+        ],
+        [
+          -14.0,
+          1.0,
+          0
+        ],
+        [
+          -15.0,
+          1.0,
+          0
+        ],
+        [
+          -16.0,
+          1.0,
+          0
+        ],
+        [
+          -17.0,
+          1.0,
+          0
+        ],
+        [
+          -18.0,
+          1.0,
+          0
+        ],
+        [
+          -19.0,
+          1.0,
+          0
+        ],
+        [
+          -20.0,
+          1.0,
+          0
+        ],
+        [
+          -21.0,
+          1.0,
+          0
+        ],
+        [
+          -22.0,
+          1.0,
+          0
+        ],
+        [
+          -23.0,
+          1.0,
+          0
+        ],
+        [
+          -24.0,
+          1.0,
+          0
+        ],
+        [
+          -25.0,
+          1.0,
+          0
+        ],
+        [
+          -26.0,
+          1.0,
+          0
+        ],
+        [
+          -27.0,
+          1.0,
+          0
+        ],
+        [
+          -28.0,
+          1.0,
+          0
+        ],
+        [
+          -29.0,
+          1.0,
+          0
+        ],
+        [
+          -30.0,
+          1.0,
+          0
+        ],
+        [
+          -31.0,
+          0.992,
+          1
+        ],
+        [
+          -32.0,
+          0.968,
+          2
+        ],
+        [
+          -33.0,
+          0.784,
+          16
+        ],
+        [
+          -34.0,
+          0.504,
+          25
+        ],
+        [
+          -35.0,
+          0.072,
+          71
+        ]
+      ],
+      "count": 125,
+      "level_90": -32.369565217391305,
+      "level_50": -34.00925925925926,
+      "options": {}
+    },
+    {
+      "test": "70cm: M17 Trace SMS At The Bench Level",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.051.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.051.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.051.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.051.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.051.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.051.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.051.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.051.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.051.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.051.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ]
+    },
+    {
+      "test": "70cm: M17 Trace SMS At The Bench Level",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {}
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.053.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.053.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.053.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.053.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.053.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.053.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.053.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.053.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.053.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.053.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -10.0,
+      "tx_gain_offset_db": -10.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-10.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.055.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.055.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.055.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.055.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.055.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.055.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.055.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.055.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.055.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.055.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -11.0,
+      "tx_gain_offset_db": -11.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-11.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.057.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.057.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.057.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.057.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.057.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.057.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.057.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.057.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.057.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.057.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -12.0,
+      "tx_gain_offset_db": -12.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-12.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.059.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.059.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.059.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.059.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.059.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.059.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.059.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.059.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.059.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.059.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -13.0,
+      "tx_gain_offset_db": -13.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-13.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.061.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.061.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.061.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.061.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.061.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.061.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.061.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.061.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.061.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.061.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -14.0,
+      "tx_gain_offset_db": -14.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 9,
+      "missing": [
+        3
+      ],
+      "crc_failed": 0,
+      "rate": 0.9,
+      "options": {
+        "level_db": "-14.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.063.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.063.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.063.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.063.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.063.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.063.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.063.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.063.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.063.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.063.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -15.0,
+      "tx_gain_offset_db": -15.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-15.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.065.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.065.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.065.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.065.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.065.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.065.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.065.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.065.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.065.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.065.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -16.0,
+      "tx_gain_offset_db": -16.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-16.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.067.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.067.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.067.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.067.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.067.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.067.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.067.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.067.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.067.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.067.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -17.0,
+      "tx_gain_offset_db": -17.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-17.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.069.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.069.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.069.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.069.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.069.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.069.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.069.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.069.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.069.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.069.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -18.0,
+      "tx_gain_offset_db": -18.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-18.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.071.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.071.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.071.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.071.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.071.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.071.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.071.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.071.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.071.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.071.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -19.0,
+      "tx_gain_offset_db": -19.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 7,
+      "missing": [
+        1,
+        4,
+        6
+      ],
+      "crc_failed": 0,
+      "rate": 0.7,
+      "options": {
+        "level_db": "-19.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.073.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.073.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.073.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.073.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.073.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.073.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.073.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.073.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.073.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.073.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -20.0,
+      "tx_gain_offset_db": -20.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-20.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.075.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.075.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.075.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.075.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.075.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.075.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.075.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.075.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.075.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.075.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -21.0,
+      "tx_gain_offset_db": -21.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-21.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.077.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.077.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.077.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.077.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.077.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.077.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.077.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.077.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.077.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.077.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -22.0,
+      "tx_gain_offset_db": -22.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-22.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.079.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.079.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.079.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.079.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.079.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.079.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.079.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.079.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.079.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.079.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -23.0,
+      "tx_gain_offset_db": -23.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-23.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.081.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.081.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.081.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.081.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.081.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.081.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.081.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.081.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.081.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.081.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -24.0,
+      "tx_gain_offset_db": -24.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-24.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.083.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.083.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.083.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.083.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.083.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.083.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.083.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.083.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.083.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.083.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -25.0,
+      "tx_gain_offset_db": -25.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-25.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.085.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.085.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.085.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.085.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.085.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.085.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.085.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.085.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.085.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.085.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -26.0,
+      "tx_gain_offset_db": -26.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-26.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.087.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.087.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.087.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.087.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.087.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.087.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.087.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.087.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.087.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.087.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -27.0,
+      "tx_gain_offset_db": -27.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 9,
+      "missing": [
+        7
+      ],
+      "crc_failed": 0,
+      "rate": 0.9,
+      "options": {
+        "level_db": "-27.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.089.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.089.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.089.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.089.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.089.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.089.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.089.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.089.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.089.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.089.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -28.0,
+      "tx_gain_offset_db": -28.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 10,
+      "missing": [],
+      "crc_failed": 0,
+      "rate": 1.0,
+      "options": {
+        "level_db": "-28.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.091.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.091.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.091.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.091.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.091.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.091.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.091.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.091.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.091.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.091.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -29.0,
+      "tx_gain_offset_db": -29.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 9,
+      "missing": [
+        0
+      ],
+      "crc_failed": 0,
+      "rate": 0.9,
+      "options": {
+        "level_db": "-29.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.093.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.093.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.093.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.093.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.093.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.093.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.093.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.093.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.093.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.093.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -30.0,
+      "tx_gain_offset_db": -30.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 9,
+      "missing": [
+        4
+      ],
+      "crc_failed": 0,
+      "rate": 0.9,
+      "options": {
+        "level_db": "-30.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.095.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.095.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.095.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.095.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.095.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.095.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.095.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.095.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.095.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.095.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -31.0,
+      "tx_gain_offset_db": -31.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 7,
+      "missing": [
+        1,
+        2,
+        7
+      ],
+      "crc_failed": 1,
+      "rate": 0.7,
+      "options": {
+        "level_db": "-31.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.097.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.097.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.097.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.097.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.097.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.097.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.097.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.097.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.097.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.097.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -32.0,
+      "tx_gain_offset_db": -32.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 5,
+      "missing": [
+        0,
+        1,
+        4,
+        6,
+        7
+      ],
+      "crc_failed": 2,
+      "rate": 0.5,
+      "options": {
+        "level_db": "-32.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "transmit",
+      "mode": "m17-sms",
+      "source": "N0CALL",
+      "destination": "@ALL",
+      "texts": [
+        "oatb631.099.000 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.099.001 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.099.002 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.099.003 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.099.004 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.099.005 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.099.006 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.099.007 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.099.008 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+        "oatb631.099.009 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+      ],
+      "relative_level_db": -33.0,
+      "tx_gain_offset_db": -33.0,
+      "digital_backoff_db": 0.0
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sms",
+      "sent": 10,
+      "length": 60,
+      "heard": 1,
+      "missing": [
+        0,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "crc_failed": 2,
+      "rate": 0.1,
+      "options": {
+        "level_db": "-33.0"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace SMS Sensitivity",
+      "band": "70cm",
+      "kind": "m17-trace-sensitivity",
+      "unit": "dB re bench",
+      "traffic": "sms",
+      "points": [
+        [
+          -10.0,
+          1.0,
+          0
+        ],
+        [
+          -11.0,
+          1.0,
+          0
+        ],
+        [
+          -12.0,
+          1.0,
+          0
+        ],
+        [
+          -13.0,
+          1.0,
+          0
+        ],
+        [
+          -14.0,
+          0.9,
+          0
+        ],
+        [
+          -15.0,
+          1.0,
+          0
+        ],
+        [
+          -16.0,
+          1.0,
+          0
+        ],
+        [
+          -17.0,
+          1.0,
+          0
+        ],
+        [
+          -18.0,
+          1.0,
+          0
+        ],
+        [
+          -19.0,
+          0.7,
+          0
+        ],
+        [
+          -20.0,
+          1.0,
+          0
+        ],
+        [
+          -21.0,
+          1.0,
+          0
+        ],
+        [
+          -22.0,
+          1.0,
+          0
+        ],
+        [
+          -23.0,
+          1.0,
+          0
+        ],
+        [
+          -24.0,
+          1.0,
+          0
+        ],
+        [
+          -25.0,
+          1.0,
+          0
+        ],
+        [
+          -26.0,
+          1.0,
+          0
+        ],
+        [
+          -27.0,
+          0.9,
+          0
+        ],
+        [
+          -28.0,
+          1.0,
+          0
+        ],
+        [
+          -29.0,
+          0.9,
+          0
+        ],
+        [
+          -30.0,
+          0.9,
+          0
+        ],
+        [
+          -31.0,
+          0.7,
+          1
+        ],
+        [
+          -32.0,
+          0.5,
+          2
+        ],
+        [
+          -33.0,
+          0.1,
+          2
+        ]
+      ],
+      "count": 10,
+      "level_90": -18.333333333333332,
+      "level_50": -32.0,
+      "options": {
+        "length": "60"
+      }
+    },
+    {
+      "test": "70cm: M17 Trace Receive Stack Has Headroom",
+      "band": "70cm",
+      "kind": "m17-trace-stack",
+      "min_free_bytes": 128,
+      "beats": 1124,
+      "stack": 512,
+      "least_free": 0,
+      "dropped": 0,
+      "resets": 0
+    }
+  ],
+  "trace_build": "139145 c6000-bench",
+  "operator": [
+    {
+      "kind": "instruct",
+      "text": "Plan for Trace:\n  Radio: TYT MD-UV390 2504BN02025 as TYT MD-UV3x0 (radios/mduv3x0-m17.yaml), firmware c6000-bench-db1fdbbc\n  Bench: k0ret, receiver hackrf, transmitter hackrf, calibration assumed of 2026-10-20\n  2m: 146.537 MHz (to receiver 58.4 dB, from transmitter 58.4 dB)\n  70cm: 445.975 MHz (to receiver 58.0 dB, from transmitter 58.3 dB)\n  Modes: m17\n  Every test: attenuator chain between the radio and the hackrf, where it stays\n  Tests (16):\n    - 2m: M17 Trace Every Frame At The Bench Level\n    - 2m: M17 Trace Joins A Transmission Late\n    - 2m: M17 Trace Joins Late Through A Weak Signal\n    - 2m: M17 Trace Back-To-Back Transmissions\n    - 2m: M17 Trace Stream Sensitivity\n    - 2m: M17 Trace SMS At The Bench Level\n    - 2m: M17 Trace SMS Sensitivity\n    - 2m: M17 Trace Receive Stack Has Headroom\n    - 70cm: M17 Trace Every Frame At The Bench Level\n    - 70cm: M17 Trace Joins A Transmission Late\n    - 70cm: M17 Trace Joins Late Through A Weak Signal\n    - 70cm: M17 Trace Back-To-Back Transmissions\n    - 70cm: M17 Trace Stream Sensitivity\n    - 70cm: M17 Trace SMS At The Bench Level\n    - 70cm: M17 Trace SMS Sensitivity\n    - 70cm: M17 Trace Receive Stack Has Headroom\nCheck the setup, then continue to begin.",
+      "answer": "ok"
+    }
+  ]
+}

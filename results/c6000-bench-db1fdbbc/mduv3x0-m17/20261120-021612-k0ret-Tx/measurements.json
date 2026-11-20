@@ -1,0 +1,211 @@
+{
+  "schema": 1,
+  "suite": "Tx",
+  "started": "2026-11-20T02:16:12+00:00",
+  "station": "k0ret",
+  "radio": "TYT MD-UV3x0",
+  "radio_file": "mduv3x0-m17",
+  "firmware": "c6000-bench-db1fdbbc",
+  "hardware": "TYT MD-UV390 2504BN02025",
+  "suite_commit": "640a40ac39",
+  "bands": {
+    "2m": 146537500,
+    "70cm": 445975000
+  },
+  "calibration": {
+    "method": "assumed",
+    "measured": "2026-10-20",
+    "expires": "2026-12-31",
+    "sha256": "d55ce4aa0a3c"
+  },
+  "records": [
+    {
+      "test": "2m: M17 TX Deviation And Ratio Meet The Specification",
+      "band": "2m",
+      "kind": "radio-console-setup",
+      "state": [
+        "M17",
+        "146537500",
+        "146537500",
+        "2500",
+        "ANALOG",
+        "CAL",
+        "171",
+        "0",
+        "0"
+      ]
+    },
+    {
+      "test": "2m: M17 TX Deviation And Ratio Meet The Specification",
+      "band": "2m",
+      "kind": "m17-modem",
+      "modem": "CHIP"
+    },
+    {
+      "test": "2m: M17 TX Deviation And Ratio Meet The Specification",
+      "band": "2m",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture01.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.079888,
+          "duration_s": 5.167296,
+          "carrier_offset_hz": 249621.73382245336,
+          "outer_deviation_hz": 2359.2461005705854,
+          "inner_deviation_hz": 791.7321905209326,
+          "deviation_ratio": 2.979853704089362,
+          "evm_percent": 3.44035185999651,
+          "symbol_rate_hz": 4800.001918088068,
+          "symbol_rate_error_ppm": 0.3996016808560654,
+          "polarity": "normal",
+          "preamble_s": 0.19375,
+          "lsf_latency_s": 0.232553700327346,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 121,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 9300.0,
+          "power_db": -9.148414611816406,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -378.2661775466404,
+          "baseband_file": "capture01/tx1-baseband.wav",
+          "voice_peak_dbfs": -44.9652990547737,
+          "voice_rms_dbfs": -64.45142331653003,
+          "voice_clipped": 0.0,
+          "voice_file": "capture01/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "2m: M17 TX Deviation And Ratio Meet The Specification",
+      "band": "2m",
+      "kind": "limit",
+      "field": "outer_deviation_hz",
+      "value": 2359.2461005705854,
+      "limit": "2280-2520 Hz",
+      "mode": "m17",
+      "passed": true
+    },
+    {
+      "test": "2m: M17 TX Deviation And Ratio Meet The Specification",
+      "band": "2m",
+      "kind": "limit",
+      "field": "deviation_ratio",
+      "value": 2.979853704089362,
+      "limit": "2.85-3.15",
+      "mode": "m17",
+      "passed": true
+    },
+    {
+      "test": "70cm: M17 TX Deviation And Ratio Meet The Specification",
+      "band": "70cm",
+      "kind": "radio-console-setup",
+      "state": [
+        "M17",
+        "445975000",
+        "445975000",
+        "2500",
+        "CHIP",
+        "CAL",
+        "70",
+        "0",
+        "0"
+      ]
+    },
+    {
+      "test": "70cm: M17 TX Deviation And Ratio Meet The Specification",
+      "band": "70cm",
+      "kind": "m17-modem",
+      "modem": "CHIP"
+    },
+    {
+      "test": "70cm: M17 TX Deviation And Ratio Meet The Specification",
+      "band": "70cm",
+      "kind": "m17-capture",
+      "instruction": "timed capture",
+      "files": [
+        "capture02.cs8"
+      ],
+      "restarts": 0,
+      "transmissions": [
+        {
+          "start_s": 1.080844,
+          "duration_s": 5.1634,
+          "carrier_offset_hz": 249657.92952437754,
+          "outer_deviation_hz": 2398.1398038016614,
+          "inner_deviation_hz": 793.9864796261504,
+          "deviation_ratio": 3.0203786403652977,
+          "evm_percent": 3.1365131146761853,
+          "symbol_rate_hz": 4800.000443974013,
+          "symbol_rate_error_ppm": 0.09249458599036586,
+          "polarity": "normal",
+          "preamble_s": 0.19979166666666667,
+          "lsf_latency_s": 0.2585074840684911,
+          "lsf_found": true,
+          "lsf_crc_ok": true,
+          "source": "K0RET",
+          "destination": "@ALL",
+          "lsf_type": 5,
+          "stream_frames": 120,
+          "frame_number_errors": 0,
+          "last_frame_flagged": true,
+          "lich_lsf_ok": true,
+          "eot_found": true,
+          "occupied_bandwidth_hz": 9500.0,
+          "power_db": -6.423847198486328,
+          "receiver_clipped": 0.0,
+          "frequency_error_hz": -342.0704756224586,
+          "baseband_file": "capture02/tx1-baseband.wav",
+          "voice_peak_dbfs": -44.7794975393691,
+          "voice_rms_dbfs": -64.94228559930032,
+          "voice_clipped": 0.0,
+          "voice_file": "capture02/tx1-voice.wav",
+          "m17_demod_sources": [
+            "K0RET"
+          ]
+        }
+      ]
+    },
+    {
+      "test": "70cm: M17 TX Deviation And Ratio Meet The Specification",
+      "band": "70cm",
+      "kind": "limit",
+      "field": "outer_deviation_hz",
+      "value": 2398.1398038016614,
+      "limit": "2280-2520 Hz",
+      "mode": "m17",
+      "passed": true
+    },
+    {
+      "test": "70cm: M17 TX Deviation And Ratio Meet The Specification",
+      "band": "70cm",
+      "kind": "limit",
+      "field": "deviation_ratio",
+      "value": 3.0203786403652977,
+      "limit": "2.85-3.15",
+      "mode": "m17",
+      "passed": true
+    }
+  ],
+  "trace_build": "118288 c6000-bench",
+  "operator": [
+    {
+      "kind": "instruct",
+      "text": "Plan for Tx:\n  Radio: TYT MD-UV390 2504BN02025 as TYT MD-UV3x0 (radios/mduv3x0-m17.yaml), firmware c6000-bench-db1fdbbc\n  Bench: k0ret, receiver hackrf, transmitter hackrf, calibration assumed of 2026-10-20\n  2m: 146.537 MHz (to receiver 58.4 dB, from transmitter 58.4 dB)\n  70cm: 445.975 MHz (to receiver 58.0 dB, from transmitter 58.3 dB)\n  Modes: m17\n  Every test: attenuator chain between the radio and the hackrf, where it stays\n  Tests (2):\n    - 2m: M17 TX Deviation And Ratio Meet The Specification\n    - 70cm: M17 TX Deviation And Ratio Meet The Specification\nCheck the setup, then continue to begin.",
+      "answer": "ok"
+    }
+  ]
+}
