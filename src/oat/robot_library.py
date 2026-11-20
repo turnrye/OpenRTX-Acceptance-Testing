@@ -1443,6 +1443,9 @@ class OpenRTXAcceptance:
         answer = self.radio_console(f"MODEM {modem}")
         if answer[:1] != [modem]:
             raise AssertionError(f"the radio answered MODEM {answer}")
+        # The rtx thread takes the change a little later: the radio's
+        # calibration pair (MOD CAL) follows the modem
+        self.wait_seconds(0.5)
         BuiltIn().set_suite_metadata("M17 modem", modem, top=True)
         self._record("m17-modem", modem=modem)
 
