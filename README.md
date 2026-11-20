@@ -125,6 +125,7 @@ audio tests were left out on purpose.
 | `m17/tx.robot` | M17 transmit: deviations and ratio, symbol rate, carrier, bandwidth, EVM, decode rate, preamble, long transmissions, power, Codec2 input level and aliasing |
 | `m17/rx.robot` | M17 receive of a generated stream: callsign, Codec2 tone, sensitivity, carrier offset, speaker images, receive right after a transmission, key presses during receive |
 | `m17/trace.robot` | M17 receive read from the radio's own trace (needs:trace, a trace build from `firmware/m17-trace`): every frame at the bench's level, joining a transmission late (link setup rebuilt from the LICH), back-to-back transmissions, stream and SMS sensitivity sweeps (90% and 50% points), the receive thread's stack, and a soak (tag `long`). No operator after setup |
+| `m17/modulation.robot` | The HR_C6000 M17 modem's modulation pair swept around the radio's calibration (needs:console, a bench console build): EVM, deviations and decoding at every pair, the best pair picked inside the radio file's limits, and charts of EVM and deviation against Mod1 |
 | `aprs/rx.robot` | APRS receive (OpenRTX#559): messages to the radio's APRS callsign reach the inbox, matched as an address, stored once, not pushed out by other traffic; full-size frames; deviation and pre-emphasis. The operator reads the inbox; message tags end in the run's tag, so reruns aren't copies |
 | `aprs/performance.robot` | APRS receive performance read from the radio's KISS TNC (needs:tnc): every frame at the bench's level, full-size and escaped frames through the TNC, a sensitivity sweep (90% and 50% points), twist, deviation, short TXDELAY, off-frequency and clock error, back-to-back frames, and a soak (tag `long`). No operator after setup |
 
@@ -224,6 +225,15 @@ bench's `trace` section names. `m17/trace.robot` scores those reports against wh
 by frame, so receive performance is measured exactly, without the speaker. On the MD-UV3x0 the
 USB port and the audio interface share the accessory jack: run the `needs:trace` and `needs:audio`
 tests in separate passes.
+
+A bench console build (OpenRTX branch `c6000/bench`: the trace plus a console) also takes commands
+on that port, named after the rtxlink CAT fields: mode, frequencies, power, callsign, M17 modem
+(analog path or the HR_C6000's), the HR_C6000 modulation pair, and PTT. With `console: true` in
+the bench's `trace` section the suites set the radio up and key it through the console instead of
+asking the operator, `m17/tx.robot` and `m17/trace.robot` pick the modem with `-v M17_MODEM:ANALOG`
+or `-v M17_MODEM:CHIP` (recorded as the run's "M17 modem" metadata), and `m17/modulation.robot`
+sweeps the modulation pair. Charts a run draws are kept in its `charts/` folder and published with
+its results.
 
 ### Transmit power
 

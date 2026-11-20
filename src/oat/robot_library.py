@@ -30,6 +30,7 @@ from oat.trace import make_trace
 from oat.sanitize import scrub
 from oat.operator import make_operator
 from oat import recorded
+from oat import sweep as sweep_mod
 from oat.sdr import make_receiver, make_transmitter
 from oat.sdr.sim import SimBurst, SimReceiver, SimTransmitter, link_loopback
 from oat.m17 import codec as m17_codec
@@ -1378,6 +1379,180 @@ class OpenRTXAcceptance:
             return float(level_dbm)
         return SIM_BENCH_LEVEL_DBM + float(level_db or 0.0)
 
+    # Bench console ----------------------------------------------------------
+
+    def _console(self):
+        """
+        The radio's bench console: the trace port of a build with it, when
+        the bench file's trace section says console: true; else None.
+        """
+        cfg = (self.bench or {}).get("trace") or {}
+        if self.trace is None or not cfg.get("console"):
+            return None
+        return self.trace
+
+    @keyword
+    def bench_has_radio_console(self) -> bool:
+        """
+        Whether the radio takes commands on its trace port (the bench file's
+        trace section has console: true): then the bench sets the radio up
+        and keys it itself.
+        """
+        return self._console() is not None
+
+    @keyword
+    def radio_console(self, command: str) -> list:
+        """
+        Send a bench console command and return the answer's fields after
+        the time stamp, as strings.
+        """
+        console = self._console()
+        if console is None:
+            BuiltIn().skip("No radio console: a trace build with the console "
+                           "and console: true in the bench's trace section")
+        answer = console.ask(command)
+        logger.info(f"{command} -> {answer.kind} {' '.join(answer.fields)}")
+        return answer.fields[1:]
+
+    @keyword
+    def set_up_radio_over_console(self, mode: str = "M17",
+                                  callsign: str = "", power_mw=None):
+        """
+        Over the bench console: the mode, both frequencies on the current
+        band's, the callsign when given, and the power (power_mw, else the
+        radio file's console_power_mw, else left as it is).
+        """
+        frequency = int(self._frequency())
+        self.radio_console(f"MODE {mode}")
+        self.radio_console(f"FREQ {frequency} {frequency}")
+        if callsign:
+            self.radio_console(f"CALL {callsign}")
+        power = power_mw or self.radio.get("console_power_mw")
+        if power:
+            self.radio_console(f"POWER {int(power)}")
+        state = self.radio_console("STAT")
+        self._record("radio-console-setup", state=state)
+
+    @keyword
+    def set_m17_modem(self, modem: str):
+        """
+        The M17 modem setting over the bench console, ANALOG or CHIP (the
+        HR_C6000's), recorded in the run's metadata.
+        """
+        modem = modem.upper()
+        answer = self.radio_console(f"MODEM {modem}")
+        if answer[:1] != [modem]:
+            raise AssertionError(f"the radio answered MODEM {answer}")
+        BuiltIn().set_suite_metadata("M17 modem", modem, top=True)
+        self._record("m17-modem", modem=modem)
+
+    @keyword
+    def sweep_m17_modulation(self, mod1_from: float = 0.75,
+                             mod1_to: float = 1.25, mod1_steps: int = 8,
+                             mod2_fractions: str = "0,0.2,0.4,0.6,0.8",
+                             seconds: float = 3.0) -> dict:
+        """
+        Sweep the HR_C6000's modulation pair around the radio's calibration
+        (oat.sweep.modulation_grid) over the bench console: at each pair a
+        keyed M17 transmission of `seconds`, measured from the capture.
+        Picks the decoded point with the lowest EVM inside the radio file's
+        outer deviation and ratio limits, charts EVM and deviation against
+        Mod1 (charts/ in the run's folder, and in the log), and puts the
+        radio back on its calibration.
+        """
+        cal = self.radio_console("MOD CAL")
+        cal_pair = (int(cal[1]), int(cal[2]))
+        fractions = [float(f) for f in str(mod2_fractions).split(",")]
+        grid = sweep_mod.modulation_grid(cal_pair[0], float(mod1_from),
+                                         float(mod1_to), int(mod1_steps),
+                                         fractions)
+        points = []
+        try:
+            for mod1, mod2 in grid:
+                self.radio_console(f"MOD {mod1} {mod2}")
+                self.start_capture()
+                self.wait_seconds(1)
+                self.key_radio()
+                self.wait_seconds(float(seconds))
+                self.release_radio()
+                self.wait_seconds(1)
+                point = {"mod1": mod1, "mod2": mod2}
+                try:
+                    tx = self.stop_capture_and_measure_m17(expected=1)[0]
+                    point.update({
+                        k: tx.get(k) for k in (
+                            "outer_deviation_hz", "inner_deviation_hz",
+                            "deviation_ratio", "evm_percent",
+                            "stream_frames", "frame_number_errors")})
+                    point["decoded"] = bool(tx.get("lsf_crc_ok"))
+                except AssertionError as e:
+                    logger.warn(f"Mod {mod1}/{mod2}: {e}")
+                    point.update({"decoded": False, "evm_percent": None,
+                                  "outer_deviation_hz": None,
+                                  "deviation_ratio": None})
+                points.append(point)
+        finally:
+            self.radio_console("MOD CAL")
+
+        limits = self.radio.get("m17", {})
+        deviation_limits = tuple(limits["outer_deviation_hz"]) \
+            if "outer_deviation_hz" in limits else None
+        ratio_limits = tuple(limits["deviation_ratio"]) \
+            if "deviation_ratio" in limits else None
+        best = sweep_mod.pick_modulation(points, deviation_limits,
+                                         ratio_limits)
+        result = {"calibration": list(cal_pair), "grid": {
+                      "mod1_from": float(mod1_from), "mod1_to": float(mod1_to),
+                      "mod1_steps": int(mod1_steps), "mod2_fractions": fractions,
+                      "seconds": float(seconds)},
+                  "points": points, "best": best}
+        if best is not None:
+            result["best_ratios"] = {
+                "mod1": best["mod1"] / cal_pair[0],
+                "mod2_of_cal_mod1": best["mod2"] / cal_pair[0],
+                **({"mod2_of_cal_mod2": best["mod2"] / cal_pair[1]}
+                   if cal_pair[1] else {})}
+        self._chart_sweep(result, deviation_limits)
+        self._record("m17-modulation-sweep", **result)
+
+        rows = "".join(
+            f"<tr><td>{p['mod1']}</td><td>{p['mod2']}</td>"
+            f"<td>{_fmt(p.get('outer_deviation_hz'), '.0f')}</td>"
+            f"<td>{_fmt(p.get('deviation_ratio'), '.2f')}</td>"
+            f"<td>{_fmt(p.get('evm_percent'), '.1f')}</td>"
+            f"<td>{'yes' if p.get('decoded') else 'no'}</td></tr>"
+            for p in points)
+        logger.info("<table><tr><th>Mod1</th><th>Mod2</th><th>outer Hz</th>"
+                    "<th>ratio</th><th>EVM %</th><th>decoded</th></tr>"
+                    f"{rows}</table>", html=True)
+        if best is None:
+            raise AssertionError("no point decoded inside the deviation and "
+                                 "ratio limits")
+        BuiltIn().set_test_message(
+            f"calibration {cal_pair[0]}/{cal_pair[1]}, picked "
+            f"{best['mod1']}/{best['mod2']}: EVM {best['evm_percent']:.1f} %, "
+            f"outer {best['outer_deviation_hz']:.0f} Hz, ratio "
+            f"{best['deviation_ratio']:.2f}", append=True)
+        return result
+
+    def _chart_sweep(self, result: dict, deviation_limits):
+        """Chart a modulation sweep into charts/ and the log."""
+        try:
+            from oat import charts
+        except ImportError:
+            logger.warn("No chart: matplotlib is missing")
+            return
+        name = f"m17-modulation-{self.band or 'band'}"
+        title = (f"{self.radio['name']} {self.band or ''}: M17 modulation "
+                 f"sweep, calibration {result['calibration'][0]}/"
+                 f"{result['calibration'][1]}")
+        files, png = charts.modulation_sweep(
+            result["points"], tuple(result["calibration"]), deviation_limits,
+            result["best"], title, self.run_dir / "charts" / name)
+        result["charts"] = [str(p.relative_to(self.run_dir)) for p in files]
+        logger.info(f'<img src="data:image/png;base64,{png}" width="640">',
+                    html=True)
+
     # M17 receive trace ----------------------------------------------------
 
     def _need_trace(self):
@@ -2118,8 +2293,9 @@ class OpenRTXAcceptance:
         interface's PTT line (or the simulated interface), rather than by
         asking the operator.
         """
-        return self.ptt is not None or isinstance(self.audio,
-                                                  audio_mod.SimAudio)
+        return (self.ptt is not None
+                or isinstance(self.audio, audio_mod.SimAudio)
+                or self._console() is not None)
 
     @keyword
     def bench_transmits_at_calibrated_levels(self) -> bool:
@@ -2174,6 +2350,8 @@ class OpenRTXAcceptance:
         """
         if self.ptt is not None:
             self.ptt.key()
+        elif self._console() is not None:
+            self._console().ask("PTT ON")
         else:
             self.operator.instruct("Key PTT and hold it, then continue.")
         if isinstance(self.audio, audio_mod.SimAudio) and isinstance(
@@ -2185,6 +2363,8 @@ class OpenRTXAcceptance:
         """Release PTT, as Key Radio keyed it."""
         if self.ptt is not None:
             self.ptt.unkey()
+        elif self._console() is not None:
+            self._console().ask("PTT OFF")
         else:
             self.operator.instruct("Release PTT, then continue.")
         if getattr(self, "_sim_keyed", None) is not None:
@@ -2699,3 +2879,8 @@ class OpenRTXAcceptance:
         BuiltIn().set_test_message(f"M17 audio down to {last_good:.0f} dBm",
                                    append=True)
         return result
+
+
+def _fmt(value, spec: str) -> str:
+    """A number for a table cell, or a dash for none."""
+    return "-" if value is None else format(value, spec)

@@ -54,6 +54,10 @@ operator:
 #trace:
 #  type: serial
 #  port: /dev/cu.usbmodem1101
+#  # A build with the bench console too (OpenRTX branch c6000/bench): the
+#  # bench sets the radio's mode, frequency, power, callsign and M17 modem,
+#  # and keys it, over the same port, instead of asking the operator
+#  #console: true
 
 # The USB sound interface on the radio's accessory connector, for the tests
 # tagged needs:audio: test audio into the mic input, the speaker captured.

@@ -41,10 +41,20 @@ ${SPEECH_WAV}     ${EMPTY}
 # A reference tone and the two above Codec2's 4 kHz band (M17-TX-9); at an
 # 8 kHz sampling rate 5 and 7 kHz fold back to 3 and 1 kHz
 ${ALIAS_LEVEL_DBFS}    -30
+# With a bench console (console: true in the bench's trace section): the M17
+# modem the radio transmits with, ANALOG or CHIP (the HR_C6000's), or empty to
+# leave it as it is
+${M17_MODEM}      ${EMPTY}
 
 *** Keywords ***
 Set Up M17
-    Operator Does    Set the radio to M17, ${FREQUENCY_MHZ} MHz, callsign ${CALLSIGN}, destination @ALL or empty, low power, no encryption
+    ${console}=    Bench Has Radio Console
+    IF    ${console}
+        Set Up Radio Over Console    M17    callsign=${CALLSIGN}
+        IF    $M17_MODEM    Set M17 Modem    ${M17_MODEM}
+    ELSE
+        Operator Does    Set the radio to M17, ${FREQUENCY_MHZ} MHz, callsign ${CALLSIGN}, destination @ALL or empty, low power, no encryption
+    END
 
 Capture Keyed M17
     [Documentation]    One M17 transmission of ${seconds} s keyed through Key Radio,

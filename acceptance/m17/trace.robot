@@ -52,6 +52,10 @@ ${WEAK_LEVEL}     -30
 ${SOAK_MINUTES}    10
 # Least free receive-thread stack the runs may leave, in bytes
 ${MIN_FREE_STACK}    128
+# With a bench console (console: true in the bench's trace section): the M17
+# modem the radio receives with, ANALOG or CHIP (the HR_C6000's), or empty to
+# leave it as it is
+${M17_MODEM}      ${EMPTY}
 &{BANDS_SET_UP}
 
 *** Keywords ***
@@ -59,7 +63,13 @@ Set Up M17 Trace
     [Documentation]    Once per band: the radio receiving M17 on the band's frequency,
     ...                its USB port on the bench's trace port.
     IF    $BAND not in $BANDS_SET_UP
-        Operator Does    Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it
+        ${console}=    Bench Has Radio Console
+        IF    ${console}
+            Set Up Radio Over Console    M17
+            IF    $M17_MODEM    Set M17 Modem    ${M17_MODEM}
+        ELSE
+            Operator Does    Set the radio to M17 on ${FREQUENCY_MHZ} MHz, no encryption, any destination accepted, with its USB port connected to the bench's trace port and nothing else reading it
+        END
         M17 Trace Should Be Running
         Set To Dictionary    ${BANDS_SET_UP}    ${BAND}=${True}
     END

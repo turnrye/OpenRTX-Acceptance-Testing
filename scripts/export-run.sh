@@ -95,11 +95,17 @@ merged = merge_reruns(Path(sys.argv[2]), [Path(p) for p in sys.argv[3:]])
 Path(sys.argv[1]).write_text(scrub(json.dumps(merged, indent=2)) + "\n")
 PY
 
+# Charts the run drew (bench-*/charts/*), next to its results
+for charts in "$run"/bench-*/charts; do
+    [ -d "$charts" ] && mkdir -p "$dest/charts" && cp "$charts"/* "$dest/charts/"
+done
+
 uv run python - "$dest" <<'PY'
 import sys
 from pathlib import Path
 from oat.sanitize import private_paths
-left = [(p.name, x) for p in Path(sys.argv[1]).iterdir()
+left = [(p.name, x) for p in Path(sys.argv[1]).rglob("*")
+        if p.suffix in (".json", ".xml", ".svg")
         for x in private_paths(p.read_text())]
 if left:
     sys.exit(f"absolute paths left, export removed: {left[:3]}")

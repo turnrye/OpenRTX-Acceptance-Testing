@@ -82,6 +82,36 @@ class Trace:
     def command(self, text: str) -> None:
         """Send a command to the radio."""
 
+    def ask(self, text: str, timeout_s: float = 2.0) -> Event:
+        """
+        Send a bench console command (a firmware/m17-trace build with the
+        console, see bench/example.yaml) and wait for its answer: the line
+        whose keyword is the command's first word.
+
+        @param text: the command.
+        @param timeout_s: how long to wait for the answer.
+        @return the answer.
+        @raise RuntimeError: the radio answered ERR.
+        @raise TimeoutError: no answer.
+        """
+        keyword = text.split()[0]
+        with self._lock:
+            seen = len(self._events)
+        self.command(text)
+        deadline = time.monotonic() + timeout_s
+        while True:
+            with self._lock:
+                new = self._events[seen:]
+            for e in new:
+                if e.kind == "ERR":
+                    raise RuntimeError(f"the radio's console refused {text!r}")
+                if e.kind == keyword:
+                    return e
+            if time.monotonic() >= deadline:
+                raise TimeoutError(f"no answer to {text!r} from the radio's "
+                                   "console: a build without it?")
+            time.sleep(0.02)
+
     def close(self) -> None:
         """Stop the trace and stop listening."""
 
@@ -196,6 +226,56 @@ class SimTrace(Trace):
 
     def _line(self, text: str) -> None:
         self._add(text)
+
+    # The simulated radio's bench console: settings it keeps and answers
+    # with, and a calibration pair to sweep around
+    SIM_CAL = (120, 60)
+
+    def command(self, text: str) -> None:
+        parts = text.split()
+        if not parts:
+            return
+        if not hasattr(self, "_console"):
+            self._console = {"MODE": "M17", "FREQ": "0 0", "POWER": "1000",
+                             "MODEM": "ANALOG", "CALL": "N0CALL",
+                             "MOD": None, "PTT": "0"}
+        name, args = parts[0], parts[1:]
+        ms = int(self.clock.now * 1000)
+        if name == "ID":
+            self._line(f"ID {self.label}")
+        elif name == "TRACE":
+            self._line(f"{'ON' if args[:1] == ['ON'] else 'OFF'} {ms}")
+        elif name == "MOD":
+            if args == ["CAL"]:
+                self._console["MOD"] = None
+            elif len(args) == 2:
+                self._console["MOD"] = (int(args[0]), int(args[1]))
+            pair = self._console["MOD"]
+            kind = "SET" if pair else "CAL"
+            pair = pair or self.SIM_CAL
+            self._line(f"MOD {ms} {kind} {pair[0]} {pair[1]}")
+        elif name == "FREQ":
+            if args:
+                self._console["FREQ"] = f"{args[0]} {args[-1]}"
+            self._line(f"FREQ {ms} {self._console['FREQ']}")
+        elif name == "PTT":
+            if args:
+                self._console["PTT"] = "1" if args[0] == "ON" else "0"
+            self._line(f"PTT {ms} {self._console['PTT']}")
+        elif name == "TX":
+            self._line(f"TX {ms} {args[0] if args else 0}")
+        elif name == "STAT":
+            c = self._console
+            pair = c["MOD"] or self.SIM_CAL
+            self._line(f"STAT {ms} {c['MODE']} {c['FREQ']} {c['POWER']} "
+                       f"{c['MODEM']} {'SET' if c['MOD'] else 'CAL'} "
+                       f"{pair[0]} {pair[1]} {c['PTT']}")
+        elif name in self._console:
+            if args:
+                self._console[name] = " ".join(args)
+            self._line(f"{name} {ms} {self._console[name]}")
+        else:
+            self._line(f"ERR {ms} {name}")
 
     def sigma(self, level_dbm: float | None) -> float:
         """Noise rms on the symbols at a level, in inner-level units."""
