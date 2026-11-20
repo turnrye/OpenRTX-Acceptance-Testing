@@ -22,9 +22,11 @@ from pathlib import Path
 from robot.api import ResultVisitor
 
 REPO = Path(__file__).resolve().parents[2]
-# Absolute paths: POSIX ones of two or more components, home-relative ones
-# and Windows drive paths
-ABSOLUTE_PATH = re.compile(r"(?<![\w.])(?:~/|[A-Za-z]:\\|/(?=[\w.-]+/))[^\s\"'<>]*")
+# Absolute paths: POSIX ones of two or more components (also in file:///
+# URLs), home-relative ones and Windows drive paths. Not a URL's host and path
+# (http://host/...), nor an SVG's DOCTYPE (-//W3C//DTD)
+ABSOLUTE_PATH = re.compile(
+    r"(?<![\w.])(?<!:/)(?<!-/)(?:~/|[A-Za-z]:\\|/(?=[\w.-]+/))[^\s\"'<>]*")
 
 
 def relative(path: str) -> str:
