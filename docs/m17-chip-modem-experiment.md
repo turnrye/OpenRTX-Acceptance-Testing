@@ -34,8 +34,9 @@ from each radio's own DMR calibration, with no per-unit tuning.
 - **Firmware:** the branch
   [turnrye/OpenRTX feat/m17-chip-modem](https://github.com/turnrye/OpenRTX/tree/feat/m17-chip-modem),
   plus a test-only console on the radio's USB serial port (the bench keys the radio, switches the
-  modem, and reads a receive trace). The console is not on the branch. The MD-UV390 ran an earlier
-  build (`c6000-bench-db1fdbbc`), the CS7000-PLUS the final one (`c6000-bench-0066f6e2`).
+  modem, and reads a receive trace). The console is not on the branch. The CS7000-PLUS ran the
+  final build (`c6000-bench-0066f6e2`). The MD-UV390 ran an earlier one (`c6000-bench-db1fdbbc`)
+  first, then its chip receive again on the final one, after the FM copy read fix (below).
 - **Setting:** M17 menu, "Modem: Analog / HR_C6000". The suites switch it over the console.
 - **Bench:** a HackRF One through attenuators, both directions. Levels are relative to each radio's
   bench level, not absolute dBm, and the two radios have different bench levels (below).
@@ -48,19 +49,22 @@ from each radio's own DMR calibration, with no per-unit tuning.
 
 ![MD-UV390: receive sensitivity at 2 m and 70 cm, transmit EVM and deviation](m17-chip-modem/mduv390.png)
 
-| | Analog | Chip |
-|---|---|---|
-| TX 2 m: outer deviation, EVM | 2474 Hz, 8.8% | 2359 Hz, 3.4% |
-| TX 70 cm: outer deviation, EVM | 2538 Hz, 7.9% | 2398 Hz, 3.1% |
-| RX 2 m stream, 90% / 50% | -31.5 / -33.1 dB | -31.2 / -33.1 dB |
-| RX 70 cm stream, 90% / 50% | -32.4 / -34.0 dB | -32.5 / -33.5 dB |
-| Weak late join, 2 m: decoded, garbled played | 220/250, 20 | 172/250, 38 |
-| Weak late join, 70 cm: decoded, garbled played | 240/250, 6 | 201/250, 30 |
-| Bench level | 250/250, 10/10 SMS | 249/250 (2 m), 9/10 SMS (70 cm) |
+| | Analog | Chip, first build | Chip, read fix |
+|---|---|---|---|
+| TX 2 m: outer deviation, EVM | 2474 Hz, 8.8% | 2359 Hz, 3.4% | |
+| TX 70 cm: outer deviation, EVM | 2538 Hz, 7.9% | 2398 Hz, 3.1% | |
+| RX 2 m stream, 90% / 50% | -31.5 / -33.1 dB | -31.2 / -33.1 dB | -31.3 / -32.9 dB |
+| RX 70 cm stream, 90% / 50% | -32.4 / -34.0 dB | -32.5 / -33.5 dB | -32.4 / -33.4 dB |
+| Weak late join, 2 m: decoded, garbled played | 220/250, 20 | 172/250, 38 | 228/250, 16 |
+| Weak late join, 70 cm: decoded, garbled played | 240/250, 6 | 201/250, 30 | 231/250, 13 |
+| SMS 90%, 2 m / 70 cm | -28.2 / -18.3 dB | -10.0 / -16.0 dB | -28.0 / -30.2 dB |
+| Bench level, 2 m / 70 cm | 250, 250; SMS 10, 10 | 249, 250; SMS 10, 9 | 250, 250; SMS 10, 10 |
 
-Receive sensitivity is the same within half a dB. Near threshold the chip path plays more garbled
-frames, and at full level it lost a frame or an SMS now and then. The analog 70 cm transmit failed
-this suite's 2280-2520 Hz limit by 18 Hz; chip transmit passed on both bands, closer to 2400 Hz.
+The chart shows the analog path against the chip with the read fix. Receive sensitivity is the same
+within half a dB. The first build lost a frame or an SMS now and then at full level and played more
+garbled frames near threshold; with the read fix those losses are gone and it passes every receive
+test the analog path passes. The analog 70 cm transmit failed this suite's 2280-2520 Hz limit by
+18 Hz; chip transmit passed on both bands, closer to 2400 Hz.
 
 ## CS7000-PLUS
 
@@ -89,8 +93,9 @@ The SMS points are 10 messages each, so they move in steps of 10%; the dips in t
 - **FM copy read.** The first byte of every SPI read of the chip's RAM came back corrupt on the
   CS7000-PLUS, so each 32 ms block started with a bad sample. The driver now starts the read one
   word early and drops it. A model of the receive path (the real OpenRTX demodulator fed a
-  simulated copy) points at this as the likely cause of the MD-UV390's losses at transmission
-  starts; the MD-UV390 has not been rerun with the fix yet.
+  simulated copy) pointed at this as the likely cause of the MD-UV390's losses at transmission
+  starts, and the rerun with the fix confirmed it: those losses went, and garbled frames near
+  threshold halved.
 - **MD-UV3x0 VHF calibration.** The VHF calibration frequencies were read without their factor of
   ten, so every 2 m interpolation used the 174 MHz point. Fixed in OpenRTX/OpenRTX#588.
 
@@ -107,7 +112,8 @@ The SMS points are 10 messages each, so they move in steps of 10%; the dips in t
 
 ## Next
 
-- Rerun the MD-UV390 receive suites with the final firmware and the copy read fix.
+- The MD-UV390's microphone still reaches the MCU only through the M17 hardware mod (this unit has
+  it). The microphone through the HR_C6000's codec, over I2S as on the MD-9600, is next.
 - On-air checks against other M17 radios, both targets.
 - Find the CS7000-PLUS sensitivity gap.
 
@@ -115,5 +121,7 @@ The SMS points are 10 messages each, so they move in steps of 10%; the dips in t
 
 All runs are in `results/`, with the firmware and the suite commit they ran:
 
-- MD-UV390: [`results/c6000-bench-db1fdbbc/mduv3x0-m17/`](../results/c6000-bench-db1fdbbc/mduv3x0-m17/)
+- MD-UV390: [`results/c6000-bench-db1fdbbc/mduv3x0-m17/`](../results/c6000-bench-db1fdbbc/mduv3x0-m17/),
+  and the rerun with the read fix in
+  [`results/c6000-bench-0066f6e2/mduv3x0-m17/`](../results/c6000-bench-0066f6e2/mduv3x0-m17/)
 - CS7000-PLUS: [`results/c6000-bench-0066f6e2/cs7000p/`](../results/c6000-bench-0066f6e2/cs7000p/)
